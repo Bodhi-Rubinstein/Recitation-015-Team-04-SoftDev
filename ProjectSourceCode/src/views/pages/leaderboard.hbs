@@ -1,0 +1,29 @@
+<!--ChatGPT prompt: write html code using bootstrap to make a table with these columns: rank (number), name, best player, and number of battles won
+(edited to be dynamically loaded with handlebars, and sylistic choices)-->
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Leaderboard</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-info">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Best Player</th>
+                    <th scope="col">Battles Won</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{!-- start loop --}}
+                {{#each leaders}}
+                <tr>
+                    <td>{{rank}}</td>
+                    <td>{{name}}</td>
+                    <td>{{best_player}}</td>
+                    <td>{{battles_won}}</td>
+                </tr>
+                {{/each}}
+                {{!-- end loop --}}
+            </tbody>
+        </table>
+    </div>
+</div>
