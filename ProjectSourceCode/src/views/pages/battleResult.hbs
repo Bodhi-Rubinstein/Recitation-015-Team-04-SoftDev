@@ -1,0 +1,11 @@
+<div class="container my-5">
+  <h2 class="mb-4">Battle Results</h2>
+  <p>User Score: {{result.userScore}} | Bot Score: {{result.botScore}}</p>
+  {{#if (eq result.winner "tie")}}
+    <p>The battle ended in a tie.</p>
+  {{else}}
+    <p><strong>Winner:</strong> {{result.winner}}</p>
+  {{/if}}
+  <pre>{{result.battleLogs}}</pre>
+  <a href="/battle" class="btn btn-primary mt-3">Back to Battle Arena</a>
+</div>
