@@ -174,7 +174,16 @@ app.get('/logout', (req, res) => {
     return res.render('pages/logout', { message: 'Successfully logged out!' });
 });
 
+app.get('/collection', auth, async (req, res) => {
+  try {
+// get users cards from here once i figure out how to do that 
 
+    res.render('pages/collection'); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('error for if there is probles on the server end');
+  }
+});
       
 
 // *****************************************************
