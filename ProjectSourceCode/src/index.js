@@ -91,6 +91,10 @@ app.get('/register', (req, res) => {
     res.render('pages/register');
 });
 
+app.get('/openPack', (req, res) => {
+    res.render('pages/openPack');
+});
+
 //Login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -139,10 +143,59 @@ app.post('/register', async (req, res) => {
       return res.redirect('/register'); // Stay on register page if error occurs
   }
 });
+
+//opening pack
+app.post('/open-pack', async (req, res) => {
+  const username = req.session.user.username; //get username for cardsToUsers
+
+  try {
+    const userQuery = `SELECT money FROM users WHERE username = $1;`; //get money
+    const user = await db.one(userQuery, [username]);
+
+    if (user.money >= 100) {
+      const updateMoneyQuery = `UPDATE users SET money = money - 100 WHERE username = $1;`; //subtract money
+      await db.none(updateMoneyQuery, [username]);
+
+      //get 5 random cards
+      const randomCardsQuery = 
+        `SELECT id, name 
+        FROM cards 
+        ORDER BY RANDOM() 
+        LIMIT 5;
+      `;
+      const randomCards = await db.any(randomCardsQuery);
+
+      const values = randomCards
+        .map(card => `('${username}', ${card.id})`) //make an array of these pairs in values
+        .join(', '); //make a single string
+
+      const insertCardsQuery = `
+        INSERT INTO cardsToUsers (username_id, card_id)
+        VALUES ${values};
+      `;
+      await db.none(insertCardsQuery);
+
+      // Respond with success and the pack contents
+      res.json({
+        success: true,
+        message: 'Pack opened successfully!',
+        packContents: randomCards.map(card => card.name), // Send back the names of the cards
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'You do not have enough money to open a pack.',
+      });
+    }
+  } catch (error) {
+    console.error('Error opening pack:', error);
+    res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
+  }
+});
   
 
       // Authentication Middleware.
-const auth = (req, res, next) => {
+  const auth = (req, res, next) => {
     if (!req.session.user) {
       // Default to login page.
       return res.redirect('/login');
