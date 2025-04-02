@@ -1,0 +1,72 @@
+<div class="container my-5">
+  <h2 class="mb-4">Deck Builder</h2>
+  <form action="/deckbuilder" method="POST">
+    <div class="row mb-3">
+      <div class="col">
+        <label for="card1" class="form-label">Card 1</label>
+        <select id="card1" name="card1" class="form-select" required>
+          <option value="">Select a card</option>
+          {{#each availableCards}}
+            <option value="{{this.id}}">{{this.name}}
+              (Atk:
+              {{this.attack}}, Def:
+              {{this.defense}})</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col">
+        <label for="card2" class="form-label">Card 2</label>
+        <select id="card2" name="card2" class="form-select" required>
+          <option value="">Select a card</option>
+          {{#each availableCards}}
+            <option value="{{this.id}}">{{this.name}}
+              (Atk:
+              {{this.attack}}, Def:
+              {{this.defense}})</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="card3" class="form-label">Card 3</label>
+        <select id="card3" name="card3" class="form-select" required>
+          <option value="">Select a card</option>
+          {{#each availableCards}}
+            <option value="{{this.id}}">{{this.name}}
+              (Atk:
+              {{this.attack}}, Def:
+              {{this.defense}})</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col">
+        <label for="card4" class="form-label">Card 4</label>
+        <select id="card4" name="card4" class="form-select" required>
+          <option value="">Select a card</option>
+          {{#each availableCards}}
+            <option value="{{this.id}}">{{this.name}}
+              (Atk:
+              {{this.attack}}, Def:
+              {{this.defense}})</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="card5" class="form-label">Card 5</label>
+        <select id="card5" name="card5" class="form-select" required>
+          <option value="">Select a card</option>
+          {{#each availableCards}}
+            <option value="{{this.id}}">{{this.name}}
+              (Atk:
+              {{this.attack}}, Def:
+              {{this.defense}})</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Deck</button>
+  </form>
+</div>
