@@ -1,3 +1,4 @@
+/*
 INSERT INTO cards (name, sport, attack, defense, health, overall, special_move)
 VALUES 
     ('LeBron James', 'Basketball', 90, 90, 90, 96, TRUE);
@@ -37,3 +38,4 @@ VALUES
 INSERT INTO cards (name, sport, attack, defense, health, overall, special_move)
 VALUES 
     ('Joel Embiid', 'Basketball', 82, 94, 90, 87, FALSE);
+*/
