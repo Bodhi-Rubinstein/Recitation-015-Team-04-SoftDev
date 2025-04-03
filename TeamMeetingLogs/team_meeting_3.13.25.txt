@@ -1,0 +1,26 @@
+Team Meeting notes:
+Victoria: 
+-	Showed bug fix for login/request infinite loop.
+-	Stats for leaderboard: rank, username, best player, games won
+-	Will add ability to sort by those stats
+Cam:
+-	Login/register page demo
+-	Will work on packs openings and card acquisition
+-	Will try and add five initial cards inside 1 deck when a user is created. 
+Mati:
+-	Trade page demo with html
+-	Having issue with database access
+-	Will work on backend to trade page, including initiating a trade, showing pending trades, and officiating accepted trades.
+Brendan:
+-	Collections page demo with html
+-	Will work on backend of collections page, including database access
+-	Will work on statistics view for cards and players
+Bodhi:
+-	Populate DB demo
+-	Will work on fixing bugs and making a PR
+-	Will be able to help with trades or battles afterwards
+Luca:
+-	Will send battles demo video
+-	Working to integrate with current changes
+-	Wants to add speed stat (icebox)
+-	Start working on visuals soon.
