@@ -200,7 +200,6 @@ app.post('/open-pack', async (req, res) => {
     res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
   }
 });
-  
 
     // Authentication Middleware.
   const auth = (req, res, next) => {
@@ -246,6 +245,36 @@ app.get("/collection", auth, async (req, res) => {
   }
 });
 
+// Authentication Required
+app.use(auth);
+// leaderboard
+app.get('/leaderboard', (req, res) => {
+  return res.render('pages/leaderboard',
+    {
+      //dummy data until SQL queries added
+      leaders: [
+        {
+          rank: 1,
+          name: "A Team",
+          best_player: "Lebron",
+          battles_won: 50
+        },
+
+        {
+          rank: 2,
+          name: "B Team",
+          best_player: "Serena Williams",
+          battles_won: 45
+        },
+        {
+          rank: 3,
+          name: "C Team",
+          best_player: "Sports Player",
+          battles_won: 40
+        }
+      ]
+    }
+  );
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
