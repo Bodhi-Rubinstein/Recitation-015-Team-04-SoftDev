@@ -1,0 +1,49 @@
+<div class="container my-5">
+  <h2>Interactive Test Battle Simulation</h2>
+  <p><strong>Round:</strong> {{battle.round}}</p>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <h3>User Card</h3>
+      <p><strong>Name:</strong> {{battle.currentRound.userCard.name}}</p>
+      <p><strong>Attack:</strong> {{battle.currentRound.userCard.attack}}</p>
+      <p><strong>Defense:</strong> {{battle.currentRound.userCard.defense}}</p>
+      <p><strong>Health:</strong> {{battle.currentRound.userCurrentHealth}}</p>
+    </div>
+    <div class="col-md-6">
+      <h3>Bot Card</h3>
+      <p><strong>Name:</strong> {{battle.currentRound.botCard.name}}</p>
+      <p><strong>Attack:</strong> {{battle.currentRound.botCard.attack}}</p>
+      <p><strong>Defense:</strong> {{battle.currentRound.botCard.defense}}</p>
+      <p><strong>Health:</strong> {{battle.currentRound.botCurrentHealth}}</p>
+    </div>
+  </div>
+  
+  {{#if battle.finalWinner}}
+    <h2>Battle Over!</h2>
+    <p><strong>Final Winner:</strong> {{battle.finalWinner}}</p>
+  {{else}}
+    {{#if diceRolled}}
+      <p><strong>Multipliers:</strong> User: {{battle.currentRound.userMultiplier}}, Bot: {{battle.currentRound.botMultiplier}}</p>
+      {{#if roundOver}}
+        <form action="/testbattle/next" method="POST">
+          <button type="submit" class="btn btn-secondary">Next Round</button>
+        </form>
+      {{else}}
+        <form action="/testbattle/attack" method="POST">
+          <button type="submit" class="btn btn-primary">Attack</button>
+        </form>
+      {{/if}}
+    {{else}}
+      <form action="/testbattle/roll" method="POST">
+        <button type="submit" class="btn btn-primary">Roll to Modify Stats</button>
+      </form>
+    {{/if}}
+  {{/if}}
+  
+  <h3>Round Log</h3>
+  <pre>{{battle.currentRound.roundLog}}</pre>
+  
+  <h3>Score</h3>
+  <p>User: {{battle.userScore}} | Bot: {{battle.botScore}}</p>
+</div>

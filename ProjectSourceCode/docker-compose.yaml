@@ -20,7 +20,8 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./:/repository
-    command: 'npm run testandrun' # the command to `npm run testandrun` runs mocha
+
+      - .:/ProjectSourceCode
+    command: 'npm run testandrun && node src/populate_db.js' # the command to `npm run testandrun` runs mocha
 volumes:
   group-project:
