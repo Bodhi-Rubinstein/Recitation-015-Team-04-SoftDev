@@ -143,10 +143,10 @@ app.post('/register', async (req, res) => {
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login');
-  }
+  // if (!req.session.user) {
+  //   // Default to login page.
+  //   return res.redirect('/login');
+  // }
   next();
 };
 
@@ -203,15 +203,11 @@ app.get('/logout', (req, res) => {
 });
 
 
-// app.get('/welcome', (req, res) => {
-//   res.json({ status: 'success', message: 'Welcome!' });
-// });
 
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-module.exports = app.listen(3000);
+app.listen(3000);
 console.log('Server is listening on port 3000');
-
