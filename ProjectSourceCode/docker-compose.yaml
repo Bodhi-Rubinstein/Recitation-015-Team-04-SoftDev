@@ -1,3 +1,4 @@
+# version: '3.9'
 services:
   db:
     image: postgres:14
@@ -7,11 +8,10 @@ services:
     volumes:
       - group-project:/var/lib/postgresql/data
       - ./src/init_data:/docker-entrypoint-initdb.d
-
   web:
     image: node:lts
-    user: 'root'
-    working_dir: /ProjectSourceCode
+    user: 'node'
+    working_dir: /repository
     env_file: .env
     environment:
       - NODE_ENV=development
@@ -20,8 +20,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - .:/ProjectSourceCode
-    command: sh -c "npm install && npm start"
-
+      - ./:/repository
+    command: 'npm run testandrun' # the command to `npm run testandrun` runs mocha
 volumes:
   group-project:
