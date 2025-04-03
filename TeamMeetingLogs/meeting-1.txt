@@ -1,0 +1,19 @@
+3/17 
+
+TA meeting
+
+Last week-
+Cam: Created SQL queries to initialize the database for users and players
+Luca: Use Case Diagram/ Readme
+Mati: Created the documentation and finalizing of project ideas.
+Bodhi: Set up github, added trade, battle, and decks table, and help with database schema visualizing.
+Brendan: added two tables to the database for transactions and information about battles
+Victoria: Helped with database design/schema, helped with team detail brainstorming and documentation
+
+This week-
+Cam: Login/logout (first), Opening packs & adding to collection if extra time
+Luca: Battles
+Mati: Trades
+Bodhi: API and live stats, trades or battles as needed
+Brendan: Collection
+Victoria: Profile page w/ button to collection, leaderboard
