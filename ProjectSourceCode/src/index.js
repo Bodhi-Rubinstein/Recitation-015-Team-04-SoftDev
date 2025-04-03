@@ -90,9 +90,7 @@ app.get("/register", (req, res) => {
   res.render("pages/register");
 });
 
-app.get('/openPack', (req, res) => {
-    res.render('pages/openPack');
-});
+
 
 //Login
 app.post("/login", async (req, res) => {
@@ -152,8 +150,40 @@ app.post("/register", async (req, res) => {
 });
 
 
+    // Authentication Middleware.
+  const auth = (req, res, next) => {
+    if (!req.session.user) {
+      // Default to login page.
+      return res.redirect('/login');
+    }
+    next();
+  };
+  
+// Authentication Required
+app.use(auth);
+
+app.get('/openPack', (req, res) => {
+  res.render('pages/openPack');
+});
+
+//home route (only for authenticated users)
+app.get("/home", auth, async (req, res) => {
+  const username = req.session.user.username;
+  try {
+    // Query for the user stats
+    const userStats = await db.one("SELECT * FROM users WHERE username = $1", [
+      username,
+    ]);
+    // Render the home page and pass the user stats to the view
+    res.render("pages/home", { user: userStats });
+  } catch (error) {
+    console.error("Error fetching user stats:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 //opening pack
-app.post('/open-pack', async (req, res) => {
+app.post('/open-pack', auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
 
   try {
@@ -201,33 +231,7 @@ app.post('/open-pack', async (req, res) => {
   }
 });
 
-    // Authentication Middleware.
-  const auth = (req, res, next) => {
-    if (!req.session.user) {
-      // Default to login page.
-      return res.redirect('/login');
-    }
-    next();
-  };
-  
-//home route (only for authenticated users)
-app.get("/home", auth, async (req, res) => {
-  const username = req.session.user.username;
-  try {
-    // Query for the user stats
-    const userStats = await db.one("SELECT * FROM users WHERE username = $1", [
-      username,
-    ]);
-    // Render the home page and pass the user stats to the view
-    res.render("pages/home", { user: userStats });
-  } catch (error) {
-    console.error("Error fetching user stats:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
 
-// Authentication Required
-app.use(auth);
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
