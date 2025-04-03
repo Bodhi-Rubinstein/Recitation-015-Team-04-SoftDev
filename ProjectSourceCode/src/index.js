@@ -129,6 +129,13 @@ app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
+  let usernameCheckQuery = `SELECT * FROM users WHERE username = $1;`;
+  // Check if the username already exists
+  const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
+  
+  if(existingUser){
+    return res.render('pages/register', { message: 'Username already exists. Please choose another one.' });
+  }
 
   try {
       await db.one(userInsertQuery, [username, hash]);
@@ -140,7 +147,7 @@ app.post('/register', async (req, res) => {
       return res.redirect('/login'); // Redirect to login after successful registration
   } catch (error) {
       console.error(error);
-      return res.redirect('/register'); // Stay on register page if error occurs
+      return res.render('pages/register'), { message: 'An error occurred. Please try again.' }; // Stay on register page if error occurs
   }
 });
 
@@ -150,7 +157,7 @@ app.post('/open-pack', async (req, res) => {
 
   try {
     const userQuery = `SELECT money FROM users WHERE username = $1;`; //get money
-    const user = await db.one(userQuery, [username]);
+    const user = await db.one(userQuery, [username]); //return 1 line with this query
 
     if (user.money >= 100) {
       const updateMoneyQuery = `UPDATE users SET money = money - 100 WHERE username = $1;`; //subtract money
@@ -194,7 +201,7 @@ app.post('/open-pack', async (req, res) => {
 });
   
 
-      // Authentication Middleware.
+    // Authentication Middleware.
   const auth = (req, res, next) => {
     if (!req.session.user) {
       // Default to login page.
