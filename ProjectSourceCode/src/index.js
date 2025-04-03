@@ -103,7 +103,7 @@ app.post("/login", async (req, res) => {
     const user = await db.oneOrNone(userSearchQuery, [username]);
     if (!user) {
       //if user DNE
-      return res.redirect("/register");
+      return res.render("pages/register", { message: 'Username does not exist. Please make an account.' });
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -129,6 +129,13 @@ app.post("/register", async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
+  let usernameCheckQuery = `SELECT * FROM users WHERE username = $1;`;
+  // Check if the username already exists
+  const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
+  
+  if(existingUser){
+    return res.render('pages/register', { message: 'Username already exists. Please choose another one.' });
+  }
 
   try {
     await db.one(userInsertQuery, [username, hash]);
@@ -151,7 +158,7 @@ app.post('/open-pack', async (req, res) => {
 
   try {
     const userQuery = `SELECT money FROM users WHERE username = $1;`; //get money
-    const user = await db.one(userQuery, [username]);
+    const user = await db.one(userQuery, [username]); //return 1 line with this query
 
     if (user.money >= 100) {
       const updateMoneyQuery = `UPDATE users SET money = money - 100 WHERE username = $1;`; //subtract money
@@ -195,7 +202,7 @@ app.post('/open-pack', async (req, res) => {
 });
   
 
-      // Authentication Middleware.
+    // Authentication Middleware.
   const auth = (req, res, next) => {
     if (!req.session.user) {
       // Default to login page.
@@ -240,11 +247,19 @@ app.get("/collection", auth, async (req, res) => {
 });
 
 // GET /deckbuilder - Render the deck builder page.
-app.get("/deckbuilder", auth, async (req, res) => {
+app.get("/deckBuilder", auth, async (req, res) => {
+  const username = req.session.user.username; //get username for cardsToUsers
   try {
-    // Fetch available cards so the user can choose cards for their deck.
-    const availableCards = await db.any("SELECT * FROM cards");
-    res.render("pages/deckbuilder", { availableCards });
+    const availableCardsQuery = `
+    SELECT * 
+    FROM cards 
+    JOIN cardsToUsers 
+    ON cards.id = cardsToUsers.card_id 
+    WHERE cardsToUsers.username_id = $1;
+  `;    
+  // Fetch available cards so the user can choose cards for their deck.
+    const availableCards = await db.any(availableCardsQuery, [username]);
+    res.render("pages/deckBuilder", { availableCards });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading deck builder.");
@@ -252,7 +267,7 @@ app.get("/deckbuilder", auth, async (req, res) => {
 });
 
 // POST /deckbuilder - Create a new deck from the selected cards.
-app.post("/deckbuilder", auth, async (req, res) => {
+app.post("/deckBuilder", auth, async (req, res) => {
   const { card1, card2, card3, card4, card5 } = req.body;
   const username = req.session.user.username;
   try {
