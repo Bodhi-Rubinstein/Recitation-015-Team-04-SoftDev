@@ -103,7 +103,7 @@ app.post("/login", async (req, res) => {
     const user = await db.oneOrNone(userSearchQuery, [username]);
     if (!user) {
       //if user DNE
-      return res.redirect("/register");
+      return res.render("pages/register", { message: 'Username does not exist. Please make an account.' });
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -248,9 +248,17 @@ app.get("/collection", auth, async (req, res) => {
 
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
+  const username = req.session.user.username; //get username for cardsToUsers
   try {
-    // Fetch available cards so the user can choose cards for their deck.
-    const availableCards = await db.any("SELECT * FROM cards");
+    const availableCardsQuery = `
+    SELECT * 
+    FROM cards 
+    JOIN cardsToUsers 
+    ON cards.id = cardsToUsers.card_id 
+    WHERE cardsToUsers.username_id = $1;
+  `;    
+  // Fetch available cards so the user can choose cards for their deck.
+    const availableCards = await db.any(availableCardsQuery, [username]);
     res.render("pages/deckBuilder", { availableCards });
   } catch (error) {
     console.error(error);
