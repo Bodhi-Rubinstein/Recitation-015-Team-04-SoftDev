@@ -1,0 +1,59 @@
+Weekly Notes:
+
+Commit update from last week: 
+
+Luca – Worked on battle. 
+-	Bot functionality with difficulty (kind of)
+-	Battle functionality implemented
+-	Cards played against each other and win/lose mechanics
+
+For next week:
+-	Add complexity to battle functionality
+-	Pick up other work if finished
+
+Cam – Login page
+-	Designed login and register page which are now stylized
+-	Login/register functionality added (redirects and database queries)
+-	Added stats to home page for users.
+-	Made the navbar to navigate to other pages
+-	Also created logout page that ends user session
+
+For next week:
+-	User packs and cards. Ownership for card functionality.
+-	Cards being visible on that home page
+-	Shop and card acquisition
+
+Brendan Fisher – Collection page
+-	Worked on displaying cards and statistics
+-	Added functionality to show user’s owned cards
+-	HTML and some backend work
+
+For next week:
+-	Finishing functionality for packs to collection
+-	How statistics are viewed on player page
+
+
+Mati – Trades
+-	Made basic html for trades page which includes pending trades from DB. Propose trade button
+
+For next week:
+-	Continue to work on functionality for player drop down
+-	Being able to initiate trades
+-	Work on back end for trades
+
+Bodhi – Populate Database
+-	Populate database from NBA players csv file
+-	Create cards for each NBA player and calculate game statistics for each one.
+
+For next week:
+-	Fix bugs and create PR for database. Ensure it populates on docker startup
+-	Help with trades or battles based on needs from others.
+
+
+Victoria – Leaderboard
+-	Got html  for leaderboard display
+-	Backend work done on leaderboard
+
+For next week:
+-	Get database queries done for leaderboard table
+-	Potentially pick up other work that is interesting 
