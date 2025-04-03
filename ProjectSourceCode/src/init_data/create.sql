@@ -95,19 +95,19 @@ CREATE TABLE nbaPlayers (
     player_weight FLOAT NOT NULL,
     college VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    draft_year INT NOT NULL,
-    draft_round INT NOT NULL,
-    draft_number INT NOT NULL,
-    gp INT NOT NULL,
-    pts NUMERIC(4,1) NOT NULL,
-    reb NUMERIC(4,1) NOT NULL,
-    ast NUMERIC(4,1) NOT NULL,
-    net_rating NUMERIC(4,1) NOT NULL,
-    oreb_pct NUMERIC(4,3) NOT NULL,
-    dreb_pct NUMERIC(4,3) NOT NULL,
-    usg_pct NUMERIC(4,3) NOT NULL,
-    ts_pct NUMERIC(4,3) NOT NULL,
-    ast_pct NUMERIC(4,3) NOT NULL,
+    draft_year VARCHAR(20) NOT NULL,
+    draft_round VARCHAR(20) NOT NULL,
+    draft_number VARCHAR(20) NOT NULL,
+    gp INT NOT NULL, -- games played
+    pts NUMERIC(4,1) NOT NULL, -- average points per game
+    reb NUMERIC(4,1) NOT NULL, -- average rebounds per game
+    ast NUMERIC(4,1) NOT NULL, -- average assists per game
+    net_rating NUMERIC(4,1) NOT NULL, -- net rating
+    oreb_pct NUMERIC(4,3) NOT NULL, -- offensive rebound percentage
+    dreb_pct NUMERIC(4,3) NOT NULL, -- defensive rebound percentage
+    usg_pct NUMERIC(4,3) NOT NULL, -- usage percentage
+    ts_pct NUMERIC(4,3) NOT NULL, -- true shooting percentage
+    ast_pct NUMERIC(4,3) NOT NULL, -- assist percentage
     season VARCHAR(10) NOT NULL
 );
 
