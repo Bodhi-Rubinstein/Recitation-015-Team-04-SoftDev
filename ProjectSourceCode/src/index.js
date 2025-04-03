@@ -138,6 +138,7 @@ app.post("/register", async (req, res) => {
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
   
   if(existingUser){
+    res.status(400);
     return res.render('pages/register', { message: 'Username already exists. Please choose another one.' });
   }
 
@@ -147,7 +148,7 @@ app.post("/register", async (req, res) => {
     // Initialize the user with zero cards in cardsToUsers
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
     await db.none(initCardsQuery, [username]);
-
+    res.status(200);
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
