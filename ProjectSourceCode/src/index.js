@@ -247,11 +247,11 @@ app.get("/collection", auth, async (req, res) => {
 });
 
 // GET /deckbuilder - Render the deck builder page.
-app.get("/deckbuilder", auth, async (req, res) => {
+app.get("/deckBuilder", auth, async (req, res) => {
   try {
     // Fetch available cards so the user can choose cards for their deck.
     const availableCards = await db.any("SELECT * FROM cards");
-    res.render("pages/deckbuilder", { availableCards });
+    res.render("pages/deckBuilder", { availableCards });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading deck builder.");
@@ -259,7 +259,7 @@ app.get("/deckbuilder", auth, async (req, res) => {
 });
 
 // POST /deckbuilder - Create a new deck from the selected cards.
-app.post("/deckbuilder", auth, async (req, res) => {
+app.post("/deckBuilder", auth, async (req, res) => {
   const { card1, card2, card3, card4, card5 } = req.body;
   const username = req.session.user.username;
   try {
