@@ -274,7 +274,8 @@ app.get('/leaderboard', (req, res) => {
         }
       ]
     }
-  );
+  )
+});
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
