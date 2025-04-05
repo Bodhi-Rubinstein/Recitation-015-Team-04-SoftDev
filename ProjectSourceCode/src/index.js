@@ -68,6 +68,8 @@ app.use(
   })
 );
 
+app.use('/resources', express.static(__dirname + '/resources'));
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -88,6 +90,10 @@ app.get("/login", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("pages/register");
+});
+
+app.get("/trade", (req,res) => {
+  res.render("pages/trade");
 });
 
 //Login
@@ -379,7 +385,7 @@ app.post("/testbattle/attack", (req, res) => {
     } deals ${botDamage.toFixed(2)} damage.\n`;
   }
   req.session.battle = battleState;
-  res.redirect("/testbattle");
+  res.redirect("/testbattle"); 
 });
 
 // POST /testbattle/next – End current round, record outcome, and move to next round.
@@ -427,7 +433,143 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
+app.post("/trades", async (req, res) => {
+  try {
+    const { card1_id, card2_id } = req.body;
+    // get owner and name info for both cards
+    const card1Info = await db.query(
+        `SELECT u.username, c.name
+         FROM cardsToUsers cu
+         JOIN users u ON cu.username_id = u.username
+         JOIN cards c ON cu.card_id = c.id
+         WHERE cu.card_id = $1`,
+        [card1_id]
+    );
+    const card2Info = await db.query(
+        `SELECT u.username, c.name
+         FROM cardsToUsers cu
+         JOIN users u ON cu.username_id = u.username
+         JOIN cards c ON cu.card_id = c.id
+         WHERE cu.card_id = $1`,
+        [card2_id]
+    );
 
+    // validates both cards
+    if (!card1Info.length|| !card2Info.length) {
+        return res.status(404).json({ error: "One or both cards not found or not owned." });
+    }
+    const card1_owner = card1Info[0].username;
+    const card2_owner = card2Info[0].username;
+    const card1_name = card1Info[0].name;
+    const card2_name = card2Info[0].name;
+
+    // Insert into trades table
+    await db.query(
+        `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
+         VALUES ($1, $2, $3, $4)`,
+        [card1_id, card2_id, card1_owner, card2_owner]
+    );
+
+    res.status(201).json({
+        message: "Trade offer sent!",
+        trade: {
+            offer: card1_name,
+            request: card2_name,
+            card1_owner,
+            card2_owner,
+            card1_id,
+            card2_id,
+            status: "Pending"
+        }
+    });
+} catch (err) {
+    console.error(err);
+    //res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" }); 
+}
+});
+
+
+//this ensures that everytime the user loads into the page, the trades are ran 
+app.get("/trades/:username", async (req, res) => {
+  try {
+      const { username } = req.params;
+      const result = await db.query(
+          "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
+          [username]
+      );
+      res.json(result);
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");
+      res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+
+app.post("/trades/:tradeId/accept", async (req, res) => {
+  try {
+    const { tradeId } = req.params;
+    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [tradeId]);
+
+    if (!tradeResult.length) {
+      return res.status(404).json({ error: "Trade not found" });
+    }
+    const { card1_id, card2_id, card1_owner, card2_owner } = tradeResult[0];
+    // swaps the ownership of cards in the cardsToUsers table
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card2_owner, card1_id, card1_owner]
+    );
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card1_owner, card2_id, card2_owner]
+    );
+    // removes the trade from the trades table
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade accepted and completed successfully" });
+  } catch (err) {
+    console.error("Error accepting trade:", err);
+    //res.status(500).send("Server error while accepting trade");
+    res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+app.delete("/trades/:tradeId/reject", async (req, res) => {
+  try {
+      const { tradeId } = req.params;
+      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+      res.status(200).json({ message: "Trade rejected" });
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");
+      res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+app.delete("/trades/:tradeId", async (req, res) => {
+  try {
+      const tradeId = req.params.tradeId;
+      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+      res.status(200).json({ message: "Trade removed successfully" });
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");\
+      res.status(500).json({ error: "Server error" }); 
+
+  }
+});
+
+
+app.get("/cards", async (req, res) => {
+  try {
+      const result = await db.query("SELECT id, name FROM cards");
+      res.json(result);
+  } catch (err) {
+      console.error("Error fetching cards:", err);
+      res.status(500).send("Server error");
+  }
+});
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
