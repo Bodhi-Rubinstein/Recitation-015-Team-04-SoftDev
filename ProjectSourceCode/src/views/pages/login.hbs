@@ -38,6 +38,10 @@
     Don't have an account?
     <a href="/register">Register here</a>
   </p>
+  {{#if error}}
+  <div class="alert alert-danger">{{error}}</div>
+{{/if}}
+
 </main>
 </body>
 {{> message }}

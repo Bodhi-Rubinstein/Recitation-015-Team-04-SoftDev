@@ -117,9 +117,8 @@ app.post("/login", async (req, res) => {
       return res.redirect("/home"); //returns up here so no infinite loop
     } else {
       //render login again
-      return res.render("pages/login", {
-        message: "Incorrect username or password.",
-      });
+      res.status(400).send("Incorrect username or password");
+      res.render('login', { error: 'Incorrect username or password' });
     }
   } catch (error) {
     console.error(error);
