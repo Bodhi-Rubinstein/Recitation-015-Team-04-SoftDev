@@ -68,6 +68,8 @@ app.use(
   })
 );
 
+app.use('/resources', express.static(__dirname + '/resources'));
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -94,9 +96,11 @@ app.get("/register", (req, res) => {
   res.render("pages/register");
 });
 
-app.get('/openPack', (req, res) => {
-    res.render('pages/openPack');
+
+app.get("/trade", (req,res) => {
+  res.render("pages/trade");
 });
+
 
 //Login
 app.post("/login", async (req, res) => {
@@ -144,19 +148,56 @@ app.post("/register", async (req, res) => {
     await db.one(userInsertQuery, [username, hash]);
 
     // Initialize the user with zero cards in cardsToUsers
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
-    res.status(200);
+
+
+    let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
+    await db.none(userDeckQuery, [username]);
+
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
-    return res.redirect("/register"); // Stay on register page if error occurs
+    return res.redirect("/"); // Stay on  page if error occurs
   }
 });
 
 
+    // Authentication Middleware.
+  const auth = (req, res, next) => {
+    if (!req.session.user) {
+      // Default to login page.
+      return res.redirect('/login');
+    }
+    next();
+  };
+  
+// Authentication Required
+app.use(auth);
+
+app.get('/openPack', (req, res) => {
+  res.render('pages/openPack');
+});
+
+//home route (only for authenticated users)
+app.get("/home", auth, async (req, res) => {
+  const username = req.session.user.username;
+  try {
+    // Query for the user stats
+    const userStats = await db.one("SELECT * FROM users WHERE username = $1", [
+      username,
+    ]);
+    // Render the home page and pass the user stats to the view
+    res.render("pages/home", { user: userStats });
+  } catch (error) {
+    console.error("Error fetching user stats:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 //opening pack
-app.post('/open-pack', async (req, res) => {
+app.post('/open-pack', auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
 
   try {
@@ -203,35 +244,8 @@ app.post('/open-pack', async (req, res) => {
     res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
   }
 });
-  
 
-    // Authentication Middleware.
-  const auth = (req, res, next) => {
-    if (!req.session.user) {
-      // Default to login page.
-      return res.redirect('/login');
-    }
-    next();
-  };
-  
-//home route (only for authenticated users)
-app.get("/home", auth, async (req, res) => {
-  const username = req.session.user.username;
-  try {
-    // Query for the user stats
-    const userStats = await db.one("SELECT * FROM users WHERE username = $1", [
-      username,
-    ]);
-    // Render the home page and pass the user stats to the view
-    res.render("pages/home", { user: userStats });
-  } catch (error) {
-    console.error("Error fetching user stats:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
 
-// Authentication Required
-app.use(auth);
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
@@ -240,15 +254,56 @@ app.get("/logout", (req, res) => {
 
 app.get("/collection", auth, async (req, res) => {
   try {
-    // get users cards from here once i figure out how to do that
+    const username = req.session.user.username;
 
-    res.render("pages/collection");
+    // Query the DB for all cards this user owns
+    const userCardsQuery = `
+      SELECT c.name, c.sport, c.attack, c.defense, c.health, c.overall
+      FROM cards c
+      JOIN cardsToUsers cu ON c.id = cu.card_id
+      WHERE cu.username_id = $1
+    `;
+    const userCards = await db.any(userCardsQuery, [username]);
+
+    // Render the collection page, passing in userCards
+    res.render("pages/collection", { userCards });
   } catch (error) {
     console.error(error);
-    res.status(500).send("error for if there is probles on the server end");
+    res.status(500).send("Error fetching user cards");
   }
 });
 
+// Authentication Required
+app.use(auth);
+// leaderboard
+app.get('/leaderboard', (req, res) => {
+  return res.render('pages/leaderboard',
+    {
+      //dummy data until SQL queries added
+      leaders: [
+        {
+          rank: 1,
+          name: "A Team",
+          best_player: "Lebron",
+          battles_won: 50
+        },
+
+        {
+          rank: 2,
+          name: "B Team",
+          best_player: "Serena Williams",
+          battles_won: 45
+        },
+        {
+          rank: 3,
+          name: "C Team",
+          best_player: "Sports Player",
+          battles_won: 40
+        }
+      ]
+    }
+  )
+});
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
@@ -452,7 +507,7 @@ app.post("/testbattle/attack", (req, res) => {
     } deals ${botDamage.toFixed(2)} damage.\n`;
   }
   req.session.battle = battleState;
-  res.redirect("/testbattle");
+  res.redirect("/testbattle"); 
 });
 
 // POST /testbattle/next – End current round, record outcome, and move to next round.
@@ -500,7 +555,143 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
+app.post("/trades", async (req, res) => {
+  try {
+    const { card1_id, card2_id } = req.body;
+    // get owner and name info for both cards
+    const card1Info = await db.query(
+        `SELECT u.username, c.name
+         FROM cardsToUsers cu
+         JOIN users u ON cu.username_id = u.username
+         JOIN cards c ON cu.card_id = c.id
+         WHERE cu.card_id = $1`,
+        [card1_id]
+    );
+    const card2Info = await db.query(
+        `SELECT u.username, c.name
+         FROM cardsToUsers cu
+         JOIN users u ON cu.username_id = u.username
+         JOIN cards c ON cu.card_id = c.id
+         WHERE cu.card_id = $1`,
+        [card2_id]
+    );
 
+    // validates both cards
+    if (!card1Info.length|| !card2Info.length) {
+        return res.status(404).json({ error: "One or both cards not found or not owned." });
+    }
+    const card1_owner = card1Info[0].username;
+    const card2_owner = card2Info[0].username;
+    const card1_name = card1Info[0].name;
+    const card2_name = card2Info[0].name;
+
+    // Insert into trades table
+    await db.query(
+        `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
+         VALUES ($1, $2, $3, $4)`,
+        [card1_id, card2_id, card1_owner, card2_owner]
+    );
+
+    res.status(201).json({
+        message: "Trade offer sent!",
+        trade: {
+            offer: card1_name,
+            request: card2_name,
+            card1_owner,
+            card2_owner,
+            card1_id,
+            card2_id,
+            status: "Pending"
+        }
+    });
+} catch (err) {
+    console.error(err);
+    //res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" }); 
+}
+});
+
+
+//this ensures that everytime the user loads into the page, the trades are ran 
+app.get("/trades/:username", async (req, res) => {
+  try {
+      const { username } = req.params;
+      const result = await db.query(
+          "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
+          [username]
+      );
+      res.json(result);
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");
+      res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+
+app.post("/trades/:tradeId/accept", async (req, res) => {
+  try {
+    const { tradeId } = req.params;
+    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [tradeId]);
+
+    if (!tradeResult.length) {
+      return res.status(404).json({ error: "Trade not found" });
+    }
+    const { card1_id, card2_id, card1_owner, card2_owner } = tradeResult[0];
+    // swaps the ownership of cards in the cardsToUsers table
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card2_owner, card1_id, card1_owner]
+    );
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card1_owner, card2_id, card2_owner]
+    );
+    // removes the trade from the trades table
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade accepted and completed successfully" });
+  } catch (err) {
+    console.error("Error accepting trade:", err);
+    //res.status(500).send("Server error while accepting trade");
+    res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+app.delete("/trades/:tradeId/reject", async (req, res) => {
+  try {
+      const { tradeId } = req.params;
+      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+      res.status(200).json({ message: "Trade rejected" });
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");
+      res.status(500).json({ error: "Server error" }); 
+  }
+});
+
+app.delete("/trades/:tradeId", async (req, res) => {
+  try {
+      const tradeId = req.params.tradeId;
+      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+      res.status(200).json({ message: "Trade removed successfully" });
+  } catch (err) {
+      console.error(err);
+      //res.status(500).send("Server error");\
+      res.status(500).json({ error: "Server error" }); 
+
+  }
+});
+
+
+app.get("/cards", async (req, res) => {
+  try {
+      const result = await db.query("SELECT id, name FROM cards");
+      res.json(result);
+  } catch (err) {
+      console.error("Error fetching cards:", err);
+      res.status(500).send("Server error");
+  }
+});
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************

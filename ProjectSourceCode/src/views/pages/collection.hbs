@@ -3,10 +3,23 @@
 
 <main class="container mt-4">
   <h1>My Collections</h1>
-  <p> cards the user currently owns.</p>
+  <p>Cards the user currently owns.</p>
+  
+  <!-- Sort Dropdown -->
+  <div class="d-flex justify-content-end mb-2">
+    <label for="sortDropdown" class="me-2">Sort by:</label>
+    <select id="sortDropdown" class="form-select w-auto" onchange="handleSortChange()">
+      <option value="">Select</option>
+      <option value="0_str_desc">Card Name (High to Low)</option>
+      <option value="1_str_desc">Sport (High to Low)</option>
+      <option value="2_num_desc">Attack (High to Low)</option>
+      <option value="3_num_desc">Defense (High to Low)</option>
+      <option value="4_num_desc">Health (High to Low)</option>
+      <option value="5_num_desc">Overall (High to Low)</option>
+    </select>
+  </div>
 
-  <!-- empty for now  -->
-  <table class="table table-bordered mt-4">
+  <table class="table table-bordered" id="cardsTable">
     <thead>
       <tr>
         <th>Card Name</th>
@@ -15,12 +28,70 @@
         <th>Defense</th>
         <th>Health</th>
         <th>Overall</th>
-        <th>Special Move</th> <!-- maybe idk -->
       </tr>
     </thead>
     <tbody>
+      {{#each userCards}}
+      <tr>
+        <td>{{this.name}}</td>
+        <td>{{this.sport}}</td>
+        <td>{{this.attack}}</td>
+        <td>{{this.defense}}</td>
+        <td>{{this.health}}</td>
+        <td>{{this.overall}}</td>
+      </tr>
+      {{/each}}
     </tbody>
   </table>
 </main>
+
+<script>
+  /**
+   * Sorts the table rows based on the given column index in descending order.
+   * @param {number} colIndex - The index of the column to sort by.
+   * @param {string} type - "num" for numeric or "str" for string.
+   */
+  function sortTable(colIndex, type) 
+  {
+    const table = document.getElementById("cardsTable");
+    const tbody = table.querySelector("tbody");
+    let rows = Array.from(tbody.querySelectorAll("tr"));
+
+    rows.sort((rowA, rowB) => 
+    {
+      let cellA = rowA.cells[colIndex].innerText.trim();
+      let cellB = rowB.cells[colIndex].innerText.trim();
+      let comparison = 0;
+
+      if (type === "num") 
+      {
+        const valA = parseFloat(cellA) || 0;
+        const valB = parseFloat(cellB) || 0;
+        comparison = valA - valB;
+      } 
+      else 
+      {
+        comparison = cellA.localeCompare(cellB);
+      }
+
+      // descending order (high-to-low)
+      return -comparison;
+    });
+
+    // Append the sorted rows back into the table body.
+    rows.forEach(row => tbody.appendChild(row));
+  }
+
+  // sort dropdown change event.
+  function handleSortChange() 
+  {
+    const dropdown = document.getElementById("sortDropdown");
+    const value = dropdown.value;
+    if (!value) return; // No sort
+    const [colIndexStr, type] = value.split("_");
+    const colIndex = parseInt(colIndexStr, 10);
+    sortTable(colIndex, type);
+  }
+</script>
 
 {{> footer}}
