@@ -91,6 +91,10 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 app.get("/login", (req, res) => {
   res.render("pages/login");
 });
@@ -124,9 +128,7 @@ app.post("/login", async (req, res) => {
       return res.redirect("/home"); //returns up here so no infinite loop
     } else {
       //render login again
-      return res.render("pages/login", {
-        message: "Incorrect username or password.",
-      });
+      res.status(400).render('pages/login', { message: 'Incorrect username or password' });
     }
   } catch (error) {
     console.error(error);
@@ -158,13 +160,14 @@ app.post("/register", async (req, res) => {
     return res.render("pages/register", {
       message: "Username already exists. Please choose another one.",
     });
-  }
+
 
   try {
     await db.one(userInsertQuery, [username, hash]);
 
     // Initialize the user with zero cards in cardsToUsers
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
 
     if (req.accepts("json")) {
@@ -180,6 +183,7 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ status: "error", message: error.message });
     }
     return res.redirect("/register"); // Stay on register page if error occurs
+
   }
 });
 
@@ -295,31 +299,28 @@ app.get("/collection", auth, async (req, res) => {
 // Authentication Required
 app.use(auth);
 // leaderboard
-app.get("/leaderboard", (req, res) => {
-  return res.render("pages/leaderboard", {
-    //dummy data until SQL queries added
-    leaders: [
-      {
-        rank: 1,
-        name: "A Team",
-        best_player: "Lebron",
-        battles_won: 50,
-      },
 
-      {
-        rank: 2,
-        name: "B Team",
-        best_player: "Serena Williams",
-        battles_won: 45,
-      },
-      {
-        rank: 3,
-        name: "C Team",
-        best_player: "Sports Player",
-        battles_won: 40,
-      },
-    ],
-  });
+app.get('/leaderboard', async(req, res) => {
+  try {
+    const leaderboardQuery = `
+    SELECT username AS name, trophies AS battles_won
+    FROM users
+    ORDER BY trophies DESC
+    LIMIT 10;
+  `;
+  // Fetch available cards so the user can choose cards for their deck.
+    const leaders = await db.any(leaderboardQuery);
+    current_rank = 1
+    leaders.forEach(leader => {
+      leader.rank = current_rank;
+      current_rank = current_rank + 1;
+    })
+    res.render("pages/leaderboard", { leaders });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error loading leaderboard");
+  }
+
 });
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {

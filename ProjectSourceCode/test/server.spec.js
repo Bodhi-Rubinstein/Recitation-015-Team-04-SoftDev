@@ -41,57 +41,85 @@ describe("Server!", () => {
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
-describe("POST /register", () => {
-  // ---- clean DB before and after the suite so tests are repeatable
-  before(async () => {
-    await db.none("DELETE FROM users WHERE username = $1", [TEST_USER]);
-  });
-  after(async () => {
-    await db.none("DELETE FROM users WHERE username = $1", [TEST_USER]);
-    server.close(); // shuts the HTTP server so `npm test` exits
-    pgp.end(); // closes pg‑promise pool
-  });
+// Example Positive Testcase :
+// API: /add_user
+// Input: {id: 5, name: 'John Doe', dob: '2020-02-20'}
+// Expect: res.status == 200 and res.body.message == 'Success'
+// Result: This test case should pass and return a status 200 along with a "Success" message.
+// Explanation: The testcase will call the /add_user API with the following input
+// and expects the API to return a status of 200 along with the "Success" message.
 
-  // ---------- Positive case ---------------------------------------
-  it("creates a new user when given valid data", (done) => {
+
+describe('Testing Add User API', () => {
+    it('positive : /register. Checking creating new user.', done => {
+      chai
+        .request(server)
+        .post('/register')
+        .type('form')
+        .send({username: 'John Doe', password: 'testpassword123'})
+        .end((err, res) => {
+          expect(res).to.have.status(200); //checks response status is 200
+          expect(res.redirects[0]).to.include('/login'); //checks that it redirects to the login page
+          done();
+        });
+    });
+
+
+  // Example Negative Testcase :
+  // API: /add_user
+  // Input: {id: 5, name: 10, dob: '2020-02-20'}
+  // Expect: res.status == 400 and res.body.message == 'Invalid input'
+  // Result: This test case should pass and return a status 400 along with a "Invalid input" message.
+  // Explanation: The testcase will call the /add_user API with the following invalid inputs
+  // and expects the API to return a status of 400 along with the "Invalid input" message.
+  it('Negative : /register. Checking duplicate username.', done => {
     chai
       .request(server)
-      .post("/register")
-      .send({ username: TEST_USER, password: "Secret123!" })
-      .end(async (err, res) => {
-        if (err) return done(err);
-
-        // 1. HTTP contract
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equal("success");
-
-        // 2. Database side‑effect
-        const row = await db.oneOrNone(
-          "SELECT username FROM users WHERE username = $1",
-          [TEST_USER]
-        );
-        expect(row).to.not.be.null;
-        expect(row.username).to.equal(TEST_USER);
-
-        done();
-      });
-  });
-
-  // ---------- Negative case ---------------------------------------
-  it("rejects registration when username is missing", (done) => {
-    chai
-      .request(server)
-      .post("/register")
-      .send({ password: "whatever" }) // <-- invalid payload
+      .post('/register')
+    .type('form')
+      .send({username: 'John Doe', password: 'testpassword321'})
       .end((err, res) => {
-        if (err) return done(err);
-
         expect(res).to.have.status(400);
-        expect(res.body.status).to.equal("error");
-        expect(res.body.message).to.match(/missing/i);
-
+        expect(res.text).to.include('Username already exists. Please choose another one.');
         done();
       });
   });
+});
+// ********************************************************************************
+
+describe('Testing User Login User API', () => {
+  it('positive : /login. Checking letting user log in.', done => {
+    chai
+      .request(server)
+      .post('/login')
+      .type('form')
+      .send({username: 'John Doe', password: 'testpassword123'})
+      .end((err, res) => {
+        expect(res).to.have.status(200); //checks response status is 200
+        expect(res.redirects[0]).to.include('/home'); //checks that it redirects to the login page
+        done();
+      });
+  });
+
+
+// Example Negative Testcase :
+// API: /add_user
+// Input: {id: 5, name: 10, dob: '2020-02-20'}
+// Expect: res.status == 400 and res.body.message == 'Invalid input'
+// Result: This test case should pass and return a status 400 along with a "Invalid input" message.
+// Explanation: The testcase will call the /add_user API with the following invalid inputs
+// and expects the API to return a status of 400 along with the "Invalid input" message.
+it('Negative : /login. Checking incorrect passowrd.', done => {
+  chai
+    .request(server)
+    .post('/login')
+  .type('form')
+    .send({username: 'John Doe', password: 'testpassword124'})
+    .end((err, res) => {
+      expect(res).to.have.status(400);
+      expect(res.text).to.include('Incorrect username or password');
+      done();
+    });
+});
 });
 // ********************************************************************************
