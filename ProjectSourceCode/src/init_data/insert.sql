@@ -1,3 +1,7 @@
+INSERT INTO decks (card1_id, card2_id, card3_id, card4_id, card5_id)
+    VALUES (138, 198, 197, 183, 181);
+
+
 /*
 INSERT INTO cards (name, sport, attack, defense, health, overall, special_move)
 VALUES 
