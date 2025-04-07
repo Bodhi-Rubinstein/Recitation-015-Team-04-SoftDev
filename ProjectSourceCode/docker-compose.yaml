@@ -21,7 +21,7 @@ services:
       - '3000:3000'
     volumes:
       - .:/ProjectSourceCode
-    command: sh -c "npm install && node src/populate_db.js && npm start"
+    command: 'npm run testandrun'
 
 volumes:
   group-project:

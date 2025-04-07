@@ -84,6 +84,10 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 app.get("/login", (req, res) => {
   res.render("pages/login");
 });
@@ -117,9 +121,7 @@ app.post("/login", async (req, res) => {
       return res.redirect("/home"); //returns up here so no infinite loop
     } else {
       //render login again
-      return res.render("pages/login", {
-        message: "Incorrect username or password.",
-      });
+      res.status(400).render('pages/login', { message: 'Incorrect username or password' });
     }
   } catch (error) {
     console.error(error);
@@ -138,6 +140,7 @@ app.post("/register", async (req, res) => {
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
   
   if(existingUser){
+    res.status(400);
     return res.render('pages/register', { message: 'Username already exists. Please choose another one.' });
   }
 
@@ -148,6 +151,7 @@ app.post("/register", async (req, res) => {
     //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
+
 
     let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
     await db.none(userDeckQuery, [username]);
@@ -692,5 +696,5 @@ app.get("/cards", async (req, res) => {
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log("Server is listening on port 3000");
