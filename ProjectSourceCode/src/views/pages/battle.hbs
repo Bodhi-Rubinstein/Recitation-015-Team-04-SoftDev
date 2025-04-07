@@ -1,23 +1,35 @@
-<h2 class="mb-4">Battle Arena</h2>
+<div class="container my-5">
+  <h2 class="mb-4">Battle Arena</h2>
 
-<form action="/battle/start" method="POST" class="mb-3">
-  <label for="deckSelect" class="form-label">Choose a deck:</label>
-  <select id="deckSelect" name="deck_id" class="form-select mb-4" required>
-    {{#each decks}}
-      <option value="{{this.deck_id}}">{{this.name}}</option>
-    {{/each}}
-  </select>
+  <form id="battleForm" class="row gy-2 gx-3 align-items-center">
+    <div class="col-md-6">
+      <label for="deckSelect" class="form-label">Pick a deck:</label>
+      <select id="deckSelect" class="form-select" required>
+        {{#each decks}}
+          <option value="{{this.deck_id}}">{{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
 
-  <button type="submit" name="type" value="bot" class="btn btn-primary">
-    Battle Bot
-  </button>
-  <button
-    type="submit"
-    name="type"
-    value="human"
-    class="btn btn-secondary"
-    disabled
-  >
-    Human (soon)
-  </button>
-</form>
+    <div class="col-auto">
+      <button
+        type="button"
+        id="playBot"
+        class="btn btn-primary"
+      >Play Bot</button>
+      <button
+        type="button"
+        id="playHuman"
+        class="btn btn-secondary"
+        disabled
+      >Play Human</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById("playBot").onclick = () => {
+    const deckId = document.getElementById("deckSelect").value;
+    window.location = `/battle/play/${deckId}`;       // go to animated screen
+  };
+</script>

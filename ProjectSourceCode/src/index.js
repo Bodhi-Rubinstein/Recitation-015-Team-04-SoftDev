@@ -52,7 +52,7 @@ const hbs = engine({
   layoutsDir: path.join(__dirname, "views", "layouts"),
   partialsDir: path.join(__dirname, "views", "partials"),
   helpers: {
-    eq: (a, b) => a === b,          // ← makes {{#if (eq x y)}} work
+    eq: (a, b) => a === b, // ← makes {{#if (eq x y)}} work
   },
 });
 
@@ -445,6 +445,54 @@ app.post("/battle/start", auth, async (req, res) => {
   }
 });
 
+// index.js  (add after POST /battle/start)
+
+app.get("/battle/play/:deckId", auth, async (req, res) => {
+  const username = req.session.user.username;
+  const deckId = req.params.deckId;
+
+  // security: make sure this deck belongs to the user
+  const ok = await db.oneOrNone(
+    `SELECT 1 FROM userToDecks WHERE username_id=$1 AND deck_id=$2`,
+    [username, deckId]
+  );
+  if (!ok) return res.redirect("/battle");
+
+  const deck = await db.one("SELECT * FROM decks WHERE id=$1", [deckId]);
+  const cardIds = [
+    deck.card1_id,
+    deck.card2_id,
+    deck.card3_id,
+    deck.card4_id,
+    deck.card5_id,
+  ];
+  const userCards = await db.any("SELECT * FROM cards WHERE id IN ($1:csv)", [
+    cardIds,
+  ]);
+  const botCards = await db.any(
+    "SELECT * FROM cards ORDER BY RANDOM() LIMIT 5"
+  );
+
+  res.render("pages/battlePlay", {
+    userCards: JSON.stringify(userCards),
+    botCards: JSON.stringify(botCards),
+    username,
+  });
+});
+
+// receive final result so you still update DB / trophies
+app.post("/battle/finish", auth, async (req, res) => {
+  const { userScore, botScore, logs } = req.body;
+  const username = req.session.user.username;
+  try {
+    await battle.recordFinishedBattle(username, userScore, botScore, logs, db);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
+  }
+});
+
 // GET /testbattle – Display the interactive test battle page.
 app.get("/testbattle", (req, res) => {
   if (!req.session.battle) {
@@ -738,6 +786,48 @@ app.get("/cards", async (req, res) => {
     console.error("Error fetching cards:", err);
     res.status(500).send("Server error");
   }
+});
+
+// POST /battle/finish  – called via fetch from the browser
+app.post("/battle/finish", auth, async (req, res) => {
+  const { userScore, botScore, logs } = req.body;
+  const username = req.session.user.username;
+  try {
+    const battleId = await battle.recordFinishedBattle(
+      username,
+      userScore,
+      botScore,
+      logs,
+      db
+    );
+    res.json({ ok: true, battleId });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// GET /battle/result/:id  – render battleResult.hbs
+app.get("/battle/result/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const result = await db.one(
+    `
+      SELECT
+        (SELECT username FROM users WHERE id = battles.player1_id) AS player,
+        player1_score AS "userScore",
+        player2_score AS "botScore",
+        CASE WHEN winner_id = 0 THEN 'tie'
+             WHEN winner_id = battles.player1_id THEN (SELECT username FROM users WHERE id = winner_id)
+             ELSE 'bot' END                            AS winner
+      FROM battles
+      WHERE id = $1`,
+    [id]
+  );
+
+  const logs = await db
+    .one(`SELECT action_detail FROM battle_logs WHERE battle_id = $1`, [id])
+    .then((r) => r.action_detail);
+
+  res.render("pages/battleResult", { result: { ...result, battleLogs: logs } });
 });
 // *****************************************************
 // <!-- Section 5 : Start Server-->
