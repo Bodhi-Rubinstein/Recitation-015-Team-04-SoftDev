@@ -80,6 +80,10 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
+});
+
 app.get("/", (req, res) => {
   res.redirect("/login");
 });
@@ -130,6 +134,16 @@ app.post("/login", async (req, res) => {
 // Register
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
+  if (!username || !password) {
+    if (req.accepts("json")) {
+      // test client hits this branch
+      return res
+        .status(400)
+        .json({ status: "error", message: "Missing field" });
+    }
+    return res.redirect("/register"); // browser
+  }
+
   const hash = await bcrypt.hash(password, 10);
 
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
@@ -148,9 +162,18 @@ app.post("/register", async (req, res) => {
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
     await db.none(initCardsQuery, [username]);
 
+    if (req.accepts("json")) {
+      return res
+        .status(200)
+        .json({ status: "success", message: "User created" });
+    }
+
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
+    if (req.accepts("json")) {
+      return res.status(400).json({ status: "error", message: error.message });
+    }
     return res.redirect("/register"); // Stay on register page if error occurs
   }
 });
@@ -546,7 +569,6 @@ app.post("/testbattle/next", (req, res) => {
   req.session.battle = battleState;
   res.redirect("/testbattle");
 });
-
 app.post("/trades", async (req, res) => {
   try {
     const { card1_id, card2_id } = req.body;
@@ -688,5 +710,5 @@ app.get("/cards", async (req, res) => {
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log("Server is listening on port 3000");
