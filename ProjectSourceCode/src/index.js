@@ -246,12 +246,22 @@ app.get("/logout", (req, res) => {
 
 app.get("/collection", auth, async (req, res) => {
   try {
-    // get users cards from here once i figure out how to do that
+    const username = req.session.user.username;
 
-    res.render("pages/collection");
+    // Query the DB for all cards this user owns
+    const userCardsQuery = `
+      SELECT c.name, c.sport, c.attack, c.defense, c.health, c.overall
+      FROM cards c
+      JOIN cardsToUsers cu ON c.id = cu.card_id
+      WHERE cu.username_id = $1
+    `;
+    const userCards = await db.any(userCardsQuery, [username]);
+
+    // Render the collection page, passing in userCards
+    res.render("pages/collection", { userCards });
   } catch (error) {
     console.error(error);
-    res.status(500).send("error for if there is probles on the server end");
+    res.status(500).send("Error fetching user cards");
   }
 });
 
