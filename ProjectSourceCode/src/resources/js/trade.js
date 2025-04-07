@@ -11,20 +11,32 @@ async function loadAll(){
 };
 
 //load players
-async function loadPlayers() {
+async function loadPlayers(username) {
     const offerDropdown = document.getElementById("offerCard");
     const tradeForDropdown = document.getElementById("tradeForCard");
     offerDropdown.innerHTML = "";
     tradeForDropdown.innerHTML = "";
 
     try {
+        const player_card_query =
+        `SELECT * 
+        FROM cards 
+        JOIN cardsToUsers 
+        ON cards.id = cardsToUsers.card_id 
+        WHERE cardsToUsers.username_id = $1;`;
+
+        const player_cards = await db.any(player_card_query, [username]);
+        player_cards.forEach(card => {
+            const option1 = document.createElement("option");
+            option1.value = card.id;
+            option1.textContent = card.name;
+            offerDropdown.appendChild(option1);
+        });
+
+
         const response = await fetch("/cards"); 
         const cards = await response.json();
         cards.forEach(card => {
-            const option1 = document.createElement("option");
-            option1.value = card.id; 
-            option1.textContent = card.name;
-            offerDropdown.appendChild(option1);
 
             const option2 = document.createElement("option");
             option2.value = card.id;
@@ -37,7 +49,7 @@ async function loadPlayers() {
 }
 
 // trade submits
-async function submitTrade(event) {
+document.getElementById("tradeForm").addEventListener("submit", async (event) =>{
     event.preventDefault();
     const offerCard = document.getElementById("offerCard").value;
     const tradeForCard = document.getElementById("tradeForCard").value;
@@ -74,7 +86,7 @@ async function submitTrade(event) {
         console.error("Error submitting trade:", err);
         alert("Server error while submitting trade.");
     }
-};
+});
 
 // pending trades
 function updateTradeList() {

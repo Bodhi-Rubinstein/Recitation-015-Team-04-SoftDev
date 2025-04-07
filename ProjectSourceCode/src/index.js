@@ -93,9 +93,6 @@ app.get("/register", (req, res) => {
 });
 
 
-app.get("/trade", (req,res) => {
-  res.render("pages/trade");
-});
 
 
 //Login
@@ -145,13 +142,17 @@ app.post("/register", async (req, res) => {
     await db.one(userInsertQuery, [username, hash]);
 
     // Initialize the user with zero cards in cardsToUsers
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
+
+    let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
+    await db.none(userDeckQuery, [username]);
 
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
-    return res.redirect("/register"); // Stay on register page if error occurs
+    return res.redirect("/"); // Stay on register page if error occurs
   }
 });
 
@@ -545,6 +546,30 @@ app.post("/testbattle/next", (req, res) => {
 
   req.session.battle = battleState;
   res.redirect("/testbattle");
+});
+
+app.get("/trade", auth, async (req,res) => {
+  const username = req.session.user.username;
+  
+    try {
+        const all_cards_query = `SELECT * FROM cards;`;
+        const player_card_query =
+        `SELECT * 
+        FROM cards 
+        JOIN cardsToUsers 
+        ON cards.id = cardsToUsers.card_id 
+        WHERE cardsToUsers.username_id = $1;`;
+        //pull all owned player cards
+        const player_cards = await db.any(player_card_query, [username]);
+        //pull all cards
+        const all_cards = await db.any(all_cards_query);
+
+        const player_trade_query = `SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner $2`
+
+        res.render("pages/trade", { player_cards: player_cards ,all_cards: all_cards});
+    } catch (err) {
+        console.error("Error loading cards:", err);
+    }
 });
 
 app.post("/trades", async (req, res) => {
