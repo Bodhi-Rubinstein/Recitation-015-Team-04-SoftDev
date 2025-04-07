@@ -145,13 +145,17 @@ app.post("/register", async (req, res) => {
     await db.one(userInsertQuery, [username, hash]);
 
     // Initialize the user with zero cards in cardsToUsers
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
+
+    let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
+    await db.none(userDeckQuery, [username]);
 
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
-    return res.redirect("/register"); // Stay on register page if error occurs
+    return res.redirect("/"); // Stay on  page if error occurs
   }
 });
 
