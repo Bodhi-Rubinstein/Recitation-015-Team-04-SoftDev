@@ -1,6 +1,15 @@
 <div class="container my-5">
   <h2 class="mb-4">Deck Builder</h2>
   <form action="/deckbuilder" method="POST">
+    <div class="mb-3">
+      <label for="deckName" class="form-label">Deck name (optional)</label>
+      <input
+        id="deckName"
+        name="deckName"
+        class="form-control"
+        placeholder="e.g. NBA All-Stars"
+      />
+    </div>
     <div class="row mb-3">
       <div class="col">
         <label for="card1" class="form-label">Card 1</label>
@@ -73,37 +82,4 @@
   </form>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () { const cardSelects
-  = document.querySelectorAll('select[id^="card"]'); // Function to update the
-  options in all dropdowns const updateOptions = () => { //put all selected vals
-  into an array const selectedValues = Array.from(cardSelects).map(select =>
-  select.value); // Update each dropdown cardSelects.forEach(select => { const
-  currentValue = select.value; // Keep the current value selected
-  Array.from(select.options).forEach(option => { // Loop through each option if
-  (option.value === '') { // Always keep the default "Select a card" option
-  enabled option.disabled = false; } else if
-  (selectedValues.includes(option.value) && option.value !== currentValue) { //
-  Disable the option if it's selected in another dropdown option.disabled =
-  true; } else { // Enable the option if it's not selected elsewhere
-  option.disabled = false; } }); }); }; // Add event listeners to all dropdowns
-  cardSelects.forEach(select => { select.addEventListener('change',
-  updateOptions); }); // Initialize the options on page load updateOptions();
-  });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () { const cardSelects
-  = document.querySelectorAll('select[id^="card"]'); const updateOptions = () =>
-  { //put all selected vals into an array const selectedValues =
-  Array.from(cardSelects).map(select => select.value);
-  cardSelects.forEach(select => { const currentValue = select.value; //current
-  val selected Array.from(select.options).forEach(option => { //loop thru each
-  option if (option.value === '') { //select a card alw enabled option.disabled
-  = false; } else if (selectedValues.includes(option.value) && option.value !==
-  currentValue) { //if the option is selected elsewhere option.disabled = true;
-  } else { //otherwise enable it option.disabled = false; } }); }); }; // Add
-  event listeners to all dropdowns cardSelects.forEach(select => {
-  select.addEventListener('change', updateOptions); }); // Initialize the
-  options on page load updateOptions(); });
-</script>
+<script src="/resources/js/deckbuilder.js"></script>

@@ -1,9 +1,23 @@
-<div class="container my-5">
-  <h2 class="mb-4">Battle Arena</h2>
-  {{> message}} <!-- Displays any alert messages -->
-  <p>Select your opponent:</p>
-  <form action="/battle/start" method="POST">
-    <button type="submit" name="type" value="bot" class="btn btn-primary">Match with Bot</button>
-    <button type="submit" name="type" value="human" class="btn btn-secondary" disabled>Match with Human (Coming Soon)</button>
-  </form>
-</div>
+<h2 class="mb-4">Battle Arena</h2>
+
+<form action="/battle/start" method="POST" class="mb-3">
+  <label for="deckSelect" class="form-label">Choose a deck:</label>
+  <select id="deckSelect" name="deck_id" class="form-select mb-4" required>
+    {{#each decks}}
+      <option value="{{this.deck_id}}">{{this.name}}</option>
+    {{/each}}
+  </select>
+
+  <button type="submit" name="type" value="bot" class="btn btn-primary">
+    Battle Bot
+  </button>
+  <button
+    type="submit"
+    name="type"
+    value="human"
+    class="btn btn-secondary"
+    disabled
+  >
+    Human (soon)
+  </button>
+</form>
