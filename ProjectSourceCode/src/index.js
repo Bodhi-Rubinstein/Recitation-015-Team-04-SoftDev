@@ -13,6 +13,7 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcryptjs"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const battle = require("./resources/js/battle"); // Updated path because battle.js is in src/js/
+app.use("/resources", express.static(path.join(__dirname, "resources")));
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -45,15 +46,17 @@ db.connect()
 
 // Register `hbs` as our view engine using its bound `engine()` function.
 
-app.engine(
-  "hbs",
-  engine({
-    extname: "hbs",
-    defaultLayout: "main",
-    layoutsDir: path.join(__dirname, "views", "layouts"),
-    partialsDir: path.join(__dirname, "views", "partials"),
-  })
-);
+const hbs = engine({
+  extname: "hbs",
+  defaultLayout: "main",
+  layoutsDir: path.join(__dirname, "views", "layouts"),
+  partialsDir: path.join(__dirname, "views", "partials"),
+  helpers: {
+    eq: (a, b) => a === b, // ← makes {{#if (eq x y)}} work
+  },
+});
+
+app.engine("hbs", hbs);
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -68,7 +71,7 @@ app.use(
   })
 );
 
-app.use('/resources', express.static(__dirname + '/resources'));
+app.use("/resources", express.static(__dirname + "/resources"));
 
 app.use(
   bodyParser.urlencoded({
@@ -79,6 +82,10 @@ app.use(
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
+
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
+});
 
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -96,11 +103,9 @@ app.get("/register", (req, res) => {
   res.render("pages/register");
 });
 
-
-app.get("/trade", (req,res) => {
+app.get("/trade", (req, res) => {
   res.render("pages/trade");
 });
-
 
 //Login
 app.post("/login", async (req, res) => {
@@ -111,7 +116,9 @@ app.post("/login", async (req, res) => {
     const user = await db.oneOrNone(userSearchQuery, [username]);
     if (!user) {
       //if user DNE
-      return res.render("pages/register", { message: 'Username does not exist. Please make an account.' });
+      return res.render("pages/register", {
+        message: "Username does not exist. Please make an account.",
+      });
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -138,6 +145,15 @@ app.post("/register", async (req, res) => {
   const passwordError = validatePassword(password);
   if (passwordError) {
     return res.render("pages/register", { message: passwordError }); 
+=======
+  if (!username || !password) {
+    if (req.accepts("json")) {
+      // test client hits this branch
+      return res
+        .status(400)
+        .json({ status: "error", message: "Missing field" });
+    }
+    return res.redirect("/register"); // browser
   }
 
   const hash = await bcrypt.hash(password, 10);
@@ -146,11 +162,12 @@ app.post("/register", async (req, res) => {
   let usernameCheckQuery = `SELECT * FROM users WHERE username = $1;`;
   // Check if the username already exists
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
-  
-  if(existingUser){
-    res.status(400);
-    return res.render('pages/register', { message: 'Username already exists. Please choose another one.' });
-  }
+
+  if (existingUser) {
+    return res.render("pages/register", {
+      message: "Username already exists. Please choose another one.",
+    });
+
 
   try {
     await db.one(userInsertQuery, [username, hash]);
@@ -160,32 +177,37 @@ app.post("/register", async (req, res) => {
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
 
-
-    let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
-    await db.none(userDeckQuery, [username]);
+    if (req.accepts("json")) {
+      return res
+        .status(200)
+        .json({ status: "success", message: "User created" });
+    }
 
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
-    return res.redirect("/"); // Stay on  page if error occurs
+    if (req.accepts("json")) {
+      return res.status(400).json({ status: "error", message: error.message });
+    }
+    return res.redirect("/register"); // Stay on register page if error occurs
+
   }
 });
 
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect("/login");
+  }
+  next();
+};
 
-    // Authentication Middleware.
-  const auth = (req, res, next) => {
-    if (!req.session.user) {
-      // Default to login page.
-      return res.redirect('/login');
-    }
-    next();
-  };
-  
 // Authentication Required
 app.use(auth);
 
-app.get('/openPack', (req, res) => {
-  res.render('pages/openPack');
+app.get("/openPack", (req, res) => {
+  res.render("pages/openPack");
 });
 
 //home route (only for authenticated users)
@@ -205,7 +227,7 @@ app.get("/home", auth, async (req, res) => {
 });
 
 //opening pack
-app.post('/open-pack', auth, async (req, res) => {
+app.post("/open-pack", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
 
   try {
@@ -217,8 +239,7 @@ app.post('/open-pack', auth, async (req, res) => {
       await db.none(updateMoneyQuery, [username]);
 
       //get 5 random cards
-      const randomCardsQuery = 
-        `SELECT id, name 
+      const randomCardsQuery = `SELECT id, name 
         FROM cards 
         ORDER BY RANDOM() 
         LIMIT 5;
@@ -226,8 +247,8 @@ app.post('/open-pack', auth, async (req, res) => {
       const randomCards = await db.any(randomCardsQuery);
 
       const values = randomCards
-        .map(card => `('${username}', ${card.id})`) //make an array of these pairs in values
-        .join(', '); //make a single string
+        .map((card) => `('${username}', ${card.id})`) //make an array of these pairs in values
+        .join(", "); //make a single string
 
       const insertCardsQuery = `
         INSERT INTO cardsToUsers (username_id, card_id)
@@ -238,22 +259,23 @@ app.post('/open-pack', auth, async (req, res) => {
       // Respond with success and the pack contents
       res.json({
         success: true,
-        message: 'Pack opened successfully!',
-        packContents: randomCards.map(card => card.name), // Send back the names of the cards
+        message: "Pack opened successfully!",
+        packContents: randomCards.map((card) => card.name), // Send back the names of the cards
       });
     } else {
       res.json({
         success: false,
-        message: 'You do not have enough money to open a pack.',
+        message: "You do not have enough money to open a pack.",
       });
     }
   } catch (error) {
-    console.error('Error opening pack:', error);
-    res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
+    console.error("Error opening pack:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred. Please try again later.",
+    });
   }
 });
-
-
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
@@ -266,7 +288,7 @@ app.get("/collection", auth, async (req, res) => {
 
     // Query the DB for all cards this user owns
     const userCardsQuery = `
-      SELECT c.name, c.sport, c.attack, c.defense, c.health, c.overall
+      SELECT c.id, c.name, c.sport, c.attack, c.defense, c.health, c.overall
       FROM cards c
       JOIN cardsToUsers cu ON c.id = cu.card_id
       WHERE cu.username_id = $1
@@ -281,9 +303,12 @@ app.get("/collection", auth, async (req, res) => {
   }
 });
 
+
+
 // Authentication Required
 app.use(auth);
 // leaderboard
+
 app.get('/leaderboard', async(req, res) => {
   try {
     const leaderboardQuery = `
@@ -316,8 +341,8 @@ app.get("/deckBuilder", auth, async (req, res) => {
     JOIN cardsToUsers 
     ON cards.id = cardsToUsers.card_id 
     WHERE cardsToUsers.username_id = $1;
-  `;    
-  // Fetch available cards so the user can choose cards for their deck.
+  `;
+    // Fetch available cards so the user can choose cards for their deck.
     const availableCards = await db.any(availableCardsQuery, [username]);
     res.render("pages/deckBuilder", { availableCards });
   } catch (error) {
@@ -328,50 +353,79 @@ app.get("/deckBuilder", auth, async (req, res) => {
 
 // POST /deckbuilder - Create a new deck from the selected cards.
 app.post("/deckBuilder", auth, async (req, res) => {
-  const { card1, card2, card3, card4, card5 } = req.body;
+  const { card1, card2, card3, card4, card5, deckName } = req.body;
   const username = req.session.user.username;
+
+  // prevent duplicate cards server‑side
+  const picked = [card1, card2, card3, card4, card5];
+  if (new Set(picked).size !== 5) {
+    return res.status(400).send("Duplicate cards in deck");
+  }
+
   try {
-    // Insert a new deck record.
-    const deckInsertQuery = `
-      INSERT INTO decks (card1_id, card2_id, card3_id, card4_id, card5_id)
-      VALUES ($1, $2, $3, $4, $5) RETURNING id;
-    `;
-    const deck = await db.one(deckInsertQuery, [
-      card1,
-      card2,
-      card3,
-      card4,
-      card5,
-    ]);
+    // 1. create the deck
+    const deck = await db.one(
+      `INSERT INTO decks (card1_id, card2_id, card3_id, card4_id, card5_id)
+       VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+      picked
+    );
 
-    // Link the new deck to the current user.
-    const userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, $2);`;
-    await db.none(userDeckQuery, [username, deck.id]);
+    // 2. link it to the user
+    await db.none(
+      `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1,$2)`,
+      [username, deck.id]
+    );
 
-    res.redirect("/collection"); // Redirect to a collection or deck overview page.
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error creating deck.");
+    // 3. save (or auto‑generate) a friendly name
+    const name =
+      deckName?.trim() ||
+      `Deck ${await db
+        .one(`SELECT COUNT(*) FROM userToDecks WHERE username_id = $1`, [
+          username,
+        ])
+        .then((r) => r.count)}`;
+
+    await db.none(
+      `INSERT INTO deck_meta (deck_id, username_id, name)
+       VALUES ($1,$2,$3)`,
+      [deck.id, username, name]
+    );
+
+    res.redirect("/collection");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating deck");
   }
 });
+
 // GET /battle – Render the battle selection page.
-app.get("/battle", auth, (req, res) => {
-  res.render("pages/battle", { message: "Select your opponent:" });
+app.get("/battle", auth, async (req, res) => {
+  const username = req.session.user.username;
+  const decks = await db.any(
+    `SELECT d.deck_id, m.name
+       FROM userToDecks d
+       JOIN deck_meta m ON d.deck_id = m.deck_id
+      WHERE d.username_id = $1
+      ORDER BY d.deck_id`,
+    [username]
+  );
+  res.render("pages/battle", { decks });
 });
 
 // POST /battle/start – Start a battle (using your saved deck against a bot).
 app.post("/battle/start", auth, async (req, res) => {
-  const battleType = req.body.type; // "bot" (human not active yet)
+  const { type: battleType, deck_id } = req.body;
   const username = req.session.user.username;
+
   try {
-    const deckMapping = await db.oneOrNone(
-      "SELECT deck_id FROM userToDecks WHERE username_id = $1",
-      [username]
+    // make sure that deck belongs to this user
+    const ok = await db.oneOrNone(
+      `SELECT 1 FROM userToDecks WHERE username_id=$1 AND deck_id=$2`,
+      [username, deck_id]
     );
-    if (!deckMapping) return res.redirect("/deckbuilder");
-    const userDeck = await db.one("SELECT * FROM decks WHERE id = $1", [
-      deckMapping.deck_id,
-    ]);
+    if (!ok) return res.status(400).send("Deck not found");
+
+    const userDeck = await db.one("SELECT * FROM decks WHERE id=$1", [deck_id]);
     const cardIds = [
       userDeck.card1_id,
       userDeck.card2_id,
@@ -398,6 +452,54 @@ app.post("/battle/start", auth, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error starting battle.");
+  }
+});
+
+// index.js  (add after POST /battle/start)
+
+app.get("/battle/play/:deckId", auth, async (req, res) => {
+  const username = req.session.user.username;
+  const deckId = req.params.deckId;
+
+  // security: make sure this deck belongs to the user
+  const ok = await db.oneOrNone(
+    `SELECT 1 FROM userToDecks WHERE username_id=$1 AND deck_id=$2`,
+    [username, deckId]
+  );
+  if (!ok) return res.redirect("/battle");
+
+  const deck = await db.one("SELECT * FROM decks WHERE id=$1", [deckId]);
+  const cardIds = [
+    deck.card1_id,
+    deck.card2_id,
+    deck.card3_id,
+    deck.card4_id,
+    deck.card5_id,
+  ];
+  const userCards = await db.any("SELECT * FROM cards WHERE id IN ($1:csv)", [
+    cardIds,
+  ]);
+  const botCards = await db.any(
+    "SELECT * FROM cards ORDER BY RANDOM() LIMIT 5"
+  );
+
+  res.render("pages/battlePlay", {
+    userCards: JSON.stringify(userCards),
+    botCards: JSON.stringify(botCards),
+    username,
+  });
+});
+
+// receive final result so you still update DB / trophies
+app.post("/battle/finish", auth, async (req, res) => {
+  const { userScore, botScore, logs } = req.body;
+  const username = req.session.user.username;
+  try {
+    await battle.recordFinishedBattle(username, userScore, botScore, logs, db);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
   }
 });
 
@@ -509,7 +611,7 @@ app.post("/testbattle/attack", (req, res) => {
     } deals ${botDamage.toFixed(2)} damage.\n`;
   }
   req.session.battle = battleState;
-  res.redirect("/testbattle"); 
+  res.redirect("/testbattle");
 });
 
 // POST /testbattle/next – End current round, record outcome, and move to next round.
@@ -592,30 +694,33 @@ function validatePassword(password){
   return null;
 }
 
+
 app.post("/trades", async (req, res) => {
   try {
     const { card1_id, card2_id } = req.body;
     // get owner and name info for both cards
     const card1Info = await db.query(
-        `SELECT u.username, c.name
+      `SELECT u.username, c.name
          FROM cardsToUsers cu
          JOIN users u ON cu.username_id = u.username
          JOIN cards c ON cu.card_id = c.id
          WHERE cu.card_id = $1`,
-        [card1_id]
+      [card1_id]
     );
     const card2Info = await db.query(
-        `SELECT u.username, c.name
+      `SELECT u.username, c.name
          FROM cardsToUsers cu
          JOIN users u ON cu.username_id = u.username
          JOIN cards c ON cu.card_id = c.id
          WHERE cu.card_id = $1`,
-        [card2_id]
+      [card2_id]
     );
 
     // validates both cards
-    if (!card1Info.length|| !card2Info.length) {
-        return res.status(404).json({ error: "One or both cards not found or not owned." });
+    if (!card1Info.length || !card2Info.length) {
+      return res
+        .status(404)
+        .json({ error: "One or both cards not found or not owned." });
     }
     const card1_owner = card1Info[0].username;
     const card2_owner = card2Info[0].username;
@@ -624,44 +729,95 @@ app.post("/trades", async (req, res) => {
 
     // Insert into trades table
     await db.query(
-        `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
+      `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
          VALUES ($1, $2, $3, $4)`,
-        [card1_id, card2_id, card1_owner, card2_owner]
+      [card1_id, card2_id, card1_owner, card2_owner]
     );
 
     res.status(201).json({
-        message: "Trade offer sent!",
-        trade: {
-            offer: card1_name,
-            request: card2_name,
-            card1_owner,
-            card2_owner,
-            card1_id,
-            card2_id,
-            status: "Pending"
-        }
+      message: "Trade offer sent!",
+      trade: {
+        offer: card1_name,
+        request: card2_name,
+        card1_owner,
+        card2_owner,
+        card1_id,
+        card2_id,
+        status: "Pending",
+      },
     });
-} catch (err) {
+  } catch (err) {
     console.error(err);
     //res.status(500).send("Server error");
-    res.status(500).json({ error: "Server error" }); 
-}
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//this ensures that everytime the user loads into the page, the trades are ran
+app.get("/trades/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const result = await db.query(
+      "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
+      [username]
+    );
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    //res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 
-//this ensures that everytime the user loads into the page, the trades are ran 
-app.get("/trades/:username", async (req, res) => {
+// in order to get the actaul player stats for the buttons in colections tab not just the game moves
+app.get("/player/details/:id", auth, async (req, res) => {
+  const cardId = req.params.id;
   try {
-      const { username } = req.params;
-      const result = await db.query(
-          "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
-          [username]
-      );
-      res.json(result);
-  } catch (err) {
-      console.error(err);
-      //res.status(500).send("Server error");
-      res.status(500).json({ error: "Server error" }); 
+    const query = `
+      SELECT 
+        c.id AS card_id,
+        c.name AS card_name,
+        c.sport,
+        c.attack,
+        c.defense,
+        c.health,
+        c.overall,
+        nb.id AS nba_id,
+        nb.player_name,
+        nb.team_abbreviation,
+        nb.age,
+        nb.player_height,
+        nb.player_weight,
+        nb.college,
+        nb.country,
+        nb.draft_year,
+        nb.draft_round,
+        nb.draft_number,
+        nb.gp,
+        nb.pts,
+        nb.reb,
+        nb.ast,
+        nb.net_rating,
+        nb.oreb_pct,
+        nb.dreb_pct,
+        nb.usg_pct,
+        nb.ts_pct,
+        nb.ast_pct,
+        nb.season
+      FROM cards c
+      LEFT JOIN nbaPlayersToCards np2c ON c.id = np2c.card_id
+      LEFT JOIN nbaPlayers nb ON np2c.player_id = nb.id
+      WHERE c.id = $1;
+    `;
+    const result = await db.oneOrNone(query, [cardId]);
+    if (!result) {
+      return res.status(404).json({ error: "Player not found" });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error retrieving player details" });
   }
 });
 
@@ -669,7 +825,10 @@ app.get("/trades/:username", async (req, res) => {
 app.post("/trades/:tradeId/accept", async (req, res) => {
   try {
     const { tradeId } = req.params;
-    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [tradeId]);
+    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [
+      tradeId,
+    ]);
+
 
     if (!tradeResult.length) {
       return res.status(404).json({ error: "Trade not found" });
@@ -686,48 +845,90 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
     );
     // removes the trade from the trades table
     await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res.status(200).json({ message: "Trade accepted and completed successfully" });
+    res
+      .status(200)
+      .json({ message: "Trade accepted and completed successfully" });
   } catch (err) {
     console.error("Error accepting trade:", err);
     //res.status(500).send("Server error while accepting trade");
-    res.status(500).json({ error: "Server error" }); 
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 app.delete("/trades/:tradeId/reject", async (req, res) => {
   try {
-      const { tradeId } = req.params;
-      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-      res.status(200).json({ message: "Trade rejected" });
+    const { tradeId } = req.params;
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade rejected" });
   } catch (err) {
-      console.error(err);
-      //res.status(500).send("Server error");
-      res.status(500).json({ error: "Server error" }); 
+    console.error(err);
+    //res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 app.delete("/trades/:tradeId", async (req, res) => {
   try {
-      const tradeId = req.params.tradeId;
-      await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-      res.status(200).json({ message: "Trade removed successfully" });
+    const tradeId = req.params.tradeId;
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade removed successfully" });
   } catch (err) {
-      console.error(err);
-      //res.status(500).send("Server error");\
-      res.status(500).json({ error: "Server error" }); 
-
+    console.error(err);
+    //res.status(500).send("Server error");\
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
 app.get("/cards", async (req, res) => {
   try {
-      const result = await db.query("SELECT id, name FROM cards");
-      res.json(result);
+    const result = await db.query("SELECT id, name FROM cards");
+    res.json(result);
   } catch (err) {
-      console.error("Error fetching cards:", err);
-      res.status(500).send("Server error");
+    console.error("Error fetching cards:", err);
+    res.status(500).send("Server error");
   }
+});
+
+// POST /battle/finish  – called via fetch from the browser
+app.post("/battle/finish", auth, async (req, res) => {
+  const { userScore, botScore, logs } = req.body;
+  const username = req.session.user.username;
+  try {
+    const battleId = await battle.recordFinishedBattle(
+      username,
+      userScore,
+      botScore,
+      logs,
+      db
+    );
+    res.json({ ok: true, battleId });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// GET /battle/result/:id  – render battleResult.hbs
+app.get("/battle/result/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const result = await db.one(
+    `
+      SELECT
+        (SELECT username FROM users WHERE id = battles.player1_id) AS player,
+        player1_score AS "userScore",
+        player2_score AS "botScore",
+        CASE WHEN winner_id = 0 THEN 'tie'
+             WHEN winner_id = battles.player1_id THEN (SELECT username FROM users WHERE id = winner_id)
+             ELSE 'bot' END                            AS winner
+      FROM battles
+      WHERE id = $1`,
+    [id]
+  );
+
+  const logs = await db
+    .one(`SELECT action_detail FROM battle_logs WHERE battle_id = $1`, [id])
+    .then((r) => r.action_detail);
+
+  res.render("pages/battleResult", { result: { ...result, battleLogs: logs } });
 });
 // *****************************************************
 // <!-- Section 5 : Start Server-->
