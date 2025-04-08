@@ -488,11 +488,19 @@ app.post("/battle/finish", auth, async (req, res) => {
   const { userScore, botScore, logs } = req.body;
   const username = req.session.user.username;
   try {
-    await battle.recordFinishedBattle(username, userScore, botScore, logs, db);
-    res.json({ ok: true });
+    const battleId = await battle.recordFinishedBattle(
+      username,
+      userScore,
+      botScore,
+      logs,
+      db
+    );
+    res.json({ ok: true, battleId });
   } catch (e) {
     console.error(e);
-    res.status(500).json({ ok: false });
+    res
+      .status(500)
+      .json({ ok: false, error: "Something went wrong saving the battle." });
   }
 });
 
@@ -686,6 +694,37 @@ function validatePassword(password) {
   return null;
 }
 
+// Add this to your index.js along with your other routes.
+app.get("/battle/result/:battleId", auth, async (req, res) => {
+  const battleId = req.params.battleId;
+  try {
+    // Query for battle details (adjust these queries according to your schema)
+    const battleRecord = await db.one("SELECT * FROM battles WHERE id = $1", [
+      battleId,
+    ]);
+    const logRecord = await db.one(
+      "SELECT action_detail FROM battle_logs WHERE battle_id = $1",
+      [battleId]
+    );
+
+    // Map the information to the expected result object.
+    // Adjust the mapping as needed:
+    const result = {
+      userScore: battleRecord.player1_score,
+      botScore: battleRecord.player2_score,
+      // Determine the winner from your stored data.
+      // This mapping assumes a winner_id of 0 means "Bot" and that if the player wins, winner_id is the username.
+      winner: battleRecord.winner_id === 0 ? "Bot" : battleRecord.winner_id,
+      battleLogs: logRecord.action_detail,
+    };
+
+    // Render the battleResult.hbs view using the result data.
+    res.render("pages/battleResult", { result });
+  } catch (error) {
+    console.error("Error fetching battle result:", error);
+    res.status(500).send("Error fetching battle result.");
+  }
+});
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************

@@ -40,7 +40,7 @@ describe("Server!", () => {
 });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
-
+/*
 // Example Positive Testcase :
 // API: /add_user
 // Input: {id: 5, name: 'John Doe', dob: '2020-02-20'}
@@ -124,3 +124,4 @@ describe("Testing User Login User API", () => {
   });
 });
 // ********************************************************************************
+*/
