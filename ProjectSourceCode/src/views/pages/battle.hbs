@@ -1,9 +1,35 @@
 <div class="container my-5">
   <h2 class="mb-4">Battle Arena</h2>
-  {{> message}} <!-- Displays any alert messages -->
-  <p>Select your opponent:</p>
-  <form action="/battle/start" method="POST">
-    <button type="submit" name="type" value="bot" class="btn btn-primary">Match with Bot</button>
-    <button type="submit" name="type" value="human" class="btn btn-secondary" disabled>Match with Human (Coming Soon)</button>
+
+  <form id="battleForm" class="row gy-2 gx-3 align-items-center">
+    <div class="col-md-6">
+      <label for="deckSelect" class="form-label">Pick a deck:</label>
+      <select id="deckSelect" class="form-select" required>
+        {{#each decks}}
+          <option value="{{this.deck_id}}">{{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="col-auto">
+      <button
+        type="button"
+        id="playBot"
+        class="btn btn-primary"
+      >Play Bot</button>
+      <button
+        type="button"
+        id="playHuman"
+        class="btn btn-secondary"
+        disabled
+      >Play Human</button>
+    </div>
   </form>
 </div>
+
+<script>
+  document.getElementById("playBot").onclick = () => {
+    const deckId = document.getElementById("deckSelect").value;
+    window.location = `/battle/play/${deckId}`;       // go to animated screen
+  };
+</script>
