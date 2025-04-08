@@ -123,7 +123,15 @@ app.post("/login", async (req, res) => {
 
 // Register
 app.post("/register", async (req, res) => {
+
+
   const { username, password } = req.body;
+  // Validate password
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return res.render("pages/register", { message: passwordError }); 
+  }
+
   const hash = await bcrypt.hash(password, 10);
 
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
@@ -500,6 +508,40 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
+function validatePassword(password){
+  const isNonWhiteSpace = /^\S*$/;
+  if (!isNonWhiteSpace.test(password)) {
+    return "Password must not contain Whitespaces.";
+  }
+
+  const isContainsUppercase = /^(?=.*[A-Z]).*$/;
+  if (!isContainsUppercase.test(password)) {
+    return "Password must have at least one Uppercase Character.";
+  }
+
+  const isContainsLowercase = /^(?=.*[a-z]).*$/;
+  if (!isContainsLowercase.test(password)) {
+    return "Password must have at least one Lowercase Character.";
+  }
+
+  const isContainsNumber = /^(?=.*[0-9]).*$/;
+  if (!isContainsNumber.test(password)) {
+    return "Password must contain at least one Digit.";
+  }
+
+  const isContainsSymbol =
+    /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+  if (!isContainsSymbol.test(password)) {
+    return "Password must contain at least one Special Character.";
+  }
+
+  const isValidLength = /^.{8,16}$/;
+  if (!isValidLength.test(password)) {
+    return "Password must be 8-16 Characters Long.";
+  }
+
+  return null;
+}
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
