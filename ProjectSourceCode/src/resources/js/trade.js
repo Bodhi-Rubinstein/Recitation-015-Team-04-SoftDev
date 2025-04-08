@@ -1,11 +1,11 @@
 console.log("test");
-let trades = [];
+//let trades = [];
 
 //upon loading of the page
 //document.addEventListener("DOMContentLoaded", function () {
 async function loadAll(){
     console.log("Page Loaded!");
-    loadPlayers(); 
+    //loadPlayers(); 
     loadTrades();
     document.getElementById("tradeForm").addEventListener("submit", submitTrade);
 };
@@ -70,13 +70,20 @@ document.getElementById("tradeForm").addEventListener("submit", async (event) =>
         if (response.ok) {
             const result = await response.json();
             alert("Trade submitted successfully!");
-            loadTrades(); // reloads the trade list with the new trade
+            await loadTrades(); // reloads the trade list with the new trade
             // hides the modal
             const modalEl = document.getElementById("tradeModal");
-            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
             if (modalInstance) {
                 modalInstance.hide();
             }
+            // remove backdrop
+            setTimeout(() => {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = 'auto';
+                document.body.style.paddingRight = '0';
+              }, 300); 
             document.getElementById("tradeForm").reset();
         } else {
             const errorData = await response.json();
@@ -89,33 +96,62 @@ document.getElementById("tradeForm").addEventListener("submit", async (event) =>
 });
 
 // pending trades
-function updateTradeList() {
-    const tradeList = document.getElementById("tradeList");
-    tradeList.innerHTML = "";
+function updateTradeList(outgoing, incoming, accepted) {
+    //clear existing lists
+    const outgoingList = document.getElementById("outgoingTrades");
+    const incomingList = document.getElementById("incomingTrades");
+    const acceptedList = document.getElementById("acceptedTrades");
 
-    trades.forEach((trade, index) => {
+    outgoingList.innerHTML = "";
+    incomingList.innerHTML = "";
+    acceptedList.innerHTML = "";
+    
+    //populate outgoing trades i.e. trades you've made
+    outgoing.forEach((trade, index) => {
         const tradeItem = document.createElement("li");
-        tradeItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-
+        tradeItem.className = "list-group-item d-flex justify-content-between align-items-center";
         tradeItem.innerHTML = `
-            ${trade.offer} → ${trade.request}
-            <span class="badge bg-warning">${trade.status}</span>
-            <button class="btn btn-danger btn-sm" onclick="cancelTrade(${index})">Cancel</button>
+          <span>You offered <strong>${trade.offer_name}</strong> for <strong>${trade.request_name}</strong></span>
+          <span class="badge bg-warning">${trade.trade_status}</span>
+          <button class="btn btn-danger btn-sm" onclick="cancelTrade(${trade.id}, ${index})">Cancel</button>
         `;
+        outgoingList.appendChild(tradeItem);
+    });
 
-        tradeList.appendChild(tradeItem);
+    //populate incoming trades i.e. trades you can accept
+    incoming.forEach((trade, index) => {
+        const tradeItem = document.createElement("li");
+        tradeItem.className = "list-group-item d-flex justify-content-between align-items-center";
+        tradeItem.innerHTML = `
+          <span>${trade.card1_owner} offered <strong>${trade.offer_name}</strong> for your <strong>${trade.request_name}</strong></span>
+          <span class="badge bg-warning">${trade.trade_status}</span>
+          <div>
+            <button class="btn btn-success btn-sm me-1" onclick="acceptTrade(${trade.id}, ${index})">Accept</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectTrade(${trade.id}, ${index})">Reject</button>
+          </div>`;
+        incomingList.appendChild(tradeItem);
+    });
+
+    //populate accepted trades
+    accepted.forEach((trade) => {
+        const tradeItem = document.createElement("li");
+        tradeItem.className = "list-group-item";
+        tradeItem.innerHTML = `
+          <span>${trade.card1_owner} traded <strong>${trade.offer_name}</strong> ⇄ <strong>${trade.request_name}</strong> with ${trade.card2_owner}</span>
+          <div><span class="badge bg-success">${trade.trade_status}</span></div>`;
+        acceptedList.appendChild(tradeItem);
     });
 }
 
 //accept trades
 async function acceptTrade(tradeId, index) {
+    //console.log("Accepting trade with ID:", tradeId);
     try {
-        const response = await fetch(     
-            `/trades/${tradeId}/accept`, { method: "POST" }
-        );
+        //calls accept trade endpoint
+        const response = await fetch(`/trades/${tradeId}/accept`, { method: "POST" });
         if (response.ok) {
-            trades.splice(index, 1); //deletes from UI
-            updateTradeList();
+
+            await loadTrades(); //reloads trade list
             alert("Trade accepted!");
         } else {
             alert("Failed to accept trade.");
@@ -129,11 +165,11 @@ async function acceptTrade(tradeId, index) {
 //reject trades
 async function rejectTrade(tradeId, index) {
     try {
+        //calls reject trade endpoint
         const response = await fetch(`/trades/${tradeId}/reject`, { method: "DELETE" });
 
         if (response.ok) {
-            trades.splice(index, 1); // deletes from UI
-            updateTradeList();
+            await loadTrades(); // reloads trade list
             alert("Trade rejected!");
         } else {
             alert("Failed to reject trade.");
@@ -145,15 +181,15 @@ async function rejectTrade(tradeId, index) {
 }
 
 // cancel trades 
-async function cancelTrade(index) {
+async function cancelTrade(tradeId, index) {
     try {
+        //calls cancel trade endpoint
         const response = await fetch(`/trades/${tradeId}`, {
             method: "DELETE",
         });
 
         if (response.ok) {
-            trades.splice(index, 1);
-            updateTradeList(); 
+            await loadTrades(); // reloads trade list
         } else {
             console.error("Failed to remove trade from database");
         }
@@ -163,6 +199,17 @@ async function cancelTrade(index) {
 }
 
 //function to load trades *still in progress
-function loadTrades() {
-    updateTradeList();
+async function loadTrades() {
+    try {
+        //fetch outgoing, incoming, and accepted trades from the server
+        const res = await fetch(`/trades/${CURRENT_USER}`);
+        const data = await res.json();
+        
+        //update the trade list with the fetched data
+        updateTradeList(data.outgoing, data.incoming, data.accepted);
+      } catch (err) {
+        console.error("Error loading trades:", err);
+      }
 }
+//load all trades when the page loads
+document.addEventListener("DOMContentLoaded", loadAll);
