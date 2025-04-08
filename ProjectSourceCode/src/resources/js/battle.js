@@ -14,7 +14,6 @@ function rollDiceMultiplier() {
   return { roll, multiplier: mapping[roll] };
 }
 
-
 // Simulate a one-on-one fight between two cards.
 function simulateCardFight(userCard, botCard) {
   let userHealth = userCard.health;
@@ -125,8 +124,64 @@ async function simulateBattle(userCards, botCards, username, db) {
   return { userScore, botScore, winner, battleLogs };
 }
 
-module.exports = {
-  simulateBattle,
-  simulateCardFight,
-  rollDiceMultiplier,
-};
+if (typeof module !== "undefined") {
+  module.exports = {
+    simulateBattle,
+    simulateCardFight,
+    rollDiceMultiplier,
+  };
+}
+
+// at bottom, keep existing module.exports, then ALSO expose for browser
+if (typeof window !== "undefined")
+  window.rollDiceMultiplier = rollDiceMultiplier;
+
+// extra helper to record finished battle (called by /battle/finish)
+async function recordFinishedBattle(
+  username,
+  userScore,
+  botScore,
+  battleLogs,
+  db
+) {
+  try {
+    const winner =
+      userScore > botScore ? username : botScore > userScore ? "bot" : "tie";
+
+    const battleId = await db
+      .one(
+        `INSERT INTO battles (player1_id, player2_id, winner_id,
+                            player1_score, player2_score)
+       VALUES ((SELECT id FROM users WHERE username=$1), 0,
+               CASE WHEN $2=$1 THEN (SELECT id FROM users WHERE username=$1) ELSE 0 END,
+               $3,$4) RETURNING id`,
+        [username, winner, userScore, botScore]
+      )
+      .then((r) => r.id);
+
+    await db.none(
+      `INSERT INTO battle_logs (battle_id, action_detail) VALUES ($1,$2)`,
+      [battleId, battleLogs]
+    );
+
+    if (winner === username) {
+      await db.none(
+        `UPDATE users SET trophies = trophies + 1, money = money + 10
+          WHERE username = $1`,
+        [username]
+      );
+    } else {
+      await db.none(`UPDATE users SET money = money + 5 WHERE username = $1`, [
+        username,
+      ]);
+    }
+
+    return battleId;
+  } catch (err) {
+    console.error("recordFinishedBattle failed:", err);
+    throw err; // propagate to caller
+  }
+}
+if (typeof module !== "undefined") {
+  module.exports.recordFinishedBattle = recordFinishedBattle;
+}
