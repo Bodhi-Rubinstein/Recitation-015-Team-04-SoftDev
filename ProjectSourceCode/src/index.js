@@ -91,8 +91,8 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/login", (req, res) => {
@@ -128,7 +128,9 @@ app.post("/login", async (req, res) => {
       return res.redirect("/home"); //returns up here so no infinite loop
     } else {
       //render login again
-      res.status(400).render('pages/login', { message: 'Incorrect username or password' });
+      res
+        .status(400)
+        .render("pages/login", { message: "Incorrect username or password" });
     }
   } catch (error) {
     console.error(error);
@@ -140,50 +142,51 @@ app.post("/login", async (req, res) => {
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    if (req.accepts("json")) {
-      // test client hits this branch
+    if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
         .json({ status: "error", message: "Missing field" });
     }
-    return res.redirect("/register"); // browser
+    return res.redirect("/register"); // normal browser flow
   }
 
   const hash = await bcrypt.hash(password, 10);
 
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
   let usernameCheckQuery = `SELECT * FROM users WHERE username = $1;`;
+
   // Check if the username already exists
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
-
   if (existingUser) {
+    if (req.get("X-Test-Env") === "1") {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Username already exists" });
+    }
     return res.render("pages/register", {
       message: "Username already exists. Please choose another one.",
     });
-
+  }
 
   try {
     await db.one(userInsertQuery, [username, hash]);
 
-    // Initialize the user with zero cards in cardsToUsers
-    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    // Initialize the user with some default cards
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
 
-    if (req.accepts("json")) {
+    if (req.get("X-Test-Env") === "1") {
       return res
         .status(200)
         .json({ status: "success", message: "User created" });
     }
-
-    return res.redirect("/login"); // Redirect to login after successful registration
+    return res.redirect("/login"); // normal browser flow
   } catch (error) {
     console.error(error);
-    if (req.accepts("json")) {
+    if (req.get("X-Test-Env") === "1") {
       return res.status(400).json({ status: "error", message: error.message });
     }
-    return res.redirect("/register"); // Stay on register page if error occurs
-
+    return res.redirect("/register");
   }
 });
 
@@ -296,13 +299,11 @@ app.get("/collection", auth, async (req, res) => {
   }
 });
 
-
-
 // Authentication Required
 app.use(auth);
 // leaderboard
 
-app.get('/leaderboard', async(req, res) => {
+app.get("/leaderboard", async (req, res) => {
   try {
     const leaderboardQuery = `
     SELECT username AS name, trophies AS battles_won
@@ -310,19 +311,18 @@ app.get('/leaderboard', async(req, res) => {
     ORDER BY trophies DESC
     LIMIT 10;
   `;
-  // Fetch available cards so the user can choose cards for their deck.
+    // Fetch available cards so the user can choose cards for their deck.
     const leaders = await db.any(leaderboardQuery);
-    current_rank = 1
-    leaders.forEach(leader => {
+    current_rank = 1;
+    leaders.forEach((leader) => {
       leader.rank = current_rank;
       current_rank = current_rank + 1;
-    })
+    });
     res.render("pages/leaderboard", { leaders });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");
   }
-
 });
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
@@ -402,6 +402,9 @@ app.get("/battle", auth, async (req, res) => {
       ORDER BY d.deck_id`,
     [username]
   );
+  if (decks.length === 0) {
+    return res.redirect("/deckBuilder");
+  }
   res.render("pages/battle", { decks });
 });
 
@@ -725,7 +728,6 @@ app.get("/trades/:username", async (req, res) => {
   }
 });
 
-
 // in order to get the actaul player stats for the buttons in colections tab not just the game moves
 app.get("/player/details/:id", auth, async (req, res) => {
   const cardId = req.params.id;
@@ -777,14 +779,12 @@ app.get("/player/details/:id", auth, async (req, res) => {
   }
 });
 
-
 app.post("/trades/:tradeId/accept", async (req, res) => {
   try {
     const { tradeId } = req.params;
     const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [
       tradeId,
     ]);
-
 
     if (!tradeResult.length) {
       return res.status(404).json({ error: "Trade not found" });
