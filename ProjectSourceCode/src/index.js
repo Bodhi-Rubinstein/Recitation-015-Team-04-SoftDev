@@ -144,6 +144,15 @@ app.post("/register", async (req, res) => {
   // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
+    return res.render("pages/register", { message: passwordError }); 
+=======
+  if (!username || !password) {
+    if (req.get("X-Test-Env") === "1") {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Missing field" });
+    }
+    return res.redirect("/register"); // normal browser flow
     return res.render("pages/register", { message: passwordError });
   }
 
@@ -169,6 +178,7 @@ app.post("/register", async (req, res) => {
     await db.one(userInsertQuery, [username, hash]);
 
     // Initialize the user with some default cards
+    // Initialize the user with some default cards
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
 
@@ -183,6 +193,7 @@ app.post("/register", async (req, res) => {
     if (req.get("X-Test-Env") === "1") {
       return res.status(400).json({ status: "error", message: error.message });
     }
+    return res.redirect("/register");
     return res.redirect("/register");
   }
 });
@@ -721,9 +732,117 @@ app.get("/battle/result/:battleId", auth, async (req, res) => {
     // Render the battleResult.hbs view using the result data.
     res.render("pages/battleResult", { result });
   } catch (error) {
-    console.error("Error fetching battle result:", error);
-    res.status(500).send("Error fetching battle result.");
+    console.error(error);
+    res.status(500).json({ error: "Error retrieving player details" });
   }
+});
+
+app.post("/trades/:tradeId/accept", async (req, res) => {
+  try {
+    const { tradeId } = req.params;
+    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [
+      tradeId,
+    ]);
+
+    if (!tradeResult.length) {
+      return res.status(404).json({ error: "Trade not found" });
+    }
+    const { card1_id, card2_id, card1_owner, card2_owner } = tradeResult[0];
+    // swaps the ownership of cards in the cardsToUsers table
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card2_owner, card1_id, card1_owner]
+    );
+    await db.query(
+      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
+      [card1_owner, card2_id, card2_owner]
+    );
+    // removes the trade from the trades table
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res
+      .status(200)
+      .json({ message: "Trade accepted and completed successfully" });
+  } catch (err) {
+    console.error("Error accepting trade:", err);
+    //res.status(500).send("Server error while accepting trade");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.delete("/trades/:tradeId/reject", async (req, res) => {
+  try {
+    const { tradeId } = req.params;
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade rejected" });
+  } catch (err) {
+    console.error(err);
+    //res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.delete("/trades/:tradeId", async (req, res) => {
+  try {
+    const tradeId = req.params.tradeId;
+    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
+    res.status(200).json({ message: "Trade removed successfully" });
+  } catch (err) {
+    console.error(err);
+    //res.status(500).send("Server error");\
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/cards", async (req, res) => {
+  try {
+    const result = await db.query("SELECT id, name FROM cards");
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching cards:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// POST /battle/finish  – called via fetch from the browser
+app.post("/battle/finish", auth, async (req, res) => {
+  const { userScore, botScore, logs } = req.body;
+  const username = req.session.user.username;
+  try {
+    const battleId = await battle.recordFinishedBattle(
+      username,
+      userScore,
+      botScore,
+      logs,
+      db
+    );
+    res.json({ ok: true, battleId });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// GET /battle/result/:id  – render battleResult.hbs
+app.get("/battle/result/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const result = await db.one(
+    `
+      SELECT
+        (SELECT username FROM users WHERE id = battles.player1_id) AS player,
+        player1_score AS "userScore",
+        player2_score AS "botScore",
+        CASE WHEN winner_id = 0 THEN 'tie'
+             WHEN winner_id = battles.player1_id THEN (SELECT username FROM users WHERE id = winner_id)
+             ELSE 'bot' END                            AS winner
+      FROM battles
+      WHERE id = $1`,
+    [id]
+  );
+
+  const logs = await db
+    .one(`SELECT action_detail FROM battle_logs WHERE battle_id = $1`, [id])
+    .then((r) => r.action_detail);
+
+  res.render("pages/battleResult", { result: { ...result, battleLogs: logs } });
 });
 // *****************************************************
 // <!-- Section 5 : Start Server-->

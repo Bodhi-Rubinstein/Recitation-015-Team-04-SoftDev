@@ -65,6 +65,22 @@ describe("Testing Add User API", () => {
         done();
       });
   });
+describe("Testing Add User API", () => {
+  before(async () => {
+    await db.none("DELETE FROM users WHERE username = $1", ["John Doe"]);
+  });
+  it("positive : /register. Checking creating new user.", (done) => {
+    chai
+      .request(server)
+      .post("/register")
+      .set("X-Test-Env", "1") // tell the route this is a test client
+      .send({ username: "John Doe", password: "testpassword123" })
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equal("success");
+        done();
+      });
+  });
   // Example Negative Testcase :
   // API: /add_user
   // Input: {id: 5, name: 10, dob: '2020-02-20'}
