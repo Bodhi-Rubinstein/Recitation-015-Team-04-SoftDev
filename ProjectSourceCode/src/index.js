@@ -140,7 +140,10 @@ app.post("/login", async (req, res) => {
 
 // Register
 app.post("/register", async (req, res) => {
+
+
   const { username, password } = req.body;
+<<<<<<< HEAD
   if (!username || !password) {
     if (req.get("X-Test-Env") === "1") {
       return res
@@ -148,6 +151,12 @@ app.post("/register", async (req, res) => {
         .json({ status: "error", message: "Missing field" });
     }
     return res.redirect("/register"); // normal browser flow
+=======
+  // Validate password
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return res.render("pages/register", { message: passwordError }); 
+>>>>>>> c27f760 (password validation works now)
   }
 
   const hash = await bcrypt.hash(password, 10);
@@ -675,6 +684,7 @@ app.post("/trades", async (req, res) => {
       [card2_id]
     );
 
+<<<<<<< HEAD
     // validates both cards
     if (!card1Info.length || !card2Info.length) {
       return res
@@ -685,6 +695,42 @@ app.post("/trades", async (req, res) => {
     const card2_owner = card2Info[0].username;
     const card1_name = card1Info[0].name;
     const card2_name = card2Info[0].name;
+=======
+function validatePassword(password){
+  const isNonWhiteSpace = /^\S*$/;
+  if (!isNonWhiteSpace.test(password)) {
+    return "Password must not contain Whitespaces.";
+  }
+
+  const isContainsUppercase = /^(?=.*[A-Z]).*$/;
+  if (!isContainsUppercase.test(password)) {
+    return "Password must have at least one Uppercase Character.";
+  }
+
+  const isContainsLowercase = /^(?=.*[a-z]).*$/;
+  if (!isContainsLowercase.test(password)) {
+    return "Password must have at least one Lowercase Character.";
+  }
+
+  const isContainsNumber = /^(?=.*[0-9]).*$/;
+  if (!isContainsNumber.test(password)) {
+    return "Password must contain at least one Digit.";
+  }
+
+  const isContainsSymbol =
+    /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+  if (!isContainsSymbol.test(password)) {
+    return "Password must contain at least one Special Character.";
+  }
+
+  const isValidLength = /^.{8,16}$/;
+  if (!isValidLength.test(password)) {
+    return "Password must be 8-16 Characters Long.";
+  }
+
+  return null;
+}
+>>>>>>> c27f760 (password validation works now)
 
     // Insert into trades table
     await db.query(
