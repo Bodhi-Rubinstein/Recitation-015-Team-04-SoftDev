@@ -142,8 +142,10 @@ app.post("/register", async (req, res) => {
   // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
+
     return res.render("pages/register", { message: passwordError }); 
   }
+
   if (!username || !password) {
     if (req.accepts("json")) {
       // test client hits this branch
@@ -165,6 +167,7 @@ app.post("/register", async (req, res) => {
   if (existingUser) {
     return res.status(400).render("pages/register", {
       message: "Username already exists. Please choose another one.",
+
     });
   }
 
@@ -196,6 +199,7 @@ app.post("/register", async (req, res) => {
 
   }
   });
+
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
