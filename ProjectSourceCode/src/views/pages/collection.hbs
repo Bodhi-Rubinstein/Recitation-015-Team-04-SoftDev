@@ -28,6 +28,7 @@
         <th>Defense</th>
         <th>Health</th>
         <th>Overall</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -39,17 +40,36 @@
         <td>{{this.defense}}</td>
         <td>{{this.health}}</td>
         <td>{{this.overall}}</td>
+        <td>
+          <button class="btn btn-info btn-sm" onclick="viewPlayerStats({{this.id}})">View Stats</button>
+        </td>
       </tr>
       {{/each}}
     </tbody>
   </table>
 </main>
 
+<!-- Bootstrap crap -->
+<div class="modal fade" id="playerModal" tabindex="-1" aria-labelledby="playerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="playerModalLabel">Player Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="playerModalBody">
+        <!-- Player details right here hopefully -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   /**
-   * Sorts the table rows based on the given column index in descending order.
-   * @param {number} colIndex - The index of the column to sort by.
-   * @param {string} type - "num" for numeric or "str" for string.
+   * Sorts the table rows based on the given column index in descending order. IF CHANGES ARE MADE TO SORT MAKE THEM HERE
    */
   function sortTable(colIndex, type) 
   {
@@ -74,15 +94,15 @@
         comparison = cellA.localeCompare(cellB);
       }
 
-      // descending order (high-to-low)
+      // Descending order (high-to-low)
       return -comparison;
     });
 
-    // Append the sorted rows back into the table body.
+    // Append sorted rows
     rows.forEach(row => tbody.appendChild(row));
   }
 
-  // sort dropdown change event.
+  // Sort dropdown change event
   function handleSortChange() 
   {
     const dropdown = document.getElementById("sortDropdown");
@@ -91,6 +111,64 @@
     const [colIndexStr, type] = value.split("_");
     const colIndex = parseInt(colIndexStr, 10);
     sortTable(colIndex, type);
+  }
+
+  /**
+   * Fetches and displays the player's card stats and NBA stats in a modal popup.
+   * @param {number} playerId - The card ID for which to fetch details.
+   */
+  function viewPlayerStats(playerId) {
+    fetch(`/player/details/${playerId}`)
+      .then(response => response.json())
+      .then(data => 
+      {
+        const modalBody = document.getElementById('playerModalBody');
+        modalBody.innerHTML = `
+          <h5>Card Stats</h5>
+          <p><strong>Name:</strong> ${data.card_name}</p>
+          <p><strong>Sport:</strong> ${data.sport}</p>
+          <p><strong>Attack:</strong> ${data.attack}</p>
+          <p><strong>Defense:</strong> ${data.defense}</p>
+          <p><strong>Health:</strong> ${data.health}</p>
+          <p><strong>Overall:</strong> ${data.overall}</p>
+          <hr>
+          <h5>NBA Stats</h5>
+          
+
+          
+          ${ data.nba_id ? `
+            <p><strong>Player Name:</strong> ${data.player_name}</p>
+            <p><strong>Team:</strong> ${data.team_abbreviation}</p>
+            <p><strong>Age:</strong> ${data.age}</p>
+            <p><strong>Height:</strong> ${data.player_height}</p>
+            <p><strong>Weight:</strong> ${data.player_weight}</p>
+            <p><strong>College:</strong> ${data.college}</p>
+            <p><strong>Country:</strong> ${data.country}</p>
+            <p><strong>Draft:</strong> Year ${data.draft_year}, Round ${data.draft_round}, Pick ${data.draft_number}</p>
+            <p><strong>Games Played:</strong> ${data.gp}</p>
+            <p><strong>PPG:</strong> ${data.pts}</p>
+            <p><strong>Rebounds:</strong> ${data.reb}</p>
+            <p><strong>Assists:</strong> ${data.ast}</p>
+            <p><strong>Net Rating:</strong> ${data.net_rating}</p>
+            <p><strong>Offensive Reb %:</strong> ${data.oreb_pct}</p>
+            <p><strong>Defensive Reb %:</strong> ${data.dreb_pct}</p>
+            <p><strong>Usage %:</strong> ${data.usg_pct}</p>
+            <p><strong>True Shooting %:</strong> ${data.ts_pct}</p>
+            <p><strong>Assist %:</strong> ${data.ast_pct}</p>
+            <p><strong>Season:</strong> ${data.season}</p>
+          ` : '<p>No NBA stats available.</p>' }
+        `;
+        //Bootstrap's modal API.
+        var playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
+        playerModal.show();
+      })
+
+      // test case for server crap
+      .catch(err => 
+      {
+        console.error(err);
+        alert('Error fetching player details.');
+      });
   }
 </script>
 
