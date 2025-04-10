@@ -140,23 +140,11 @@ app.post("/login", async (req, res) => {
 
 // Register
 app.post("/register", async (req, res) => {
-
-
   const { username, password } = req.body;
-<<<<<<< HEAD
-  if (!username || !password) {
-    if (req.get("X-Test-Env") === "1") {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Missing field" });
-    }
-    return res.redirect("/register"); // normal browser flow
-=======
   // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
-    return res.render("pages/register", { message: passwordError }); 
->>>>>>> c27f760 (password validation works now)
+    return res.render("pages/register", { message: passwordError });
   }
 
   const hash = await bcrypt.hash(password, 10);
@@ -663,40 +651,8 @@ app.post("/testbattle/next", (req, res) => {
   req.session.battle = battleState;
   res.redirect("/testbattle");
 });
-app.post("/trades", async (req, res) => {
-  try {
-    const { card1_id, card2_id } = req.body;
-    // get owner and name info for both cards
-    const card1Info = await db.query(
-      `SELECT u.username, c.name
-         FROM cardsToUsers cu
-         JOIN users u ON cu.username_id = u.username
-         JOIN cards c ON cu.card_id = c.id
-         WHERE cu.card_id = $1`,
-      [card1_id]
-    );
-    const card2Info = await db.query(
-      `SELECT u.username, c.name
-         FROM cardsToUsers cu
-         JOIN users u ON cu.username_id = u.username
-         JOIN cards c ON cu.card_id = c.id
-         WHERE cu.card_id = $1`,
-      [card2_id]
-    );
 
-<<<<<<< HEAD
-    // validates both cards
-    if (!card1Info.length || !card2Info.length) {
-      return res
-        .status(404)
-        .json({ error: "One or both cards not found or not owned." });
-    }
-    const card1_owner = card1Info[0].username;
-    const card2_owner = card2Info[0].username;
-    const card1_name = card1Info[0].name;
-    const card2_name = card2Info[0].name;
-=======
-function validatePassword(password){
+function validatePassword(password) {
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
     return "Password must not contain Whitespaces.";
@@ -717,8 +673,7 @@ function validatePassword(password){
     return "Password must contain at least one Digit.";
   }
 
-  const isContainsSymbol =
-    /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+  const isContainsSymbol = /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
   if (!isContainsSymbol.test(password)) {
     return "Password must contain at least one Special Character.";
   }
@@ -730,208 +685,7 @@ function validatePassword(password){
 
   return null;
 }
->>>>>>> c27f760 (password validation works now)
 
-    // Insert into trades table
-    await db.query(
-      `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
-         VALUES ($1, $2, $3, $4)`,
-      [card1_id, card2_id, card1_owner, card2_owner]
-    );
-
-    res.status(201).json({
-      message: "Trade offer sent!",
-      trade: {
-        offer: card1_name,
-        request: card2_name,
-        card1_owner,
-        card2_owner,
-        card1_id,
-        card2_id,
-        status: "Pending",
-      },
-    });
-  } catch (err) {
-    console.error(err);
-    //res.status(500).send("Server error");
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-//this ensures that everytime the user loads into the page, the trades are ran
-app.get("/trades/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    const result = await db.query(
-      "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
-      [username]
-    );
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    //res.status(500).send("Server error");
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// in order to get the actaul player stats for the buttons in colections tab not just the game moves
-app.get("/player/details/:id", auth, async (req, res) => {
-  const cardId = req.params.id;
-  try {
-    const query = `
-      SELECT 
-        c.id AS card_id,
-        c.name AS card_name,
-        c.sport,
-        c.attack,
-        c.defense,
-        c.health,
-        c.overall,
-        nb.id AS nba_id,
-        nb.player_name,
-        nb.team_abbreviation,
-        nb.age,
-        nb.player_height,
-        nb.player_weight,
-        nb.college,
-        nb.country,
-        nb.draft_year,
-        nb.draft_round,
-        nb.draft_number,
-        nb.gp,
-        nb.pts,
-        nb.reb,
-        nb.ast,
-        nb.net_rating,
-        nb.oreb_pct,
-        nb.dreb_pct,
-        nb.usg_pct,
-        nb.ts_pct,
-        nb.ast_pct,
-        nb.season
-      FROM cards c
-      LEFT JOIN nbaPlayersToCards np2c ON c.id = np2c.card_id
-      LEFT JOIN nbaPlayers nb ON np2c.player_id = nb.id
-      WHERE c.id = $1;
-    `;
-    const result = await db.oneOrNone(query, [cardId]);
-    if (!result) {
-      return res.status(404).json({ error: "Player not found" });
-    }
-    res.json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error retrieving player details" });
-  }
-});
-
-app.post("/trades/:tradeId/accept", async (req, res) => {
-  try {
-    const { tradeId } = req.params;
-    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [
-      tradeId,
-    ]);
-
-    if (!tradeResult.length) {
-      return res.status(404).json({ error: "Trade not found" });
-    }
-    const { card1_id, card2_id, card1_owner, card2_owner } = tradeResult[0];
-    // swaps the ownership of cards in the cardsToUsers table
-    await db.query(
-      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
-      [card2_owner, card1_id, card1_owner]
-    );
-    await db.query(
-      "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
-      [card1_owner, card2_id, card2_owner]
-    );
-    // removes the trade from the trades table
-    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res
-      .status(200)
-      .json({ message: "Trade accepted and completed successfully" });
-  } catch (err) {
-    console.error("Error accepting trade:", err);
-    //res.status(500).send("Server error while accepting trade");
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.delete("/trades/:tradeId/reject", async (req, res) => {
-  try {
-    const { tradeId } = req.params;
-    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res.status(200).json({ message: "Trade rejected" });
-  } catch (err) {
-    console.error(err);
-    //res.status(500).send("Server error");
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.delete("/trades/:tradeId", async (req, res) => {
-  try {
-    const tradeId = req.params.tradeId;
-    await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res.status(200).json({ message: "Trade removed successfully" });
-  } catch (err) {
-    console.error(err);
-    //res.status(500).send("Server error");\
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.get("/cards", async (req, res) => {
-  try {
-    const result = await db.query("SELECT id, name FROM cards");
-    res.json(result);
-  } catch (err) {
-    console.error("Error fetching cards:", err);
-    res.status(500).send("Server error");
-  }
-});
-
-// POST /battle/finish  – called via fetch from the browser
-app.post("/battle/finish", auth, async (req, res) => {
-  const { userScore, botScore, logs } = req.body;
-  const username = req.session.user.username;
-  try {
-    const battleId = await battle.recordFinishedBattle(
-      username,
-      userScore,
-      botScore,
-      logs,
-      db
-    );
-    res.json({ ok: true, battleId });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: e.message });
-  }
-});
-
-// GET /battle/result/:id  – render battleResult.hbs
-app.get("/battle/result/:id", auth, async (req, res) => {
-  const id = req.params.id;
-  const result = await db.one(
-    `
-      SELECT
-        (SELECT username FROM users WHERE id = battles.player1_id) AS player,
-        player1_score AS "userScore",
-        player2_score AS "botScore",
-        CASE WHEN winner_id = 0 THEN 'tie'
-             WHEN winner_id = battles.player1_id THEN (SELECT username FROM users WHERE id = winner_id)
-             ELSE 'bot' END                            AS winner
-      FROM battles
-      WHERE id = $1`,
-    [id]
-  );
-
-  const logs = await db
-    .one(`SELECT action_detail FROM battle_logs WHERE battle_id = $1`, [id])
-    .then((r) => r.action_detail);
-
-  res.render("pages/battleResult", { result: { ...result, battleLogs: logs } });
-});
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
