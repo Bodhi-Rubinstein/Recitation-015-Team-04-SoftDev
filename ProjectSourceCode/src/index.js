@@ -144,8 +144,8 @@ app.post("/register", async (req, res) => {
   // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
-    return res.render("pages/register", { message: passwordError }); 
-=======
+    return res.render("pages/register", { message: passwordError });
+  }
   if (!username || !password) {
     if (req.get("X-Test-Env") === "1") {
       return res
@@ -153,7 +153,6 @@ app.post("/register", async (req, res) => {
         .json({ status: "error", message: "Missing field" });
     }
     return res.redirect("/register"); // normal browser flow
-    return res.render("pages/register", { message: passwordError });
   }
 
   const hash = await bcrypt.hash(password, 10);
