@@ -144,8 +144,7 @@ app.post("/register", async (req, res) => {
   // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
-    return res.render("pages/register", { message: passwordError }); 
-=======
+      return res.render("pages/register", { message: passwordError });} 
   if (!username || !password) {
     if (req.accepts("json")) {
       // test client hits this branch
