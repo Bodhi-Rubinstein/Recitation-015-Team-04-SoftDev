@@ -174,11 +174,11 @@ app.post("/register", async (req, res) => {
       let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
       await db.none(initCardsQuery, [username]);
   
-      if (req.accepts("json")) {
-        return res
-          .status(200)
-          .json({ status: "success", message: "User created" });
-      }
+      // if (req.accepts("json")) {
+      //   return res
+      //     .status(200)
+      //     .json({ status: "success", message: "User created" });
+      // }
   
       return res.redirect("/login"); // Redirect to login after successful registration
     } catch (error) {
