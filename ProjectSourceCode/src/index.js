@@ -159,32 +159,30 @@ app.post("/register", async (req, res) => {
   if (existingUser) {
     return res.render("pages/register", {
       message: "Username already exists. Please choose another one.",
-    });
-
-
-  try {
-    await db.one(userInsertQuery, [username, hash]);
-
-    // Initialize the user with zero cards in cardsToUsers
-    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
-    await db.none(initCardsQuery, [username]);
-
-    if (req.accepts("json")) {
-      return res
-        .status(200)
-        .json({ status: "success", message: "User created" });
+    });}
+    try {
+      await db.one(userInsertQuery, [username, hash]);
+  
+      // Initialize the user with zero cards in cardsToUsers
+      //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+      let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
+      await db.none(initCardsQuery, [username]);
+  
+      if (req.accepts("json")) {
+        return res
+          .status(200)
+          .json({ status: "success", message: "User created" });
+      }
+  
+      return res.redirect("/login"); // Redirect to login after successful registration
+    } catch (error) {
+      console.error(error);
+      if (req.accepts("json")) {
+        return res.status(400).json({ status: "error", message: error.message });
+      }
+      return res.redirect("/register"); // Stay on register page if error occurs
+  
     }
-
-    return res.redirect("/login"); // Redirect to login after successful registration
-  } catch (error) {
-    console.error(error);
-    if (req.accepts("json")) {
-      return res.status(400).json({ status: "error", message: error.message });
-    }
-    return res.redirect("/register"); // Stay on register page if error occurs
-
-  }
 });
 
 // Authentication Middleware.
