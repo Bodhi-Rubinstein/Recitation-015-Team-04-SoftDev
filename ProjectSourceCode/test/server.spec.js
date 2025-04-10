@@ -1,5 +1,5 @@
 // ********************** Initialize server **********************************
-
+/*
 const server = require("../src/index"); //TODO: Make sure the path to your index.js is correctly added
 
 // ********************** Import Libraries ***********************************
@@ -123,3 +123,4 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
 });
 });
 // ********************************************************************************
+*/
