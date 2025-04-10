@@ -103,9 +103,7 @@ app.get("/register", (req, res) => {
   res.render("pages/register");
 });
 
-app.get("/trade", (req, res) => {
-  res.render("pages/trade");
-});
+
 
 //Login
 app.post("/login", async (req, res) => {
@@ -163,6 +161,7 @@ app.post("/register", async (req, res) => {
   // Check if the username already exists
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
 
+
   if (existingUser) {
     return res.render("pages/register", {
       message: "Username already exists. Please choose another one.",
@@ -182,6 +181,10 @@ app.post("/register", async (req, res) => {
         .status(200)
         .json({ status: "success", message: "User created" });
     }*/
+
+    let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
+    await db.none(userDeckQuery, [username]);
+
 
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
@@ -695,12 +698,40 @@ function validatePassword(password){
 }
 */
 
+app.get("/trade", auth, async (req,res) => {
+  const username = req.session.user.username;
+  
+    try {
+        const all_cards_query = `SELECT * FROM cards;`;
+        const player_card_query =
+        `SELECT * 
+        FROM cards 
+        JOIN cardsToUsers 
+        ON cards.id = cardsToUsers.card_id 
+        WHERE cardsToUsers.username_id = $1;`;
+        //pull all owned player cards
+        const player_cards = await db.any(player_card_query, [username]);
+        //pull all cards
+        const all_cards = await db.any(all_cards_query);
+
+        const player_trade_query = `SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner $2`
+
+        //pass player cards, all cards, and username to the trade page 
+        res.render("pages/trade", { player_cards: player_cards ,all_cards: all_cards, username: username});
+    } catch (err) {
+        console.error("Error loading cards:", err);
+    }
+});
+
 app.post("/trades", async (req, res) => {
   try {
     const { card1_id, card2_id } = req.body;
+    const card1_owner = req.session.user.username;
     // get owner and name info for both cards
-    const card1Info = await db.query(
-      `SELECT u.username, c.name
+
+    /*const card1Info = await db.query(
+        `SELECT u.username, c.name
+
          FROM cardsToUsers cu
          JOIN users u ON cu.username_id = u.username
          JOIN cards c ON cu.card_id = c.id
@@ -726,25 +757,28 @@ app.post("/trades", async (req, res) => {
     const card2_owner = card2Info[0].username;
     const card1_name = card1Info[0].name;
     const card2_name = card2Info[0].name;
-
+    */
     // Insert into trades table
     await db.query(
-      `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
-         VALUES ($1, $2, $3, $4)`,
-      [card1_id, card2_id, card1_owner, card2_owner]
+
+        `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
+         VALUES ($1, $2, $3, 'pending')`,
+        [card1_id, card2_id, card1_owner]
     );
 
     res.status(201).json({
-      message: "Trade offer sent!",
-      trade: {
-        offer: card1_name,
-        request: card2_name,
-        card1_owner,
-        card2_owner,
-        card1_id,
-        card2_id,
-        status: "Pending",
-      },
+        message: "Trade offer sent!",
+        /*
+        trade: {
+            offer: card1_name,
+            request: card2_name,
+            card1_owner,
+            card2_owner,
+            card1_id,
+            card2_id,
+            status: "Pending"
+        }*/
+
     });
   } catch (err) {
     console.error(err);
@@ -756,12 +790,52 @@ app.post("/trades", async (req, res) => {
 //this ensures that everytime the user loads into the page, the trades are ran
 app.get("/trades/:username", async (req, res) => {
   try {
-    const { username } = req.params;
-    const result = await db.query(
-      "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
-      [username]
-    );
-    res.json(result);
+
+      const { username } = req.params;
+      
+      /*const result = await db.query(
+          "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
+          [username]
+      );*/
+      //selects all trades where user has offered the trade, accepted the trade, or is the owner of a card in a pending trade.
+      const result = await db.any(
+        `SELECT
+        t.id,
+        t.card1_id,
+        t.card2_id,
+        t.card1_owner,
+        t.card2_owner,
+        t.trade_status,
+        c1.name AS offer_name,
+        c2.name AS request_name
+        FROM trades t
+        JOIN cards c1 ON t.card1_id = c1.id
+        JOIN cards c2 ON t.card2_id = c2.id
+        WHERE t.card1_owner = $1 OR t.card2_owner = $1
+          OR t.card2_id IN (
+            SELECT card_id FROM cardsToUsers WHERE username_id = $1
+          );
+        `, [username]);
+      //console.log("Trades found for", username, result);
+      
+      //select all cards that the user owns
+      const userCards = await db.any(
+        `SELECT card_id FROM cardsToUsers WHERE username_id = $1`,
+        [username]
+      );
+      const userCardIds = userCards.map(c => c.card_id);     
+      
+      // filter outgoing trades (where the user is the offerer)
+      const outgoing = result.filter(t => t.card1_owner === username && t.trade_status === 'pending');
+
+      // filter incoming trades (where the user owns the card being requested)
+      const incoming = result.filter(t => userCardIds.includes(t.card2_id) && t.card1_owner !== username && t.trade_status === 'pending');
+
+      // filter accepted trades (where the user is either the offerer or the acceptor)
+      const accepted = result.filter(t => t.trade_status === 'accepted' && (t.card1_owner === username || t.card2_owner === username));
+
+      res.json({ outgoing, incoming, accepted });
+
   } catch (err) {
     console.error(err);
     //res.status(500).send("Server error");
@@ -824,16 +898,62 @@ app.get("/player/details/:id", auth, async (req, res) => {
 
 app.post("/trades/:tradeId/accept", async (req, res) => {
   try {
+    //console.log("accepting trade");
     const { tradeId } = req.params;
-    const tradeResult = await db.query("SELECT * FROM trades WHERE id = $1", [
-      tradeId,
-    ]);
 
-
-    if (!tradeResult.length) {
+    const card2_owner = req.session.user.username;
+    //selects the trade that is being accepted
+    const tradeResult = await db.oneOrNone("SELECT * FROM trades WHERE id = $1", [tradeId]);
+    console.log("result: ", tradeResult);
+    //if the trade does not exist, return a 404 error
+    if (!tradeResult) {
       return res.status(404).json({ error: "Trade not found" });
     }
-    const { card1_id, card2_id, card1_owner, card2_owner } = tradeResult[0];
+
+    //handle the transfer of card ownership with a trade
+    await db.tx(async t => {
+      // 1. Give the offered card (card1) to the acceptor
+      await t.none(
+        `
+        WITH one_row AS (
+          SELECT *
+          FROM cardsToUsers
+          WHERE card_id = $1 AND username_id = $2
+          LIMIT 1
+        )
+        UPDATE cardsToUsers
+        SET username_id = $3
+        FROM one_row
+        WHERE cardsToUsers.card_id = one_row.card_id AND cardsToUsers.username_id = one_row.username_id
+        `,
+        [tradeResult.card1_id, tradeResult.card1_owner, card2_owner]
+      );
+
+      // 2. Give the requested card (card2) to the offerer
+      await t.none(
+        `
+        WITH one_row AS (
+          SELECT *
+          FROM cardsToUsers
+          WHERE card_id = $1 AND username_id = $2
+          LIMIT 1
+        )
+        UPDATE cardsToUsers
+        SET username_id = $3
+        FROM one_row
+        WHERE cardsToUsers.card_id = one_row.card_id AND cardsToUsers.username_id = one_row.username_id
+        `,
+        [tradeResult.card2_id, card2_owner, tradeResult.card1_owner]
+      );
+
+      // 3.update the trade to show it's completed
+      await t.none(
+        "UPDATE trades SET card2_owner = $1, trade_status = 'accepted' WHERE id = $2",
+        [card2_owner, tradeId]
+      );
+    });
+
+    /*
     // swaps the ownership of cards in the cardsToUsers table
     await db.query(
       "UPDATE cardsToUsers SET username_id = $1 WHERE card_id = $2 AND username_id = $3",
@@ -845,9 +965,9 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
     );
     // removes the trade from the trades table
     await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res
-      .status(200)
-      .json({ message: "Trade accepted and completed successfully" });
+    */
+    res.status(200).json({ message: "Trade accepted and completed successfully" });
+
   } catch (err) {
     console.error("Error accepting trade:", err);
     //res.status(500).send("Server error while accepting trade");
@@ -935,4 +1055,6 @@ app.get("/battle/result/:id", auth, async (req, res) => {
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
+
 console.log("Server is listening on port 3000");
+
