@@ -140,10 +140,10 @@ app.post("/register", async (req, res) => {
 
   const { username, password } = req.body;
   // Validate password
-  /*const passwordError = validatePassword(password);
+  const passwordError = validatePassword(password);
   if (passwordError) {
     return res.render("pages/register", { message: passwordError }); 
-  }*/
+  }
   if (!username || !password) {
     if (req.accepts("json")) {
       // test client hits this branch
@@ -163,7 +163,7 @@ app.post("/register", async (req, res) => {
 
 
   if (existingUser) {
-    return res.render("pages/register", {
+    return res.status(400).render("pages/register", {
       message: "Username already exists. Please choose another one.",
     });
   }
@@ -661,7 +661,7 @@ app.post("/testbattle/next", (req, res) => {
   req.session.battle = battleState;
   res.redirect("/testbattle");
 });
-/*
+
 function validatePassword(password){
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
@@ -696,7 +696,7 @@ function validatePassword(password){
 
   return null;
 }
-*/
+
 
 app.get("/trade", auth, async (req,res) => {
   const username = req.session.user.username;
