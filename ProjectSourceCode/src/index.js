@@ -904,7 +904,7 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
     const card2_owner = req.session.user.username;
     //selects the trade that is being accepted
     const tradeResult = await db.oneOrNone("SELECT * FROM trades WHERE id = $1", [tradeId]);
-    console.log("result: ", tradeResult);
+    //console.log("result: ", tradeResult);
     //if the trade does not exist, return a 404 error
     if (!tradeResult) {
       return res.status(404).json({ error: "Trade not found" });
