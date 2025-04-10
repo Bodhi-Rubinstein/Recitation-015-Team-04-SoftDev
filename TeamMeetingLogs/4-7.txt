@@ -1,0 +1,17 @@
+Mostly discussed what we discussed in TA meeting
+
+Last week: 
+Cam: Added error messages to login and register pages, ensured username uniqueness, made it so on deckbuilder, you can only select your players, as well as so you can only select each player once
+Luca: Worked a lot on battle(aesthetics too), added money and trophies upon win
+Brendan: Collection page, sort by stats
+Bodhi: Did some DB work with players and cards, trade ownership work
+Victoria: Developing leaderboard to show top 10
+Mati: Trade stuff, accepting, submitting, rejecting trades
+
+Next Week:
+Cam: Password requirements, tutorial page
+Luca: More work on the battle, tutorial functions
+Brendan: Stylizing/UI
+Bodhi: trade work/ownership functionality
+Victoria: Will make leaderboard filters
+Mati: tutorial, test cases

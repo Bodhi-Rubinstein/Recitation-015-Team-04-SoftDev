@@ -21,6 +21,17 @@
     </div>
 
     <div class="mb-3">
+      <p>Password must contain at each of the following: </p>
+      <ul>
+        <li>At least 1 uppercase letter</li>
+        <li>At least 1 lowercase letter</li>
+        <li>At least 1 number</li>
+        <li>At least 1 special character (e.g. !,@,#,$)</li>
+        <li>Minimum 8 characters</li>
+        <li>Maximum 16 characters</li>
+        <li>Cannot contain spaces</li>
+      </ul>
+      {{> message}}
       <label for="password" class="form-label">Password:</label>
       <input
         type="password"
@@ -40,5 +51,4 @@
   </p>
 </main>
 </body>
-{{> message}}
 </html>
