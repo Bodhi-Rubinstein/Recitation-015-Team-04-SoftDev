@@ -142,10 +142,10 @@ app.post("/register", async (req, res) => {
 
   const { username, password } = req.body;
   // Validate password
-  const passwordError = validatePassword(password);
+  /*const passwordError = validatePassword(password);
   if (passwordError) {
     return res.render("pages/register", { message: passwordError }); 
-=======
+  }*/
   if (!username || !password) {
     if (req.accepts("json")) {
       // test client hits this branch
@@ -167,7 +167,7 @@ app.post("/register", async (req, res) => {
     return res.render("pages/register", {
       message: "Username already exists. Please choose another one.",
     });
-
+  }
 
   try {
     await db.one(userInsertQuery, [username, hash]);
@@ -176,12 +176,12 @@ app.post("/register", async (req, res) => {
     //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
-
+    /*
     if (req.accepts("json")) {
       return res
         .status(200)
         .json({ status: "success", message: "User created" });
-    }
+    }*/
 
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
@@ -192,7 +192,7 @@ app.post("/register", async (req, res) => {
     return res.redirect("/register"); // Stay on register page if error occurs
 
   }
-});
+  });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
@@ -658,7 +658,7 @@ app.post("/testbattle/next", (req, res) => {
   req.session.battle = battleState;
   res.redirect("/testbattle");
 });
-
+/*
 function validatePassword(password){
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
@@ -693,7 +693,7 @@ function validatePassword(password){
 
   return null;
 }
-
+*/
 
 app.post("/trades", async (req, res) => {
   try {
