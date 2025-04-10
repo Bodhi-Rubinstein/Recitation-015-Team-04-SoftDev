@@ -1,5 +1,5 @@
 // ********************** Initialize server **********************************
-/*
+
 const server = require("../src/index"); //TODO: Make sure the path to your index.js is correctly added
 
 // ********************** Import Libraries ***********************************
@@ -56,7 +56,7 @@ describe('Testing Add User API', () => {
         .request(server)
         .post('/register')
         .type('form')
-        .send({username: 'John Doe', password: 'testpassword123'})
+        .send({username: 'John Doe', password: 'TestPassword123!'})
         .end((err, res) => {
           expect(res).to.have.status(200); //checks response status is 200
           expect(res.redirects[0]).to.include('/login'); //checks that it redirects to the login page
@@ -77,7 +77,7 @@ describe('Testing Add User API', () => {
       .request(server)
       .post('/register')
     .type('form')
-      .send({username: 'John Doe', password: 'testpassword321'})
+      .send({username: 'John Doe', password: 'TestPassword321!'})
       .end((err, res) => {
         expect(res).to.have.status(400);
         expect(res.text).to.include('Username already exists. Please choose another one.');
@@ -93,7 +93,7 @@ describe('Testing User Login User API', () => {
       .request(server)
       .post('/login')
       .type('form')
-      .send({username: 'John Doe', password: 'testpassword123'})
+      .send({username: 'John Doe', password: 'TestPassword123!'})
       .end((err, res) => {
         expect(res).to.have.status(200); //checks response status is 200
         expect(res.redirects[0]).to.include('/home'); //checks that it redirects to the login page
@@ -114,7 +114,7 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
     .request(server)
     .post('/login')
   .type('form')
-    .send({username: 'John Doe', password: 'testpassword124'})
+    .send({username: 'John Doe', password: 'TestPassword124'})
     .end((err, res) => {
       expect(res).to.have.status(400);
       expect(res.text).to.include('Incorrect username or password');
@@ -123,4 +123,3 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
 });
 });
 // ********************************************************************************
-*/
