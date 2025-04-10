@@ -319,7 +319,7 @@ app.get('/leaderboard', async(req, res) => {
   `;
   // Fetch available cards so the user can choose cards for their deck.
     const leaders = await db.any(leaderboardQuery);
-    current_rank = 1
+    let current_rank = 1
     leaders.forEach(leader => {
       leader.rank = current_rank;
       current_rank = current_rank + 1;
