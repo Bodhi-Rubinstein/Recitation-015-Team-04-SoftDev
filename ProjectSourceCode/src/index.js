@@ -312,11 +312,16 @@ app.use(auth);
 app.get('/leaderboard', async(req, res) => {
   try {
     const leaderboardQuery = `
-    SELECT username AS name, trophies AS battles_won
-    FROM users
-    ORDER BY trophies DESC
-    LIMIT 10;
-  `;
+  SELECT DISTINCT ON (u.username)
+    u.username AS name,
+    u.trophies AS battles_won,
+    c.name AS best_player
+  FROM users u
+  LEFT JOIN cardsToUsers cu ON cu.username_id = u.username
+  LEFT JOIN cards c ON c.id = cu.card_id
+  ORDER BY u.username, c.overall DESC, c.id
+  LIMIT 10;
+`;
   // Fetch available cards so the user can choose cards for their deck.
     const leaders = await db.any(leaderboardQuery);
     let current_rank = 1
