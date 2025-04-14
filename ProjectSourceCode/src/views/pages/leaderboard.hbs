@@ -3,18 +3,32 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Leaderboard</h2>
 
-    <!-- Sort Dropdown -->
-    <div class="d-flex justify-content-end mb-2">
-        <label for="sortDropdown" class="me-2">Sort by:</label>
-        <select id="sortDropdown" class="form-select w-auto" onchange="handleSortChange()">
-            <option value="">Select</option>
-            <option value="0_num_asc">Rank (Low to High)</option>
-            <option value="0_num_desc">Rank (High to Low)</option>
-            <option value="1_str_asc">Name (A to Z)</option>
-            <option value="1_str_desc">Name (Z to A)</option>
-            <option value="4_num_desc">Best Player (High to Low)</option>
-            <option value="4_num_asc">Best Player (Low to High)</option>
-        </select>
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Limit Dropdown -->
+        <div class="d-flex align-items-center">
+            <label for="limitDropdown" class="me-2">Show top:</label>
+            <select id="limitDropdown" class="form-select w-auto" onchange="handleLimitChange()">
+                <option value="">Select</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+
+        <!-- Sort Dropdown -->
+        <div class="d-flex align-items-center">
+            <label for="sortDropdown" class="me-2">Sort by:</label>
+            <select id="sortDropdown" class="form-select w-auto me-4" onchange="handleSortChange()">
+                <option value="">Select</option>
+                <option value="0_num_asc">Rank (Low to High)</option>
+                <option value="0_num_desc">Rank (High to Low)</option>
+                <option value="1_str_asc">Name (A to Z)</option>
+                <option value="1_str_desc">Name (Z to A)</option>
+                <option value="4_num_desc">Best Player (High to Low)</option>
+                <option value="4_num_asc">Best Player (Low to High)</option>
+            </select>
+        </div>
     </div>
 
     <div class="table-responsive">
@@ -35,7 +49,7 @@
                     <td>{{name}}</td>
                     <td>{{best_player}}</td>
                     <td>{{battles_won}}</td>
-                    <td hidden>{{best_player_rank}}</td>
+                    <td>{{best_player_rank}}</td>
                 </tr>
                 {{/each}}
                 {{!-- end loop --}}
@@ -48,40 +62,52 @@
 <!-- ChatGPT prompt: using the above code, write a script to make the sorting for this table (in an hbs file) work -->
 
 <script>
-function handleSortChange() {
-    const dropdown = document.getElementById("sortDropdown");
-    let value = dropdown.value;
-    console.log(value);
-    if (!value) return;
-    
+    function handleSortChange() {
+        const dropdown = document.getElementById("sortDropdown");
+        let value = dropdown.value;
+        console.log(value);
+        if (!value) return;
 
-    const [colIndex, type, direction] = value.split('_');
-    const tableBody = document.querySelector("table tbody");
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
 
-    const getCellValue = (row, index) => {
-        const cell = row.children[index];
-        return cell ? cell.textContent.trim() : '';
-    };
+        const [colIndex, type, direction] = value.split('_');
+        const tableBody = document.querySelector("table tbody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
 
-    rows.sort((a, b) => {
-        let valA = getCellValue(a, parseInt(colIndex));
-        let valB = getCellValue(b, parseInt(colIndex));
+        const getCellValue = (row, index) => {
+            const cell = row.children[index];
+            return cell ? cell.textContent.trim() : '';
+        };
 
-        if (type === 'num') {
-            valA = parseFloat(valA) || 0;
-            valB = parseFloat(valB) || 0;
-        } else {
-            valA = valA.toLowerCase();
-            valB = valB.toLowerCase();
-        }
+        rows.sort((a, b) => {
+            let valA = getCellValue(a, parseInt(colIndex));
+            let valB = getCellValue(b, parseInt(colIndex));
 
-        if (valA < valB) return direction === 'asc' ? -1 : 1;
-        if (valA > valB) return direction === 'asc' ? 1 : -1;
-        return 0;
-    });
+            if (type === 'num') {
+                valA = parseFloat(valA) || 0;
+                valB = parseFloat(valB) || 0;
+            } else {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
 
-    tableBody.innerHTML = '';
-    rows.forEach(row => tableBody.appendChild(row));
-}
+            if (valA < valB) return direction === 'asc' ? -1 : 1;
+            if (valA > valB) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        tableBody.innerHTML = '';
+        rows.forEach(row => tableBody.appendChild(row));
+    }
+
+    function handleLimitChange() {
+        const limitDropdown = document.getElementById("limitDropdown");
+        const selectedLimit = limitDropdown.value;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("limit", selectedLimit);
+
+        // Always reload with the updated URL
+        window.location.href = url.toString();
+    }
+
 </script>

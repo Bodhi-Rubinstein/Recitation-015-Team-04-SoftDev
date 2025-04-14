@@ -344,45 +344,46 @@ app.get("/collection", auth, async (req, res) => {
 app.use(auth);
 // leaderboard
 
-app.get('/leaderboard', async(req, res) => {
+app.get('/leaderboard', async (req, res) => {
   try {
-    const leaderboardQuery = `
-  WITH best_cards AS (
-  SELECT
-    u.username AS name,
-    u.trophies AS battles_won,
-    c.name AS best_player,
-    c.overall AS best_player_rank,
-    ROW_NUMBER() OVER (
-      PARTITION BY u.username
-      ORDER BY c.overall DESC  
-    ) AS card_rank
-  FROM users u
-  INNER JOIN cardsToUsers cu ON cu.username_id = u.username
-  INNER JOIN cards c ON c.id = cu.card_id
-)
-SELECT *
-FROM best_cards
-WHERE card_rank = 1
-ORDER BY battles_won DESC, best_player_rank ASC
-LIMIT 10;
-`;
- 
-    const leaders = await db.any(leaderboardQuery);
-    let current_rank = 1
-    leaders.forEach(leader => {
-      leader.rank = current_rank;
-      current_rank = current_rank + 1;
-    })
+    console.log("LIMIT RECEIVED:", req.query.limit);
 
-    
-    res.render("pages/leaderboard", { leaders });
+    const limit = parseInt(req.query.limit, 10);
+    const validatedLimit = [5, 10, 25, 50].includes(limit) ? limit : 10;
+
+    const leaderboardQuery = `
+      WITH best_cards AS (
+        SELECT
+          u.username AS name,
+          u.trophies AS battles_won,
+          c.name AS best_player,
+          c.overall AS best_player_rank,
+          ROW_NUMBER() OVER (
+            PARTITION BY u.username
+            ORDER BY c.overall DESC
+          ) AS card_rank
+        FROM users u
+        INNER JOIN cardsToUsers cu ON cu.username_id = u.username
+        INNER JOIN cards c ON c.id = cu.card_id
+      )
+      SELECT *
+      FROM best_cards
+      WHERE card_rank = 1
+      ORDER BY battles_won DESC, best_player_rank DESC
+      LIMIT $1;
+    `;
+
+    const leaders = await db.any(leaderboardQuery, [validatedLimit]);
+
+    leaders.forEach((leader, i) => leader.rank = i + 1);
+
+    res.render("pages/leaderboard", { leaders, selected: validatedLimit});
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");
   }
-
 });
+
 
 
 // GET /deckbuilder - Render the deck builder page.
