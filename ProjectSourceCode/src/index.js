@@ -79,6 +79,34 @@ app.use(
   })
 );
 
+
+// *****************************************************
+// NEW: Middleware to Update User Stats (Option B)
+// *****************************************************
+app.use(async (req, res, next) => {
+  if (req.session && req.session.user) {
+    try {
+      // Fetch the updated overall, trophies, and money from the database
+      const userStats = await db.one(
+        "SELECT overall, trophies, money FROM users WHERE username = $1",
+        [req.session.user.username]
+      );
+      // Update session user with the latest stats
+      req.session.user.overall = userStats.overall;
+      req.session.user.trophies = userStats.trophies;
+      req.session.user.money = userStats.money;
+      // Make the updated user object available to all views
+      res.locals.user = req.session.user;
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.locals.user = req.session.user; // Fall back on session data
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
@@ -139,10 +167,12 @@ app.post("/register", async (req, res) => {
   const { username, password } = req.body;
   // Validate password
 
-  /*const passwordError = validatePassword(password);
+  const passwordError = validatePassword(password);
   if (passwordError) {
+
     return res.render("pages/register", { message: passwordError }); 
-  }*/
+  }
+
   if (!username || !password) {
     if (req.get("X-Test-Env") === "1") {
       return res
@@ -161,13 +191,16 @@ app.post("/register", async (req, res) => {
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
 
   if (existingUser) {
+
     if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
         .json({ status: "error", message: "Username already exists" });
     }
     return res.render("pages/register", {
+
       message: "Username already exists. Please choose another one.",
+
     });
   }
 
@@ -199,6 +232,7 @@ app.post("/register", async (req, res) => {
     return res.redirect("/register");
   }
 });
+
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
@@ -316,24 +350,44 @@ app.use(auth);
 app.get("/leaderboard", async (req, res) => {
   try {
     const leaderboardQuery = `
-    SELECT username AS name, trophies AS battles_won
-    FROM users
-    ORDER BY trophies DESC
-    LIMIT 10;
-  `;
-    // Fetch available cards so the user can choose cards for their deck.
+
+  WITH best_cards AS (
+  SELECT
+    u.username AS name,
+    u.trophies AS battles_won,
+    c.name AS best_player,
+    c.overall AS best_player_rank,
+    ROW_NUMBER() OVER (
+      PARTITION BY u.username
+      ORDER BY c.overall DESC  
+    ) AS card_rank
+  FROM users u
+  INNER JOIN cardsToUsers cu ON cu.username_id = u.username
+  INNER JOIN cards c ON c.id = cu.card_id
+)
+SELECT *
+FROM best_cards
+WHERE card_rank = 1
+ORDER BY battles_won DESC, best_player_rank ASC
+LIMIT 10;
+`;
+ 
     const leaders = await db.any(leaderboardQuery);
-    current_rank = 1;
-    leaders.forEach((leader) => {
+    let current_rank = 1
+    leaders.forEach(leader => {
       leader.rank = current_rank;
       current_rank = current_rank + 1;
-    });
+    })
+
+
     res.render("pages/leaderboard", { leaders });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");
   }
 });
+
+
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
@@ -673,7 +727,7 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
-/*
+
 function validatePassword(password){
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
@@ -708,7 +762,7 @@ function validatePassword(password){
 
   return null;
 }
-*/
+
 
 app.get("/trade", auth, async (req, res) => {
   const username = req.session.user.username;

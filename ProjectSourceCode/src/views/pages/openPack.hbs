@@ -15,7 +15,20 @@
     <div id="packContents" class="mt-4"></div>
     <div id="errorMessage" class="mt-4 text-danger"></div>
     <div id="successMessage" class="mt-4 text-success"></div>
+  
+      <!--redirect buttons-->
+      <div id="actionButtons" class="mt-4" style="display: none;">
+      <a href="/collection" class="btn btn-secondary me-3">View in Your Collection</a>
+      <a href="/deckbuilder" class="btn btn-success">Build a Deck!</a>
+    </div>
+  
+
   </main>
+
+
+
+
+
 
   <script>
     document.getElementById('openPackButton').addEventListener('click', async function () {
@@ -41,10 +54,42 @@
 
         if (data.success) {
           successMessage.textContent = data.message;
-          packContents.textContent = `You received: ${data.packContents.join(', ')}`;
+          //row to contain the cards
+          const row = document.createElement('div');
+          row.className = 'row justify-content-center';
+
+          // Loop through each received card name and build a card element for it
+          data.packContents.forEach(cardName => {
+            const col = document.createElement('div');
+            col.className = 'col-12 col-md-4 col-lg-3 mb-3';
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card h-100';
+
+            // image possiblu
+
+            // Create the card body
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+            const h5 = document.createElement('h5');
+            h5.className = 'card-title';
+            h5.textContent = cardName;
+            cardBody.appendChild(h5);
+            cardDiv.appendChild(cardBody);
+
+            col.appendChild(cardDiv);
+            row.appendChild(col);
+          });
+
+          // Append the row of cards to the packContents container so it will be displaye
+          packContents.appendChild(row);
+
+        actionButtons.style.display = 'block';
+
         } else {
           errorMessage.textContent = data.message;
         }
+        // errror handling incase the card packs wont open
       } catch (error) {
         errorMessage.textContent = 'An error occurred. Please try again later.';
       }
