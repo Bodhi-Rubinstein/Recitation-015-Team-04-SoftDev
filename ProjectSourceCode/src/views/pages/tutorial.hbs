@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Tutorial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4"> Welcome to the NBA Trade/Battle Sim Tutorial!</h1>
+
+        <div class="accordion" id="tutorialAccordion">
+            <!-- about -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAbout">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAbout" aria-expanded="true" aria-controls="collapseAbout">
+                        About the Game 🏀
+                    </button>
+                </h2>
+                <div id="collapseAbout" class="accordion-collapse collapse show" aria-labelledby="headingAbout" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        This is a sports trading card game centered around NBA players. Build a team of five and face off against others by comparing player stats. Cards are based on real NBA athletes and their actual performance.
+                    </div>
+                </div>
+            </div>
+
+            <!-- stats -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingStats">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStats" aria-expanded="false" aria-controls="collapseStats">
+                        Player Stats Breakdown 📊
+                    </button>
+                </h2>
+                <div id="collapseStats" class="accordion-collapse collapse" aria-labelledby="headingStats" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        Every card has stats influenced by real-life data:
+                        <ul>
+                            <li><strong>Attack:</strong> Derived from points and assists per game.</li>
+                            <li><strong>Defense:</strong> Reflective of rebounds per game.</li>
+                            <li><strong>Health:</strong> Based on height and weight of the player.</li>
+                            <li><strong>Overall:</strong> A calculated average of all key stats above.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- collection -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCollection">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCollection" aria-expanded="false" aria-controls="collapseCollection">Card Collection 📁 </button>
+                </h2>
+                <div id="collapseCollection" class="accordion-collapse collapse" aria-labelledby="headingCollection" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                    Your card collection is the heart of your game experience. Every card represents a real NBA player, and stats are inspired by real-life performance.
+                    <ul>
+                        <li><strong>Organizing:</strong> View and manage your collection from your dashboard. If you see room for improvement, try trading one of your cards!</li>
+                        <li><strong>Duplicates:</strong> Got duplicates? Use them for trades or save them for strategy-based deck building.</li>
+                        <li><strong>Deck Building:</strong> Build your best 5-card lineup using your favorite cards.</li>
+                    </ul>
+                </div>
+                </div>
+
+            <!-- gameplay -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingGameplay">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGameplay" aria-expanded="false" aria-controls="collapseGameplay">
+                        How Battles Work ⚔️
+                    </button>
+                </h2>
+                <div id="collapseGameplay" class="accordion-collapse collapse" aria-labelledby="headingGameplay" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        Players use decks of 5 cards. Each round, one card is picked to battle. Players can randomly roll to increase their stats (attack, defense, and health). Battles then play out, with attack damaging from the opposition's health and defense partially nullifying damage done to oneself. When a card's health reaches 0, the round is over and the other card wins that round. Win more rounds than your opponent to claim victory and earn trophies.
+                    </div>
+                </div>
+            </div>
+
+            <!-- trading -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTrading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTrading" aria-expanded="false" aria-controls="collapseTrading">
+                        Card Trading 🔄
+                    </button>
+                </h2>
+                <div id="collapseTrading" class="accordion-collapse collapse" aria-labelledby="headingTrading" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        Trade with other players to get the cards you need. When trading:
+                        <ul>
+                            <li>You offer one of your cards and request another.</li>
+                            <li>The receiving player can accept or reject the trade.</li>
+                            <li>You can cancel a trade you initiated if it's still pending.</li>
+                        </ul>
+                        Smart trades can help create an unstoppable team, so always be on the lookout!
+                    </div>
+                </div>
+            </div>
+
+            <!-- money & packs -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingEconomy">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEconomy" aria-expanded="false" aria-controls="collapseEconomy">
+                        Money, Packs & Progress💰
+                    </button>
+                </h2>
+                <div id="collapseEconomy" class="accordion-collapse collapse" aria-labelledby="headingEconomy" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li>Win battles to earn money and trophies.</li>
+                            <li>You can still earn money if you lose battles, just at a slower rate</li>
+                            <li>Use money to buy 5-card packs containing random players.</li>
+                            <li>Trophies reflect your skill and progression in the leaderboard (more trophies, higher up on leaderboard).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- get started -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingStart">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStart" aria-expanded="false" aria-controls="collapseStart">
+                        Ready to Play? 🚀
+                    </button>
+                </h2>
+                <div id="collapseStart" class="accordion-collapse collapse" aria-labelledby="headingStart" data-bs-parent="#tutorialAccordion">
+                    <div class="accordion-body">
+                        Register, collect your first set of cards, and dive into competitive battles. Build your ultimate NBA dream team and become the top card master!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

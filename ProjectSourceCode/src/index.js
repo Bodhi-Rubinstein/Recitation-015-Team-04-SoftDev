@@ -91,6 +91,10 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+app.get("/tutorial", (req, res) => {
+  res.render("pages/tutorial");
+});
+
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
@@ -145,7 +149,7 @@ app.post("/register", async (req, res) => {
   const passwordError = validatePassword(password);
   if (passwordError) {
     return res.render("pages/register", { message: passwordError }); 
-=======
+  }
   if (!username || !password) {
     if (req.accepts("json")) {
       // test client hits this branch
@@ -192,7 +196,7 @@ app.post("/register", async (req, res) => {
     return res.redirect("/register"); // Stay on register page if error occurs
 
   }
-});
+}});
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
