@@ -1,0 +1,81 @@
+4/14/2025 weekly meeting:
+
+/////////////////////////////////////////////////////////////////////////////
+Victoria:
+
+this week:
+- created a dropdown for the leaderboard so that you can sort players by rank 
+
+next week:
+- will help out with UI 
+- will implement an option to allow 50 players 
+
+///////////////////////////////////////////////////////////////////////////////
+
+Mati:
+
+This week:
+- created a working tutorial page
+- implemented a dropdown feature within the tutorial which explains core features
+
+next week: 
+- will work on implementing a gift feature to make the tutorial more interactive
+
+/////////////////////////////////////////////////////////////////////////////
+Cameron Mars:
+
+This Week:
+- made the password stronger and more protecting for users
+- UI implementation
+- cleaned up a lot of the home page and Nav bar.
+- added images to the login and home page
+
+next week:
+
+- will keep working on user interface
+- will implement a consistent color scheme 
+
+//////////////////////////////////////////////////////////////////////////////
+Brendan Fisher
+- updated the nav bar to always display the users current trophies and currency
+- Reformatted the collections page to better represent the card functionality
+- made the open pack page more user friendly
+
+This Week:
+
+- will attempt to find a way to allow a multiplayer feature
+- developing UI more
+///////////////////////////////////////////////////////////////////////////////
+
+Luca:
+This week:
+- working on getting two users to connect on the same system (multiplayer)
+implemented a battle summary page to fix a continuity error 
+
+
+This week:
+- will continue to work on implementing a multiplayer feature 
+
+////////////////////////////////////////////////////////////////////////////////////
+
+Bohdi:
+
+This week
+- finished up loose ends within the trading system
+- implemented a trading validation process
+- created unit test cases for lab
+
+
+next week:
+- will implement the complete card design
+- implement WMBA players into database to have an even split of NBA and WMBA players
+
+///////////////////////////////////////////////////////////////////////////////////
+notes from TA:
+- the UI must be very presentable and engaging since its a game
+- work together to develop a consistent UI.
+
+Super important: list on lab website that displays mandatory functionalities that every website must have 
+
+
+if we decide to finish our presentation we can present next Monday
