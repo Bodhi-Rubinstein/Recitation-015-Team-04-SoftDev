@@ -319,18 +319,35 @@ app.use(auth);
 app.get('/leaderboard', async(req, res) => {
   try {
     const leaderboardQuery = `
-    SELECT username AS name, trophies AS battles_won
-    FROM users
-    ORDER BY trophies DESC
-    LIMIT 10;
-  `;
-  // Fetch available cards so the user can choose cards for their deck.
+  WITH best_cards AS (
+  SELECT
+    u.username AS name,
+    u.trophies AS battles_won,
+    c.name AS best_player,
+    c.overall AS best_player_rank,
+    ROW_NUMBER() OVER (
+      PARTITION BY u.username
+      ORDER BY c.overall DESC  
+    ) AS card_rank
+  FROM users u
+  INNER JOIN cardsToUsers cu ON cu.username_id = u.username
+  INNER JOIN cards c ON c.id = cu.card_id
+)
+SELECT *
+FROM best_cards
+WHERE card_rank = 1
+ORDER BY battles_won DESC, best_player_rank ASC
+LIMIT 10;
+`;
+ 
     const leaders = await db.any(leaderboardQuery);
-    current_rank = 1
+    let current_rank = 1
     leaders.forEach(leader => {
       leader.rank = current_rank;
       current_rank = current_rank + 1;
     })
+
+    
     res.render("pages/leaderboard", { leaders });
   } catch (error) {
     console.error(error);
@@ -338,6 +355,8 @@ app.get('/leaderboard', async(req, res) => {
   }
 
 });
+
+
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
   const username = req.session.user.username; //get username for cardsToUsers
