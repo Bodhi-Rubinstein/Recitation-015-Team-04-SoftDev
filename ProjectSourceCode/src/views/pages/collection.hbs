@@ -1,55 +1,37 @@
 {{> header}}
 {{> message}}
 
-<main class="container mt-4">
-  <h1>My Collections</h1>
-  <p>Cards the user currently owns.</p>
-  
-  <!-- Sort Dropdown -->
-  <div class="d-flex justify-content-end mb-2">
-    <label for="sortDropdown" class="me-2">Sort by:</label>
-    <select id="sortDropdown" class="form-select w-auto" onchange="handleSortChange()">
-      <option value="">Select</option>
-      <option value="0_str_desc">Card Name (High to Low)</option>
-      <option value="1_str_desc">Sport (High to Low)</option>
-      <option value="2_num_desc">Attack (High to Low)</option>
-      <option value="3_num_desc">Defense (High to Low)</option>
-      <option value="4_num_desc">Health (High to Low)</option>
-      <option value="5_num_desc">Overall (High to Low)</option>
-    </select>
-  </div>
+<!--collection stylesheet -->
+<link rel="stylesheet" href="/resources/css/collection.css">
 
-  <table class="table table-bordered" id="cardsTable">
-    <thead>
-      <tr>
-        <th>Card Name</th>
-        <th>Sport</th>
-        <th>Attack</th>
-        <th>Defense</th>
-        <th>Health</th>
-        <th>Overall</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each userCards}}
-      <tr>
-        <td>{{this.name}}</td>
-        <td>{{this.sport}}</td>
-        <td>{{this.attack}}</td>
-        <td>{{this.defense}}</td>
-        <td>{{this.health}}</td>
-        <td>{{this.overall}}</td>
-        <td>
-          <button class="btn btn-info btn-sm" onclick="viewPlayerStats({{this.id}})">View Stats</button>
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+<main class="container mt-4">
+  <h1>Your Owned Cards</h1>
+  
+  <!-- Grid container for cards -->
+  <div class="collection-container">
+    {{#each userCards}}
+      <div class="collection-item">
+        <h5>{{this.name}}</h5>
+
+        
+        <!--image-->
+
+
+        <!-- <img src="/resources/images/cards/{{this.id}}.png" alt="{{this.name}}"> -->
+        <!-- this should hopefully connect images to cards if you make it bohdi or maybe you want to completely overhaul it -->
+
+        <p><strong>Sport:</strong> {{this.sport}}</p>
+        <p><strong>Attack:</strong> {{this.attack}}</p>
+        <p><strong>Defense:</strong> {{this.defense}}</p>
+        <p><strong>Health:</strong> {{this.health}}</p>
+        <p><strong>Overall:</strong> {{this.overall}}</p>
+        <button class="btn btn-info btn-sm" onclick="viewPlayerStats({{this.id}})">View Stats</button>
+      </div>
+    {{/each}}
+  </div>
 </main>
 
-<!-- Bootstrap crap -->
+<!--player details -->
 <div class="modal fade" id="playerModal" tabindex="-1" aria-labelledby="playerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -58,7 +40,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="playerModalBody">
-        <!-- Player details right here hopefully -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -68,60 +49,23 @@
 </div>
 
 <script>
-  /**
-   * Sorts the table rows based on the given column index in descending order. IF CHANGES ARE MADE TO SORT MAKE THEM HERE
-   */
-  function sortTable(colIndex, type) 
-  {
-    const table = document.getElementById("cardsTable");
-    const tbody = table.querySelector("tbody");
-    let rows = Array.from(tbody.querySelectorAll("tr"));
-
-    rows.sort((rowA, rowB) => 
-    {
-      let cellA = rowA.cells[colIndex].innerText.trim();
-      let cellB = rowB.cells[colIndex].innerText.trim();
-      let comparison = 0;
-
-      if (type === "num") 
-      {
-        const valA = parseFloat(cellA) || 0;
-        const valB = parseFloat(cellB) || 0;
-        comparison = valA - valB;
-      } 
-      else 
-      {
-        comparison = cellA.localeCompare(cellB);
-      }
-
-      // Descending order (high-to-low)
-      return -comparison;
-    });
-
-    // Append sorted rows
-    rows.forEach(row => tbody.appendChild(row));
+  // Sorting functionality
+  function sortTable(colIndex, type) {
   }
 
-  // Sort dropdown change event
-  function handleSortChange() 
-  {
+  function handleSortChange() {
     const dropdown = document.getElementById("sortDropdown");
     const value = dropdown.value;
-    if (!value) return; // No sort
+    if (!value) return;
     const [colIndexStr, type] = value.split("_");
     const colIndex = parseInt(colIndexStr, 10);
     sortTable(colIndex, type);
   }
 
-  /**
-   * Fetches and displays the player's card stats and NBA stats in a modal popup.
-   * @param {number} playerId - The card ID for which to fetch details.
-   */
   function viewPlayerStats(playerId) {
     fetch(`/player/details/${playerId}`)
       .then(response => response.json())
-      .then(data => 
-      {
+      .then(data => {
         const modalBody = document.getElementById('playerModalBody');
         modalBody.innerHTML = `
           <h5>Card Stats</h5>
@@ -133,9 +77,6 @@
           <p><strong>Overall:</strong> ${data.overall}</p>
           <hr>
           <h5>NBA Stats</h5>
-          
-
-          
           ${ data.nba_id ? `
             <p><strong>Player Name:</strong> ${data.player_name}</p>
             <p><strong>Team:</strong> ${data.team_abbreviation}</p>
@@ -146,6 +87,7 @@
             <p><strong>Country:</strong> ${data.country}</p>
             <p><strong>Draft:</strong> Year ${data.draft_year}, Round ${data.draft_round}, Pick ${data.draft_number}</p>
             <p><strong>Games Played:</strong> ${data.gp}</p>
+
             <p><strong>PPG:</strong> ${data.pts}</p>
             <p><strong>Rebounds:</strong> ${data.reb}</p>
             <p><strong>Assists:</strong> ${data.ast}</p>
@@ -158,14 +100,11 @@
             <p><strong>Season:</strong> ${data.season}</p>
           ` : '<p>No NBA stats available.</p>' }
         `;
-        //Bootstrap's modal API.
         var playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
       })
-
-      // test case for server crap
-      .catch(err => 
-      {
+      // error handing incase the database isnt working
+      .catch(err => {
         console.error(err);
         alert('Error fetching player details.');
       });
