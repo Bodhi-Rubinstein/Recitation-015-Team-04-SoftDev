@@ -346,7 +346,7 @@ app.use(auth);
 
 app.get('/leaderboard', async (req, res) => {
   try {
-    console.log("LIMIT RECEIVED:", req.query.limit);
+    //console.log("LIMIT RECEIVED:", req.query.limit);
 
     const limit = parseInt(req.query.limit, 10);
     const validatedLimit = [5, 10, 25, 50].includes(limit) ? limit : 10;
