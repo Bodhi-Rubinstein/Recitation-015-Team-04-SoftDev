@@ -3,42 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
+    <style>
+    /* Custom CSS to move the image further to the left */
+    .image-column {
+      margin-left: -400px; /* Adjust this value to move the image further left */
+      margin-top: -100px; /* Adjust this value to move the image down */
+    }
+
+    .image-column img {
+      width: 600px; /* Make the image responsive */
+      max-width: 800px; /* Set a maximum width for the image */
+      height: auto; /* Maintain aspect ratio */
+    }
+  </style>
 </head>
 <body>
-    <main class="container mt-5" style="max-width: 400px;">
-  <h1 class="mb-4 text-center">Login</h1>
+<main class="container mt-5">
+  <h1 class="mb-4 text-start">Login</h1>
 
-  <form action="/login" method="POST">
-    <div class="mb-3">
-      <label for="username" class="form-label">Username:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="username"
-        name="username"
-        required
-      />
+  <div class="row">
+    <!-- Form Column -->
+    <div class="col-md-8">
+      <form action="/login" method="POST" class="text-start">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            style="width: 300px; height: 35px;"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            style="width: 300px; height: 35px;"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+
+      <p class="mt-3 text-start">
+        Don't have an account?
+        <a href="/register">Register here</a>
+      </p>
     </div>
-
-    <div class="mb-3">
-      <label for="password" class="form-label">Password:</label>
-      <input
-        type="password"
-        class="form-control"
-        id="password"
-        name="password"
-        required
-      />
+    <!-- Image Column -->
+    <div class="col-md-4 image-column">
+      <img src="../resources/img/LEBRONJAMES1.jpg" class="img-fluid" alt="The GOAT" width ="600" height="800" />
     </div>
-
-    <button type="submit" class="btn btn-primary w-100">Login</button>
-  </form>
-
-  <p class="mt-3 text-center">
-    Don't have an account?
-    <a href="/register">Register here</a>
-  </p>
-
+  </div>
 </main>
 </body>
 {{> message }}

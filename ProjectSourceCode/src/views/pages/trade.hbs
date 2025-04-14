@@ -6,7 +6,7 @@
     <title>Trade System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body onload="loadAll()">
+<body>
     <!-- content of trading page-->
     <div class="container mt-4">
         <div class="row">
@@ -17,10 +17,15 @@
 
             <!-- pending trades page -->
             <div class="col-md-9">
-                <h2>Pending Trades</h2>
-                <ul class="list-group" id="tradeList">
-                    <!-- pending trades will be listed here -->
-                </ul>
+                <!-- Outgoing trades from the current user -->
+                <h3>Outgoing Trades</h3>
+                <ul class="list-group mb-4" id="outgoingTrades"></ul>
+                <!-- Incoming trades to the current user -->
+                <h3>Incoming Trades</h3>
+                <ul class="list-group mb-4" id="incomingTrades"></ul>
+                <!-- Accepted trades from current user-->
+                <h3>Accepted Trades</h3>
+                <ul class="list-group mb-4" id="acceptedTrades"></ul>
             </div>
         </div>
     </div>
@@ -36,11 +41,29 @@
                     <form id="tradeForm">
                         <div class="mb-3">
                             <label for="offerCard" class="form-label">Your Cards</label>
-                            <select id="offerCard" class="form-select"></select>
+                            <select id="offerCard" class="form-select">
+                                <option value="">Select a card</option>
+                                {{#each player_cards}}
+                                    
+                                    <option value="{{this.id}}">{{this.name}}
+                                    (Atk:
+                                    {{this.attack}}, Def:
+                                    {{this.defense}})</option>
+                                {{/each}}
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="tradeForCard" class="form-label">Trade For</label>
-                            <select id="tradeForCard" class="form-select"></select>
+                            <select id="tradeForCard" class="form-select">
+                                <option value="">Select a card</option>
+                                {{#each all_cards}}
+                                    
+                                    <option value="{{this.id}}">{{this.name}}
+                                    (Atk:
+                                    {{this.attack}}, Def:
+                                    {{this.defense}})</option>
+                                {{/each}}
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit Trade</button>
                     </form>
@@ -50,5 +73,6 @@
     </div>
 
     <script src="/resources/js/trade.js"></script>
+    <!-- Include the current username in a script tag for use in the JavaScript -->
+    <script> const CURRENT_USER = "{{username}}";</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-

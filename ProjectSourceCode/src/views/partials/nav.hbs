@@ -34,7 +34,17 @@
         </li>
       </ul>
     </div>
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto d-flex align-items-center">
+      {{#if user}}
+      <li class="nav-item mr-3">
+
+        <div class="border rounded p-2">
+          Overall: <strong>{{user.overall}}</strong> |
+          Trophies: <strong>{{user.trophies}}</strong> | 
+          Money: <strong>{{user.money}}</strong>
+        </div>
+      </li>
+      {{/if}}
       <li class="nav-item">
         <a href="/battle" class="btn btn-danger btn-lg font-weight-bold px-4">
           Battle&nbsp;Button

@@ -53,7 +53,8 @@ CREATE TABLE trades(
     card1_id INT NOT NULL,
     card2_id INT NOT NULL,
     card1_owner VARCHAR(255) NOT NULL,
-    card2_owner VARCHAR(255) NOT NULL
+    card2_owner VARCHAR(255),
+    trade_status VARCHAR(20) DEFAULT 'pending'
 );
 DROP TABLE IF EXISTS cardPacks;
 CREATE TABLE cardPacks(
