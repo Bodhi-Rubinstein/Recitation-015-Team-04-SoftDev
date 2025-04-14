@@ -1,0 +1,60 @@
+UAT for Battle Features
+
+Test Case 1: Battle Initiation
+	•	Feature: Start Battle Against Bot
+	•	Objective: Verify that a user can select a deck and initiate a battle against a bot.
+	•	Preconditions:
+	    •	The user must be logged in.
+	    •	The user has at least one valid deck in their collection.
+	•	Test Steps:
+	    1.	Navigate to the Battle Arena page (GET /battle).
+	    2.	From the deck dropdown (populated from the database), select a valid deck.
+	    3.	Click the “Play Bot” button.
+	•	Expected Outcome:
+	    •	The browser redirects to the battle animation page (GET /battle/play/:deckId).
+	    •	The page loads and displays the user’s deck and a set of random bot cards.
+	    •	The battle animation (rolls, health bar updates, scores) starts automatically as per the functionality in battleClient.js.
+	•	Postconditions:
+	    •	The battle simulation is running; no data is written until the battle is finished.
+	•	Notes:
+	    •	Test on different browsers to ensure the animated page and dynamic content load properly.
+
+⸻
+
+Test Case 2: Battle Simulation and Conclusion
+	•	Feature: Simulate a Complete Battle Round
+	•	Objective: Ensure that the battle simulation correctly calculates the outcomes round by round and records the final result.
+	•	Preconditions:
+	    •	A battle has been initiated (as per Test Case 1).
+	    •	The battle simulation (rounds) has completed (either user or bot reached 3 wins, or 5 rounds are completed).
+	•	Test Steps:
+	    1.	Allow the animated battle sequence to run until completion.
+	    2.	Verify that the score updates are correctly displayed on the screen.
+	    3.	Once the battle ends, the system calls POST /battle/finish with the score and logs.
+	    4.	Verify that the final result page is shown (via GET /battle/result/:id).
+	•	Expected Outcome:
+	    •	The battle finishes with a clear display of the final score and the winner.
+	    •	The server responds with a redirect or a rendered page that includes battle details (scores, battle logs).
+	    •	Database entries in the battles and battle_logs tables reflect the correct scores and logs.
+	•	Postconditions:
+	    •	User trophies and money should be updated based on the battle outcome.
+	•	Notes:
+	    •	Document any discrepancies in damage calculations or round outcomes.
+	    •	Use a test account with known card stats to verify consistency.
+
+⸻
+
+Test Case 3: Error Handling in Battle Setup
+	•	Feature: Handling Invalid Deck or Unauthenticated Requests
+	•	Objective: Check that invalid battle initiation parameters or unauthenticated access are handled appropriately.
+	•	Preconditions:
+	    •	The user is either not logged in or selects a deck that does not belong to them.
+	•	Test Steps:
+	    1.	As an unauthenticated user, try to access GET /battle or POST /battle/start.
+	    2.	Alternatively, log in as a different user, then manually alter the deck ID in the URL (/battle/play/:deckId) to one that does not belong to the authenticated user.
+	•	Expected Outcome:
+	    •	The system should redirect the user back to the login page or return a 400 status with an error message such as “Deck not found.”
+	•	Postconditions:
+	    •	No battle is initiated.
+	•	Notes:
+	    •	Verify that the error messages are clear and instruct the user on corrective actions (e.g., “Please select a valid deck”).
