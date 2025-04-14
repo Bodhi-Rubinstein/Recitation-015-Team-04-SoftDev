@@ -79,6 +79,34 @@ app.use(
   })
 );
 
+
+// *****************************************************
+// NEW: Middleware to Update User Stats (Option B)
+// *****************************************************
+app.use(async (req, res, next) => {
+  if (req.session && req.session.user) {
+    try {
+      // Fetch the updated overall, trophies, and money from the database
+      const userStats = await db.one(
+        "SELECT overall, trophies, money FROM users WHERE username = $1",
+        [req.session.user.username]
+      );
+      // Update session user with the latest stats
+      req.session.user.overall = userStats.overall;
+      req.session.user.trophies = userStats.trophies;
+      req.session.user.money = userStats.money;
+      // Make the updated user object available to all views
+      res.locals.user = req.session.user;
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.locals.user = req.session.user; // Fall back on session data
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
