@@ -377,7 +377,12 @@ app.get('/leaderboard', async (req, res) => {
 
     leaders.forEach((leader, i) => leader.rank = i + 1);
 
-    res.render("pages/leaderboard", { leaders, selected: validatedLimit});
+    res.render("pages/leaderboard", {
+      leaders,
+      selected: validatedLimit,
+      currentUser: req.session.user?.username
+    });
+    
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");

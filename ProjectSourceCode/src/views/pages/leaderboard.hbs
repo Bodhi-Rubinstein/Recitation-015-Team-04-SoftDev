@@ -42,17 +42,20 @@
                 </tr>
             </thead>
             <tbody>
-                {{!-- start loop --}}
                 {{#each leaders}}
                 <tr>
                     <td>{{rank}}</td>
-                    <td>{{name}}</td>
+                    <!-- chatGPT prompt: how can i make it so the row color changes if the user which is currently logged in is on the leaderboard (edited a lot, chatGPT suggestion to use a badge-->
+                    <td>
+                        {{name}} {{#if (eq this.name ../currentUser)}}
+                        <span class="badge bg-info text-dark">You</span>
+                        {{/if}}
+                    </td>
                     <td>{{best_player}}</td>
                     <td>{{battles_won}}</td>
                     <td hidden>{{best_player_rank}}</td>
                 </tr>
                 {{/each}}
-                {{!-- end loop --}}
             </tbody>
         </table>
     </div>
