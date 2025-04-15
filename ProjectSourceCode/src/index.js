@@ -197,7 +197,7 @@ app.post("/register", async (req, res) => {
         .status(400)
         .json({ status: "error", message: "Username already exists" });
     }
-    return res.render("pages/register", {
+    return res.status(400).render("pages/register", {
 
       message: "Username already exists. Please choose another one.",
 
