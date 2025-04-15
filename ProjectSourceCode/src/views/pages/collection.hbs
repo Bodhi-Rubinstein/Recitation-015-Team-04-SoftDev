@@ -1,24 +1,56 @@
 {{> header}}
 {{> message}}
 
-<!--collection stylesheet -->
-<link rel="stylesheet" href="/resources/css/collection.css">
+<head>
+  <style>
+    body {
+      background-color: #001f3f; /* Dark blue background */
+      color: white; /* Default text color for contrast */
+    }
+
+    .collection-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px; /* Add spacing between cards */
+      justify-content: center; /* Center the cards */
+    }
+
+    .collection-item {
+      background-color: white; /* Keep the card white */
+      border: 2px solid #40E0D0; /* Turquoise border */
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+      padding: 15px; /* Add padding inside the card */
+      width: 300px; /* Set a fixed width for the cards */
+      text-align: center; /* Center the text */
+      color: black; /* Ensure text inside the card is readable */
+    }
+
+    .modal-content {
+      background-color: white; /* Keep the modal white */
+      color: black; /* Ensure text is readable */
+    }
+
+    .btn-info {
+      background-color: #40E0D0; /* Turquoise button */
+      border: none;
+      color: white;
+    }
+
+    .btn-info:hover {
+      background-color: #00509e; /* Darker blue on hover */
+    }
+  </style>
+</head>
 
 <main class="container mt-4">
-  <h1>Your Owned Cards</h1>
+  <h1 class="text-center mb-4">Your Owned Cards</h1>
   
   <!-- Grid container for cards -->
   <div class="collection-container">
     {{#each userCards}}
       <div class="collection-item">
         <h5>{{this.name}}</h5>
-
-        
-        <!--image-->
-
-
-        <!-- <img src="/resources/images/cards/{{this.id}}.png" alt="{{this.name}}"> -->
-        <!-- this should hopefully connect images to cards if you make it bohdi or maybe you want to completely overhaul it -->
 
         <p><strong>Sport:</strong> {{this.sport}}</p>
         <p><strong>Attack:</strong> {{this.attack}}</p>
@@ -31,7 +63,7 @@
   </div>
 </main>
 
-<!--player details -->
+<!-- Player Details Modal -->
 <div class="modal fade" id="playerModal" tabindex="-1" aria-labelledby="playerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -49,19 +81,6 @@
 </div>
 
 <script>
-  // Sorting functionality
-  function sortTable(colIndex, type) {
-  }
-
-  function handleSortChange() {
-    const dropdown = document.getElementById("sortDropdown");
-    const value = dropdown.value;
-    if (!value) return;
-    const [colIndexStr, type] = value.split("_");
-    const colIndex = parseInt(colIndexStr, 10);
-    sortTable(colIndex, type);
-  }
-
   function viewPlayerStats(playerId) {
     fetch(`/player/details/${playerId}`)
       .then(response => response.json())
@@ -87,7 +106,6 @@
             <p><strong>Country:</strong> ${data.country}</p>
             <p><strong>Draft:</strong> Year ${data.draft_year}, Round ${data.draft_round}, Pick ${data.draft_number}</p>
             <p><strong>Games Played:</strong> ${data.gp}</p>
-
             <p><strong>PPG:</strong> ${data.pts}</p>
             <p><strong>Rebounds:</strong> ${data.reb}</p>
             <p><strong>Assists:</strong> ${data.ast}</p>
@@ -103,7 +121,6 @@
         var playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
       })
-      // error handing incase the database isnt working
       .catch(err => {
         console.error(err);
         alert('Error fetching player details.');
