@@ -2,33 +2,20 @@
 {{> message}}
 
 <!--collection stylesheet -->
-<link rel="stylesheet" href="/resources/css/collection.css">
+<link rel="stylesheet" href="../resources/css/Collection.css">
 
 <main class="container mt-4">
   <h1>Your Owned Cards</h1>
   
-  <!-- Grid container for cards -->
-  <div class="collection-container">
-    {{#each userCards}}
-      <div class="collection-item">
-        <h5>{{this.name}}</h5>
+ <div class="collection-container">
+  {{#each userCards}}
+    <div class="collection-item" onclick="viewPlayerStats({{this.id}})">
+      <img src="../resources/img/cards/{{this.image_url}}" alt="{{this.name}}" class="card-img">
+    </div>
+  {{/each}}
+</div>
 
-        
-        <!--image-->
 
-
-        <!-- <img src="/resources/images/cards/{{this.id}}.png" alt="{{this.name}}"> -->
-        <!-- this should hopefully connect images to cards if you make it bohdi or maybe you want to completely overhaul it -->
-
-        <p><strong>Sport:</strong> {{this.sport}}</p>
-        <p><strong>Attack:</strong> {{this.attack}}</p>
-        <p><strong>Defense:</strong> {{this.defense}}</p>
-        <p><strong>Health:</strong> {{this.health}}</p>
-        <p><strong>Overall:</strong> {{this.overall}}</p>
-        <button class="btn btn-info btn-sm" onclick="viewPlayerStats({{this.id}})">View Stats</button>
-      </div>
-    {{/each}}
-  </div>
 </main>
 
 <!--player details -->
