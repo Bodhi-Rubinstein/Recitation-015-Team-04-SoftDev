@@ -203,6 +203,7 @@ app.post("/register", async (req, res) => {
         .json({ status: "error", message: "Username already exists" });
     }
     return res.status(400).render("pages/register", {
+
       message: "Username already exists. Please choose another one.",
     });
   }
