@@ -213,7 +213,7 @@ app.post("/register", async (req, res) => {
 
     // Initialize the user with some default cards
     // Initialize the user with some default cards
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 1), ($1, 2), ($1, 3), ($1, 4), ($1, 5);`;
     await db.none(initCardsQuery, [username]);
 
     /*
@@ -282,7 +282,7 @@ app.post("/open-pack", auth, async (req, res) => {
       await db.none(updateMoneyQuery, [username]);
 
       //get 5 random cards
-      const randomCardsQuery = `SELECT id, name 
+      const randomCardsQuery = `SELECT id, name, image_url 
         FROM cards 
         ORDER BY RANDOM() 
         LIMIT 5;
@@ -303,7 +303,7 @@ app.post("/open-pack", auth, async (req, res) => {
       res.json({
         success: true,
         message: "Pack opened successfully!",
-        packContents: randomCards.map((card) => card.name), // Send back the names of the cards
+        packContents: randomCards.map((card) => ({id: card.id, name: card.name, image_url: card.image_url})), // Send back the names of the cards
       });
     } else {
       res.json({
@@ -331,7 +331,7 @@ app.get("/collection", auth, async (req, res) => {
 
     // Query the DB for all cards this user owns
     const userCardsQuery = `
-      SELECT c.id, c.name, c.sport, c.attack, c.defense, c.health, c.overall
+      SELECT c.id, c.name, c.sport, c.attack, c.defense, c.health, c.overall, c.image_url
       FROM cards c
       JOIN cardsToUsers cu ON c.id = cu.card_id
       WHERE cu.username_id = $1
