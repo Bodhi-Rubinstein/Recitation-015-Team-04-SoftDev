@@ -1,66 +1,21 @@
 {{> header}}
 {{> message}}
 
-<head>
-  <style>
-    body {
-      background-color: #001f3f; /* Dark blue background */
-      color: white; /* Default text color for contrast */
-    }
-
-    .collection-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px; /* Add spacing between cards */
-      justify-content: center; /* Center the cards */
-    }
-
-    .collection-item {
-      background-color: white; 
-      border: 2px solid #40E0D0; 
-      border-radius: 10px; 
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-      padding: 15px; 
-      width: 300px; 
-      text-align: center; 
-      color: black; 
-    }
-
-    .modal-content {
-      background-color: white; /* Keep the modal white */
-      color: black; /* Ensure text is readable */
-    }
-
-    .btn-info {
-      background-color: #40E0D0; /* Turquoise button */
-      border: none;
-      color: white;
-    }
-
-    .btn-info:hover {
-      background-color: #00509e; /* Darker blue on hover */
-    }
-  </style>
-</head>
+<!--collection stylesheet -->
+<link rel="stylesheet" href="../resources/css/Collection.css">
 
 <main class="container mt-4">
   <h1 class="text-center mb-4">Your Owned Cards</h1>
   
-  <!-- Grid container for cards -->
-  <div class="collection-container">
-    {{#each userCards}}
-      <div class="collection-item">
-        <h5>{{this.name}}</h5>
+ <div class="collection-container">
+  {{#each userCards}}
+    <div class="collection-item" onclick="viewPlayerStats({{this.id}})">
+      <img src="../resources/img/cards/{{this.image_url}}" alt="{{this.name}}" class="card-img">
+    </div>
+  {{/each}}
+</div>
 
-        <p><strong>Sport:</strong> {{this.sport}}</p>
-        <p><strong>Attack:</strong> {{this.attack}}</p>
-        <p><strong>Defense:</strong> {{this.defense}}</p>
-        <p><strong>Health:</strong> {{this.health}}</p>
-        <p><strong>Overall:</strong> {{this.overall}}</p>
-        <button class="btn btn-info btn-sm" onclick="viewPlayerStats({{this.id}})">View Stats</button>
-      </div>
-    {{/each}}
-  </div>
+
 </main>
 
 <!-- Player Details Modal -->

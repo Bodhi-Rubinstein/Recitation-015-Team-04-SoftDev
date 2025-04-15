@@ -7,7 +7,8 @@ CREATE TABLE cards (
     defense INT NOT NULL,
     health INT NOT NULL,
     overall INT NOT NULL,
-    special_move BOOLEAN NOT NULL
+    special_move BOOLEAN NOT NULL,
+    image_url VARCHAR(255) NOT NULL
 );
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
@@ -115,7 +116,8 @@ CREATE TABLE nbaPlayers (
     -- true shooting percentage
     ast_pct NUMERIC(4, 3),
     -- assist percentage
-    season VARCHAR(10) NOT NULL
+    season VARCHAR(10) NOT NULL,
+    image_url VARCHAR(255) NOT NULL
 );
 DROP TABLE IF EXISTS nbaPlayersToCards;
 CREATE TABLE nbaPlayersToCards (

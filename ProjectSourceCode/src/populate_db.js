@@ -59,10 +59,10 @@ async function create_cards_from_players() {
       }
       // insert each card and return card
       let card = await db.one(
-        `INSERT INTO cards (name, sport, attack, defense, health, overall, special_move)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO cards (name, sport, attack, defense, health, overall, special_move, image_url)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
           RETURNING id`,
-        [player.player_name, 'basketball', attack, defense, health, overall, false]
+        [player.player_name, 'basketball', attack, defense, health, overall, false, player.image_url]
       );
 
       // nbaPlayersToCards mapping for each player_id to card_id
@@ -78,7 +78,7 @@ async function create_cards_from_players() {
   }
 }    
 async function populate_db() {
-  let filePath = 'src/resources/csv/nba_players_200.csv';
+  let filePath = 'src/resources/csv/nba_players_10.csv';
 
   // variable to hold the promises for each insert and ensure they finish before moving to cards
   let insertPromises = [];
@@ -109,11 +109,12 @@ async function populate_db() {
           parseFloat(row.usg_pct),
           parseFloat(row.ts_pct),
           parseFloat(row.ast_pct),
-          row.season
+          row.season,
+          row.image
         ];
         
         //define the query to insert a row into the nbaPlayers table
-        const query = `INSERT INTO nbaPlayers (player_name, league, team_abbreviation, age, player_height, player_weight, college, country, draft_year, draft_round, draft_number, gp, pts, reb, ast, net_rating, oreb_pct, dreb_pct, usg_pct, ts_pct, ast_pct, season)
+        const query = `INSERT INTO nbaPlayers (player_name, team_abbreviation, age, player_height, player_weight, college, country, draft_year, draft_round, draft_number, gp, pts, reb, ast, net_rating, oreb_pct, dreb_pct, usg_pct, ts_pct, ast_pct, season, image_url)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`;
         
         // insert the row into the database
