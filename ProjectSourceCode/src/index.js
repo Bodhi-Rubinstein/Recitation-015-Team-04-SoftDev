@@ -887,7 +887,7 @@ app.post("/trades", async (req, res) => {
     // 1. Check if the trade already exists
     const existingTrade = allTrades.find(
       (trade) => 
-        (trade.card1_id === card1_id && trade.card2_id === card2_id) &&
+        (trade.card1_id === Number(card1_id) && trade.card2_id === Number(card2_id)) &&
         (trade.card1_owner === card1_owner));
     if (existingTrade) {
       return res.status(400).json({ error: "Trade already exists" });
@@ -900,20 +900,20 @@ app.post("/trades", async (req, res) => {
     );
 
     const userCardIds = userCards.map((c) => c.card_id);
-    console.log("User cards:", userCardIds);
-    console.log("Card1 ID:", card1_id);
-    console.log(userCardIds.includes(Number(card1_id)));
+    //console.log("User cards:", userCardIds);
+    //console.log("Card2 ID:", Number(card2_id));
+    //console.log(userCardIds.includes(Number(card2_id)));
 
     if (!userCardIds.includes(Number(card1_id))) {
       return res.status(400).json({ error: "You do not own this card" });
     }
 
     // 3. Check if the user is trying for the same card
-    if (card1_id === card2_id) {
+    if (Number(card1_id) === Number(card2_id)) {
       return res.status(400).json({ error: "You cannot trade for the same card" });
     }
     // 4. Check if the user is trying to trade for a different card they own
-    if (!userCardIds.includes(card2_id)) {
+    if (userCardIds.includes(Number(card2_id))) {
       return res.status(400).json({ error: "You already own the card you're requesting" });
     }
     // Insert into trades table
@@ -1080,9 +1080,9 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
       return res.status(400).json({ error: "Trade already accepted" });
     }
 
-    // 2. Check if the user is the owner of the card being offered
-    if (tradeResult.card1_owner !== card2_owner) {
-      return res.status(400).json({ error: "You are not the owner of the offered card" });
+    // 2. Check if the user is trying to trade with themselves
+    if (tradeResult.card1_owner == card2_owner) {
+      return res.status(400).json({ error: "You cannot trade with yourself!" });
     }
 
     // 3. Check if user owns card 2 and can trade
@@ -1091,6 +1091,9 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
       `SELECT * FROM cardsToUsers WHERE card_id = $1 AND username_id = $2`,
       [card2_id, card2_owner]
     );
+    console.log("card2_owner_check: ", card2_owner_check);
+    console.log("card2_id: ", card2_id);
+    console.log("card2_owner: ", card2_owner);
     if (!card2_owner_check) {
       return res.status(400).json({ error: "You are not the owner of the offered card" });
     }
