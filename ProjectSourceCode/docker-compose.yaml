@@ -1,5 +1,5 @@
 services:
-  db:
+  powerplay_db:
     image: postgres:14
     env_file: .env
     expose:
@@ -16,7 +16,7 @@ services:
     environment:
       - NODE_ENV=development
     depends_on:
-      - db
+      - powerplay_db
     ports:
       - "3000:3000"
     volumes:
