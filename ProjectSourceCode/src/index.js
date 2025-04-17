@@ -119,6 +119,7 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+
 app.get("/tutorial", (req, res) => {
   res.render("pages/tutorial");
 });
@@ -134,8 +135,6 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("pages/register");
 });
-
-
 
 //Login
 app.post("/login", async (req, res) => {
@@ -158,7 +157,9 @@ app.post("/login", async (req, res) => {
       return res.redirect("/home"); //returns up here so no infinite loop
     } else {
       //render login again
-      res.status(400).render('pages/login', { message: 'Incorrect username or password' });
+      res
+        .status(400)
+        .render("pages/login", { message: "Incorrect username or password" });
     }
   } catch (error) {
     console.error(error);
@@ -168,10 +169,9 @@ app.post("/login", async (req, res) => {
 
 // Register
 app.post("/register", async (req, res) => {
-
-
   const { username, password } = req.body;
   // Validate password
+
   const passwordError = validatePassword(password);
   if (passwordError) {
 
@@ -179,25 +179,31 @@ app.post("/register", async (req, res) => {
   }
 
   if (!username || !password) {
-    if (req.accepts("json")) {
-      // test client hits this branch
+    if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
         .json({ status: "error", message: "Missing field" });
     }
-    return res.redirect("/register"); // browser
+    return res.redirect("/register"); // normal browser flow
   }
 
   const hash = await bcrypt.hash(password, 10);
 
   let userInsertQuery = `INSERT INTO users (username, password, overall, trophies, money) VALUES ($1, $2, 0, 0, 100) RETURNING username;`;
   let usernameCheckQuery = `SELECT * FROM users WHERE username = $1;`;
+
   // Check if the username already exists
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
 
-
   if (existingUser) {
+
+    if (req.get("X-Test-Env") === "1") {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Username already exists" });
+    }
     return res.status(400).render("pages/register", {
+
       message: "Username already exists. Please choose another one.",
 
     });
@@ -206,10 +212,11 @@ app.post("/register", async (req, res) => {
   try {
     await db.one(userInsertQuery, [username, hash]);
 
-    // Initialize the user with zero cards in cardsToUsers
-    //let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 0);`;
+    // Initialize the user with some default cards
+    // Initialize the user with some default cards
     let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
     await db.none(initCardsQuery, [username]);
+
     /*
     if (req.accepts("json")) {
       return res
@@ -220,18 +227,17 @@ app.post("/register", async (req, res) => {
     let userDeckQuery = `INSERT INTO userToDecks (username_id, deck_id) VALUES ($1, 1);`;
     await db.none(userDeckQuery, [username]);
 
-
     return res.redirect("/login"); // Redirect to login after successful registration
   } catch (error) {
     console.error(error);
-    if (req.accepts("json")) {
+    if (req.get("X-Test-Env") === "1") {
       return res.status(400).json({ status: "error", message: error.message });
     }
-    return res.redirect("/register"); // Stay on register page if error occurs
-
+    return res.redirect("/register");
+    return res.redirect("/register");
   }
+});
 
-  });
 
 
 
@@ -344,51 +350,55 @@ app.get("/collection", auth, async (req, res) => {
   }
 });
 
-
-
 // Authentication Required
 app.use(auth);
 // leaderboard
 
-app.get('/leaderboard', async(req, res) => {
+app.get('/leaderboard', async (req, res) => {
   try {
-    const leaderboardQuery = `
-  WITH best_cards AS (
-  SELECT
-    u.username AS name,
-    u.trophies AS battles_won,
-    c.name AS best_player,
-    c.overall AS best_player_rank,
-    ROW_NUMBER() OVER (
-      PARTITION BY u.username
-      ORDER BY c.overall DESC  
-    ) AS card_rank
-  FROM users u
-  INNER JOIN cardsToUsers cu ON cu.username_id = u.username
-  INNER JOIN cards c ON c.id = cu.card_id
-)
-SELECT *
-FROM best_cards
-WHERE card_rank = 1
-ORDER BY battles_won DESC, best_player_rank ASC
-LIMIT 10;
-`;
- 
-    const leaders = await db.any(leaderboardQuery);
-    let current_rank = 1
-    leaders.forEach(leader => {
-      leader.rank = current_rank;
-      current_rank = current_rank + 1;
-    })
+    //console.log("LIMIT RECEIVED:", req.query.limit);
 
+    const limit = parseInt(req.query.limit, 10);
+    const validatedLimit = [5, 10, 25, 50].includes(limit) ? limit : 10;
+
+    const leaderboardQuery = `
+      WITH best_cards AS (
+        SELECT
+          u.username AS name,
+          u.trophies AS battles_won,
+          c.name AS best_player,
+          c.overall AS best_player_rank,
+          ROW_NUMBER() OVER (
+            PARTITION BY u.username
+            ORDER BY c.overall DESC
+          ) AS card_rank
+        FROM users u
+        INNER JOIN cardsToUsers cu ON cu.username_id = u.username
+        INNER JOIN cards c ON c.id = cu.card_id
+      )
+      SELECT *
+      FROM best_cards
+      WHERE card_rank = 1
+      ORDER BY battles_won DESC, best_player_rank DESC
+      LIMIT $1;
+    `;
+
+    const leaders = await db.any(leaderboardQuery, [validatedLimit]);
+
+    leaders.forEach((leader, i) => leader.rank = i + 1);
+
+    res.render("pages/leaderboard", {
+      leaders,
+      selected: validatedLimit,
+      currentUser: req.session.user?.username
+    });
     
-    res.render("pages/leaderboard", { leaders });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");
   }
-
 });
+
 
 
 // GET /deckbuilder - Render the deck builder page.
@@ -469,6 +479,9 @@ app.get("/battle", auth, async (req, res) => {
       ORDER BY d.deck_id`,
     [username]
   );
+  if (decks.length === 0) {
+    return res.redirect("/deckBuilder");
+  }
   res.render("pages/battle", { decks });
 });
 
@@ -555,11 +568,19 @@ app.post("/battle/finish", auth, async (req, res) => {
   const { userScore, botScore, logs } = req.body;
   const username = req.session.user.username;
   try {
-    await battle.recordFinishedBattle(username, userScore, botScore, logs, db);
-    res.json({ ok: true });
+    const battleId = await battle.recordFinishedBattle(
+      username,
+      userScore,
+      botScore,
+      logs,
+      db
+    );
+    res.json({ ok: true, battleId });
   } catch (e) {
     console.error(e);
-    res.status(500).json({ ok: false });
+    res
+      .status(500)
+      .json({ ok: false, error: "Something went wrong saving the battle." });
   }
 });
 
@@ -719,6 +740,7 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
+
 function validatePassword(password){
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
@@ -755,29 +777,32 @@ function validatePassword(password){
 }
 
 
-app.get("/trade", auth, async (req,res) => {
+app.get("/trade", auth, async (req, res) => {
   const username = req.session.user.username;
-  
-    try {
-        const all_cards_query = `SELECT * FROM cards;`;
-        const player_card_query =
-        `SELECT * 
+
+  try {
+    const all_cards_query = `SELECT * FROM cards;`;
+    const player_card_query = `SELECT * 
         FROM cards 
         JOIN cardsToUsers 
         ON cards.id = cardsToUsers.card_id 
         WHERE cardsToUsers.username_id = $1;`;
-        //pull all owned player cards
-        const player_cards = await db.any(player_card_query, [username]);
-        //pull all cards
-        const all_cards = await db.any(all_cards_query);
+    //pull all owned player cards
+    const player_cards = await db.any(player_card_query, [username]);
+    //pull all cards
+    const all_cards = await db.any(all_cards_query);
 
-        const player_trade_query = `SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner $2`
+    const player_trade_query = `SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner $2`;
 
-        //pass player cards, all cards, and username to the trade page 
-        res.render("pages/trade", { player_cards: player_cards ,all_cards: all_cards, username: username});
-    } catch (err) {
-        console.error("Error loading cards:", err);
-    }
+    //pass player cards, all cards, and username to the trade page
+    res.render("pages/trade", {
+      player_cards: player_cards,
+      all_cards: all_cards,
+      username: username,
+    });
+  } catch (err) {
+    console.error("Error loading cards:", err);
+  }
 });
 
 app.post("/trades", async (req, res) => {
@@ -817,15 +842,14 @@ app.post("/trades", async (req, res) => {
     */
     // Insert into trades table
     await db.query(
-
-        `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
+      `INSERT INTO trades (card1_id, card2_id, card1_owner, card2_owner)
          VALUES ($1, $2, $3, 'pending')`,
-        [card1_id, card2_id, card1_owner]
+      [card1_id, card2_id, card1_owner]
     );
 
     res.status(201).json({
-        message: "Trade offer sent!",
-        /*
+      message: "Trade offer sent!",
+      /*
         trade: {
             offer: card1_name,
             request: card2_name,
@@ -835,7 +859,6 @@ app.post("/trades", async (req, res) => {
             card2_id,
             status: "Pending"
         }*/
-
     });
   } catch (err) {
     console.error(err);
@@ -847,16 +870,15 @@ app.post("/trades", async (req, res) => {
 //this ensures that everytime the user loads into the page, the trades are ran
 app.get("/trades/:username", async (req, res) => {
   try {
+    const { username } = req.params;
 
-      const { username } = req.params;
-      
-      /*const result = await db.query(
+    /*const result = await db.query(
           "SELECT * FROM trades WHERE card1_owner = $1 OR card2_owner = $1",
           [username]
       );*/
-      //selects all trades where user has offered the trade, accepted the trade, or is the owner of a card in a pending trade.
-      const result = await db.any(
-        `SELECT
+    //selects all trades where user has offered the trade, accepted the trade, or is the owner of a card in a pending trade.
+    const result = await db.any(
+      `SELECT
         t.id,
         t.card1_id,
         t.card2_id,
@@ -872,86 +894,89 @@ app.get("/trades/:username", async (req, res) => {
           OR t.card2_id IN (
             SELECT card_id FROM cardsToUsers WHERE username_id = $1
           );
-        `, [username]);
-      //console.log("Trades found for", username, result);
-      
-      //select all cards that the user owns
-      const userCards = await db.any(
-        `SELECT card_id FROM cardsToUsers WHERE username_id = $1`,
-        [username]
-      );
-      const userCardIds = userCards.map(c => c.card_id);     
-      
-      // filter outgoing trades (where the user is the offerer)
-      const outgoing = result.filter(t => t.card1_owner === username && t.trade_status === 'pending');
+        `,
+      [username]
+    );
+    //console.log("Trades found for", username, result);
 
-      // filter incoming trades (where the user owns the card being requested)
-      const incoming = result.filter(t => userCardIds.includes(t.card2_id) && t.card1_owner !== username && t.trade_status === 'pending');
+    //select all cards that the user owns
+    const userCards = await db.any(
+      `SELECT card_id FROM cardsToUsers WHERE username_id = $1`,
+      [username]
+    );
+    const userCardIds = userCards.map((c) => c.card_id);
 
-      // filter accepted trades (where the user is either the offerer or the acceptor)
-      const accepted = result.filter(t => t.trade_status === 'accepted' && (t.card1_owner === username || t.card2_owner === username));
+    // filter outgoing trades (where the user is the offerer)
+    const outgoing = result.filter(
+      (t) => t.card1_owner === username && t.trade_status === "pending"
+    );
 
-      res.json({ outgoing, incoming, accepted });
+    // filter incoming trades (where the user owns the card being requested)
+    const incoming = result.filter(
+      (t) =>
+        userCardIds.includes(t.card2_id) &&
+        t.card1_owner !== username &&
+        t.trade_status === "pending"
+    );
 
+    // filter accepted trades (where the user is either the offerer or the acceptor)
+    const accepted = result.filter(
+      (t) =>
+        t.trade_status === "accepted" &&
+        (t.card1_owner === username || t.card2_owner === username)
+    );
+
+    res.json({ outgoing, incoming, accepted });
   } catch (err) {
     console.error(err);
     //res.status(500).send("Server error");
     res.status(500).json({ error: "Server error" });
   }
+
+  const isContainsSymbol = /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+  if (!isContainsSymbol.test(password)) {
+    return "Password must contain at least one Special Character.";
+  }
+
+  const isValidLength = /^.{8,16}$/;
+  if (!isValidLength.test(password)) {
+    return "Password must be 8-16 Characters Long.";
+  }
+
+  return null;
 });
 
-
-// in order to get the actaul player stats for the buttons in colections tab not just the game moves
-app.get("/player/details/:id", auth, async (req, res) => {
-  const cardId = req.params.id;
+// Add this to your index.js along with your other routes.
+app.get("/battle/result/:battleId", auth, async (req, res) => {
+  const battleId = req.params.battleId;
   try {
-    const query = `
-      SELECT 
-        c.id AS card_id,
-        c.name AS card_name,
-        c.sport,
-        c.attack,
-        c.defense,
-        c.health,
-        c.overall,
-        nb.id AS nba_id,
-        nb.player_name,
-        nb.team_abbreviation,
-        nb.age,
-        nb.player_height,
-        nb.player_weight,
-        nb.college,
-        nb.country,
-        nb.draft_year,
-        nb.draft_round,
-        nb.draft_number,
-        nb.gp,
-        nb.pts,
-        nb.reb,
-        nb.ast,
-        nb.net_rating,
-        nb.oreb_pct,
-        nb.dreb_pct,
-        nb.usg_pct,
-        nb.ts_pct,
-        nb.ast_pct,
-        nb.season
-      FROM cards c
-      LEFT JOIN nbaPlayersToCards np2c ON c.id = np2c.card_id
-      LEFT JOIN nbaPlayers nb ON np2c.player_id = nb.id
-      WHERE c.id = $1;
-    `;
-    const result = await db.oneOrNone(query, [cardId]);
-    if (!result) {
-      return res.status(404).json({ error: "Player not found" });
-    }
-    res.json(result);
+    // Query for battle details (adjust these queries according to your schema)
+    const battleRecord = await db.one("SELECT * FROM battles WHERE id = $1", [
+      battleId,
+    ]);
+    const logRecord = await db.one(
+      "SELECT action_detail FROM battle_logs WHERE battle_id = $1",
+      [battleId]
+    );
+
+    // Map the information to the expected result object.
+    // Adjust the mapping as needed:
+    const result = {
+      userScore: battleRecord.player1_score,
+      botScore: battleRecord.player2_score,
+      // Determine the winner from your stored data.
+      // This mapping assumes a winner_id of 0 means "Bot" and that if the player wins, winner_id is the username.
+      winner: battleRecord.winner_id === 0 ? "Bot" : battleRecord.winner_id,
+      battleLogs: logRecord.action_detail,
+    };
+
+    // Render the battleResult.hbs view using the result data.
+    res.render("pages/battleResult", { result });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error retrieving player details" });
   }
 });
-
 
 app.post("/trades/:tradeId/accept", async (req, res) => {
   try {
@@ -960,7 +985,10 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
 
     const card2_owner = req.session.user.username;
     //selects the trade that is being accepted
-    const tradeResult = await db.oneOrNone("SELECT * FROM trades WHERE id = $1", [tradeId]);
+    const tradeResult = await db.oneOrNone(
+      "SELECT * FROM trades WHERE id = $1",
+      [tradeId]
+    );
     //console.log("result: ", tradeResult);
     //if the trade does not exist, return a 404 error
     if (!tradeResult) {
@@ -968,7 +996,7 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
     }
 
     //handle the transfer of card ownership with a trade
-    await db.tx(async t => {
+    await db.tx(async (t) => {
       // 1. Give the offered card (card1) to the acceptor
       await t.none(
         `
@@ -1023,8 +1051,9 @@ app.post("/trades/:tradeId/accept", async (req, res) => {
     // removes the trade from the trades table
     await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
     */
-    res.status(200).json({ message: "Trade accepted and completed successfully" });
-
+    res
+      .status(200)
+      .json({ message: "Trade accepted and completed successfully" });
   } catch (err) {
     console.error("Error accepting trade:", err);
     //res.status(500).send("Server error while accepting trade");
@@ -1114,4 +1143,3 @@ app.get("/battle/result/:id", auth, async (req, res) => {
 module.exports = app.listen(3000);
 
 console.log("Server is listening on port 3000");
-

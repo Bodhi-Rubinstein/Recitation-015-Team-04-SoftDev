@@ -24,20 +24,20 @@ const TEST_USER = "mocha_test_user";
 
 // ********************** DEFAULT WELCOME TESTCASE ****************************
 
-// describe("Server!", () => {
-//   // Sample test case given to test / endpoint.
-//   it("Returns the default welcome message", (done) => {
-//     chai
-//       .request(server)
-//       .get("/welcome")
-//       .end((err, res) => {
-//         expect(res).to.have.status(200);
-//         expect(res.body.status).to.equals("success");
-//         assert.strictEqual(res.body.message, "Welcome!");
-//         done();
-//       });
-//   });
-// });
+describe("Server!", () => {
+   // Sample test case given to test / endpoint.
+   it("Returns the default welcome message", (done) => {
+     chai
+       .request(server)
+       .get("/welcome")
+       .end((err, res) => {
+         expect(res).to.have.status(200);
+         expect(res.body.status).to.equals("success");
+         assert.strictEqual(res.body.message, "Welcome!");
+         done();
+       });
+   });
+ });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
@@ -48,6 +48,7 @@ const TEST_USER = "mocha_test_user";
 // Result: This test case should pass and return a status 200 along with a "Success" message.
 // Explanation: The testcase will call the /add_user API with the following input
 // and expects the API to return a status of 200 along with the "Success" message.
+
 
 
 describe('Testing Add User API', () => {
@@ -74,31 +75,38 @@ describe('Testing Add User API', () => {
   // Explanation: The testcase will call the /add_user API with the following invalid inputs
   // and expects the API to return a status of 400 along with the "Invalid input" message.
 
-  it('Negative : /register. Checking duplicate username.', done => {
+  it("Negative : /register. Checking duplicate username.", (done) => {
     chai
       .request(server)
+
       .post('/register')
     .type('form')
       .send({username: 'John Doe', password: 'TestPassword321!'})
+
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.text).to.include('Username already exists. Please choose another one.');
+        expect(res.text).to.include("Username already exists. Please choose another one.");
+        //BROKEN CHECKS BELOW
+        //expect(res.body.status).to.equal("error");
+        //expect(res.body.message).to.match(/username already exists/i);
         done();
       });
   });
 });
+
 // ********************************************************************************
 
-describe('Testing User Login User API', () => {
-  it('positive : /login. Checking letting user log in.', done => {
+describe("Testing User Login User API", () => {
+  it("positive : /login. Checking letting user log in.", (done) => {
     chai
       .request(server)
-      .post('/login')
+      .post("/login")
       .type('form')
       .send({username: 'John Doe', password: 'TestPassword123!'})
+
       .end((err, res) => {
         expect(res).to.have.status(200); //checks response status is 200
-        expect(res.redirects[0]).to.include('/home'); //checks that it redirects to the login page
+        expect(res.redirects[0]).to.include("/home"); //checks that it redirects to the login page
         done();
       });
   });
@@ -128,3 +136,4 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
 });
 
 // ********************************************************************************
+
