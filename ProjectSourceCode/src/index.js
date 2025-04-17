@@ -119,8 +119,13 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-app.get("/welcome", (req, res) => {
-  res.json({ status: "success", message: "Welcome!" });
+
+app.get("/tutorial", (req, res) => {
+  res.render("pages/tutorial");
+});
+
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
 });
 
 app.get("/login", (req, res) => {
@@ -232,6 +237,8 @@ app.post("/register", async (req, res) => {
     return res.redirect("/register");
   }
 });
+
+
 
 
 // Authentication Middleware.

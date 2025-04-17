@@ -25,19 +25,19 @@ const TEST_USER = "mocha_test_user";
 // ********************** DEFAULT WELCOME TESTCASE ****************************
 
 describe("Server!", () => {
-  // Sample test case given to test / endpoint.
-  it("Returns the default welcome message", (done) => {
-    chai
-      .request(server)
-      .get("/welcome")
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals("success");
-        assert.strictEqual(res.body.message, "Welcome!");
-        done();
-      });
-  });
-});
+   // Sample test case given to test / endpoint.
+   it("Returns the default welcome message", (done) => {
+     chai
+       .request(server)
+       .get("/welcome")
+       .end((err, res) => {
+         expect(res).to.have.status(200);
+         expect(res.body.status).to.equals("success");
+         assert.strictEqual(res.body.message, "Welcome!");
+         done();
+       });
+   });
+ });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
@@ -74,6 +74,7 @@ describe('Testing Add User API', () => {
   // Result: This test case should pass and return a status 400 along with a "Invalid input" message.
   // Explanation: The testcase will call the /add_user API with the following invalid inputs
   // and expects the API to return a status of 400 along with the "Invalid input" message.
+
   it("Negative : /register. Checking duplicate username.", (done) => {
     chai
       .request(server)
@@ -119,6 +120,7 @@ describe("Testing User Login User API", () => {
 // Result: This test case should pass and return a status 400 along with a "Invalid input" message.
 // Explanation: The testcase will call the /add_user API with the following invalid inputs
 // and expects the API to return a status of 400 along with the "Invalid input" message.
+
 it('Negative : /login. Checking incorrect passowrd.', done => {
   chai
     .request(server)
@@ -132,5 +134,6 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
     });
 });
 });
+
 // ********************************************************************************
 
