@@ -1,101 +1,101 @@
-﻿player_name,league,team_abbreviation,age,player_height,player_weight,college,country,draft_year,draft_round,draft_number,gp,pts,reb,ast,net_rating,oreb_pct,dreb_pct,usg_pct,ts_pct,ast_pct,season
-Joel Embiid,NBA,PHI,29,213.36,127.00576,Kansas,Cameroon,2014,1,3,66,33.1,10.2,4.2,8.8,0.057,0.243,0.37,0.655,0.233,2022-23
-Luka Doncic,NBA,DAL,24,200.66,104.32616,None,Slovenia,2018,1,3,66,32.4,8.6,8,2.1,0.024,0.224,0.368,0.609,0.408,2022-23
-Giannis Antetokounmpo,NBA,MIL,28,213.36,110.222856,None,Greece,2013,1,15,63,31.1,11.8,5.7,7.2,0.065,0.268,0.373,0.605,0.314,2022-23
-Nikola Jokic,NBA,DEN,28,210.82,128.820128,None,Serbia,2014,2,41,69,24.5,11.8,9.8,12.5,0.08,0.283,0.263,0.701,0.412,2022-23
-LeBron James,NBA,LAL,38,205.74,113.398,None,USA,2003,1,1,55,28.9,8.3,6.8,4.6,0.033,0.191,0.322,0.583,0.308,2022-23
-Jayson Tatum,NBA,BOS,25,203.2,95.25432,Duke,USA,2017,1,3,74,30.1,8.8,4.6,8.5,0.029,0.2,0.319,0.607,0.205,2022-23
-Anthony Davis,NBA,LAL,30,208.28,114.758776,Kentucky,USA,2012,1,1,56,25.9,12.5,2.6,4.8,0.102,0.248,0.277,0.627,0.128,2022-23
-Damian Lillard,NBA,POR,32,187.96,88.45044,Weber State,USA,2012,1,6,58,32.2,4.8,7.3,2.1,0.022,0.112,0.331,0.645,0.338,2022-23
-Shai Gilgeous-Alexander,NBA,OKC,24,198.12,88.45044,Kentucky,Canada,2018,1,11,68,31.4,4.8,5.5,2.7,0.023,0.109,0.318,0.626,0.249,2022-23
-Kevin Durant,NBA,PHX,34,208.28,108.86208,Texas,USA,2007,1,2,47,29.1,6.7,5,6.8,0.012,0.166,0.305,0.677,0.228,2022-23
-Zion Williamson,NBA,NOP,22,198.12,128.820128,Duke,USA,2019,1,1,29,26,7,4.6,7.8,0.06,0.148,0.288,0.652,0.231,2022-23
-Julius Randle,NBA,NYK,28,203.2,113.398,Kentucky,USA,2014,1,7,77,25.1,10,4.1,2.7,0.05,0.226,0.288,0.581,0.184,2022-23
-Domantas Sabonis,NBA,SAC,27,215.9,108.86208,Gonzaga,Lithuania,2016,1,11,79,19.1,12.3,7.3,3.9,0.096,0.275,0.213,0.668,0.297,2022-23
-Stephen Curry,NBA,GSW,35,187.96,83.91452,Davidson,USA,2009,1,7,56,29.4,6.1,6.3,5.8,0.02,0.147,0.297,0.656,0.274,2022-23
-Devin Booker,NBA,PHX,26,195.58,93.439952,Kentucky,USA,2015,1,13,53,27.8,4.5,5.5,6.2,0.025,0.105,0.311,0.601,0.251,2022-23
-Jaylen Brown,NBA,BOS,26,198.12,101.151016,California,USA,2016,1,3,67,26.6,6.9,3.5,5.4,0.032,0.152,0.307,0.581,0.163,2022-23
-Ja Morant,NBA,MEM,23,187.96,78.925008,Murray State,USA,2019,1,2,61,26.2,5.9,8.1,7.3,0.029,0.139,0.338,0.557,0.412,2022-23
-Lauri Markkanen,NBA,UTA,26,213.36,108.86208,Arizona,Finland,2017,1,7,66,25.6,8.6,1.9,3.8,0.055,0.183,0.259,0.641,0.086,2022-23
-Pascal Siakam,NBA,TOR,29,203.2,104.32616,New Mexico State,Cameroon,2016,1,27,71,24.2,7.8,5.8,2.4,0.047,0.177,0.27,0.565,0.244,2022-23
-James Harden,NBA,PHI,33,195.58,99.79024,Arizona State,USA,2009,1,3,58,21,6.1,10.7,6.1,0.021,0.151,0.247,0.607,0.439,2022-23
-Donovan Mitchell,NBA,CLE,26,185.42,97.52228,Louisville,USA,2017,1,13,68,28.3,4.3,4.4,5.9,0.027,0.097,0.31,0.614,0.205,2022-23
-Kyrie Irving,NBA,DAL,31,187.96,88.45044,Duke,Australia,2011,1,1,60,27.1,5.1,5.5,4.7,0.029,0.107,0.286,0.613,0.233,2022-23
-Trae Young,NBA,ATL,24,185.42,74.389088,Oklahoma,USA,2018,1,5,73,26.2,3,10.2,1.3,0.021,0.062,0.313,0.573,0.414,2022-23
-Brandon Ingram,NBA,NOP,25,203.2,86.18248,Duke,USA,2016,1,2,45,24.7,5.5,5.8,3,0.015,0.145,0.306,0.582,0.277,2022-23
-Anthony Edwards,NBA,MIN,21,193.04,102.0582,Georgia,USA,2020,1,1,79,24.6,5.8,4.4,1.9,0.017,0.139,0.292,0.564,0.192,2022-23
-DeMar DeRozan,NBA,CHI,33,198.12,99.79024,Southern California,USA,2009,1,9,74,24.5,4.6,5.1,1.5,0.013,0.116,0.272,0.592,0.222,2022-23
-Paul George,NBA,LAC,33,203.2,99.79024,Fresno State,USA,2010,1,10,56,23.8,6.1,5.1,4,0.025,0.153,0.294,0.588,0.237,2022-23
-Kawhi Leonard,NBA,LAC,32,200.66,102.0582,San Diego State,USA,2011,1,15,52,23.8,6.5,3.9,6.1,0.034,0.16,0.267,0.623,0.19,2022-23
-LaMelo Ball,NBA,CHA,21,200.66,81.64656,None,USA,2020,1,3,36,23.3,6.4,8.4,-4.7,0.031,0.147,0.289,0.541,0.352,2022-23
-Kristaps Porzingis,NBA,WAS,27,220.98,108.86208,None,Latvia,2015,1,4,65,23.2,8.4,2.7,1.4,0.057,0.194,0.272,0.627,0.125,2022-23
-Jimmy Butler,NBA,MIA,33,200.66,104.32616,Marquette,USA,2011,1,30,64,22.9,5.9,5.3,1.2,0.068,0.121,0.248,0.647,0.264,2022-23
-Karl-Anthony Towns,NBA,MIN,27,213.36,112.490816,Kentucky,USA,2015,1,1,29,20.8,8.1,4.8,1.8,0.05,0.181,0.25,0.618,0.225,2022-23
-Bam Adebayo,NBA,MIA,25,205.74,115.66596,Kentucky,USA,2017,1,14,75,20.4,9.2,3.2,1.8,0.073,0.206,0.251,0.592,0.154,2022-23
-Nikola Vucevic,NBA,CHI,32,208.28,117.93392,Southern California,Montenegro,2011,1,16,82,17.6,11,3.2,-0.5,0.062,0.274,0.218,0.594,0.146,2022-23
-RaiQuan Gray,NBA,BKN,23,200.66,122.016248,Florida State,USA,2021,2,59,1,16,9,7,-17.5,0.075,0.176,0.205,0.621,0.35,2022-23
-De'Aaron Fox,NBA,SAC,25,190.5,83.91452,Kentucky,USA,2017,1,5,73,25,4.2,6.1,3.1,0.017,0.111,0.288,0.599,0.281,2022-23
-Zach LaVine,NBA,CHI,28,195.58,90.7184,UCLA,USA,2014,1,13,77,24.8,4.5,4.2,0.3,0.016,0.108,0.278,0.607,0.187,2022-23
-Jalen Brunson,NBA,NYK,26,187.96,86.18248,Villanova,USA,2018,2,33,68,24,3.5,6.2,2.1,0.016,0.085,0.266,0.597,0.28,2022-23
-Bradley Beal,NBA,WAS,30,193.04,93.893544,Florida,USA,2012,1,3,50,23.2,3.9,5.4,0.7,0.026,0.091,0.288,0.593,0.26,2022-23
-Darius Garland,NBA,CLE,23,185.42,87.089664,Vanderbilt,USA,2019,1,5,69,21.6,2.7,7.8,8,0.012,0.067,0.262,0.587,0.328,2022-23
-Desmond Bane,NBA,MEM,25,195.58,97.52228,TCU,USA,2020,1,30,58,21.5,5,4.4,9,0.022,0.123,0.252,0.606,0.202,2022-23
-Kyle Kuzma,NBA,WAS,27,205.74,100.243832,Utah,USA,2017,1,27,64,21.2,7.2,3.7,0.3,0.025,0.172,0.273,0.544,0.164,2022-23
-Tyrese Haliburton,NBA,IND,23,195.58,83.91452,Iowa State,USA,2020,1,12,56,20.7,3.7,10.4,-1,0.018,0.092,0.238,0.624,0.457,2022-23
-Paolo Banchero,NBA,ORL,20,208.28,113.398,Duke,USA,2022,1,1,72,20,6.9,3.7,-4.2,0.035,0.174,0.272,0.529,0.171,2022-23
-Cade Cunningham,NBA,DET,21,200.66,99.79024,Oklahoma State,USA,2021,1,1,12,19.9,6.2,6,-6.1,0.027,0.148,0.287,0.492,0.306,2022-23
-Deandre Ayton,NBA,PHX,24,213.36,113.398,Arizona,Bahamas,2018,1,1,67,18,10,1.7,0,0.084,0.247,0.231,0.617,0.09,2022-23
-Josh Giddey,NBA,OKC,20,203.2,97.975872,None,Australia,2021,1,6,76,16.6,7.9,6.2,-2.2,0.058,0.189,0.239,0.533,0.293,2022-23
-Jalen Green,NBA,HOU,21,193.04,84.368112,None,USA,2021,1,2,76,22.1,3.7,3.7,-8.7,0.016,0.093,0.274,0.538,0.169,2022-23
-Keldon Johnson,NBA,SAS,23,195.58,99.79024,Kentucky,USA,2019,1,29,63,22,5,2.9,-11.3,0.025,0.133,0.273,0.551,0.137,2022-23
-Klay Thompson,NBA,GSW,33,198.12,99.79024,Washington State,USA,2011,1,11,69,21.9,4.1,2.4,2.9,0.017,0.101,0.256,0.576,0.105,2022-23
-Breanna Stewart,WNBA,SEA,22,193,77,Connecticut,US,,,,29,20.1,8.6,2.7,,0.17,0.83,,,,2016-2017
-Brittney Griner,WNBA,PHO,26,206,93,Baylor,US,,,,22,21,7.8,1.8,,0.25,0.75,,,,2016-2017
-Candace Parker,WNBA,LA,31,193,79,Tennessee,US,,,,29,17,8.3,4.4,,0.15,0.85,,,,2016-2017
-Diana Taurasi,WNBA,PHO,34,183,74,Connecticut,US,,,,20,18.8,6.5,1.6,,0.24,0.76,,,,2016-2017
-Jordan Hooper,WNBA,CHI,25,188,84,Nebraska,US,,,,29,16.1,11.5,1.4,,0.32,0.68,,,,2016-2017
-Alyssa Thomas,WNBA,CON,24,188,84,Maryland,US,,,,28,14.3,6.9,4.9,,0.18,0.82,,,,2016-2017
-Devereaux Peters,WNBA,IND,28,188,79,Notre Dame,US,,,,28,18.4,2.8,2.7,,0.1,0.9,,,,2016-2017
-Evelyn Akhator,WNBA,DAL,22,191,82,Kentucky,NG,,,,30,14.7,9.1,1.7,,0.27,0.73,,,,2016-2017
-Allie Quigley,WNBA,CHI,31,178,64,DePaul,US,,,,26,17,3.5,3.7,,0.1,0.9,,,,2016-2017
-Courtney Vandersloot,WNBA,CHI,28,173,66,Gonzaga,US,,,,22,11.6,4,8,,0.15,0.85,,,,2016-2017
-Emma Cannon,WNBA,PHO,28,188,86,Central Florida,US,,,,18,14,5.8,2.9,,0.31,0.69,,,,2016-2017
-Jia Perkins,WNBA,MIN,35,173,75,Texas Tech,US,,,,30,17.2,3.2,3.4,,0.25,0.75,,,,2016-2017
-Candice Dupree,WNBA,IND,33,188,81,Temple,US,,,,29,15,5.3,1.6,,0.2,0.8,,,,2016-2017
-Chelsea Gray,WNBA,LA,25,180,77,Duke,US,,,,30,15.2,3.3,4.4,,0.19,0.81,,,,2016-2017
-Kayla Pedersen,WNBA,CON,28,193,86,Stanford,US,,,,27,15.2,3.9,2.2,,0.11,0.89,,,,2016-2017
-Isabelle Harrison,WNBA,SAN,23,191,83,Kentucky,US,,,,31,11.7,6.5,1.5,,0.33,0.67,,,,2016-2017
-Jasmine Thomas,WNBA,CON,27,175,66,Duke,US,,,,27,14.5,2.4,4.4,,0.14,0.86,,,,2016-2017
-Layshia Clarendon,WNBA,ATL,26,175,64,UC Berkeley,US,,,,30,11,3.8,6.9,,0.23,0.77,,,,2016-2017
-Brittany Boyd,WNBA,NY,23,175,71,UC Berkeley,US,,,,2,13,4,2.5,,0.38,0.63,,,,2016-2017
-Crystal Langhorne,WNBA,SEA,30,188,84,Maryland,US,,,,30,12.3,5.8,1.5,,0.2,0.8,,,,2016-2017
-Elena Delle Donne,WNBA,WAS,28,196,85,Delaware,US,,,,30,10.6,7.2,1.4,,0.46,0.54,,,,2016-2017
-Aerial Powers,WNBA,DAL,23,183,71,Michigan State,US,,,,8,11.6,3.5,1.5,,0.21,0.79,,,,2016-2017
-Allisha Gray,WNBA,DAL,24,185,76,South Carolina,US,,,,30,13.2,4.2,1.3,,0.41,0.59,,,,2016-2017
-Brittney Sykes,WNBA,ATL,23,175,66,Rutgers,US,,,,30,13.2,4,2,,0.21,0.79,,,,2016-2017
-Cappie Pondexter,WNBA,CHI,34,175,73,Rutgers,US,,,,24,10.4,2.9,4.3,,0.14,0.86,,,,2016-2017
-Courtney Williams,WNBA,CON,22,173,62,South Florida,US,,,,29,12.9,4.2,2.1,,0.31,0.69,,,,2016-2017
-Emma Meesseman,WNBA,WAS,24,193,83,Belgium,BE,,,,23,11.3,3.5,3,,0.28,0.72,,,,2016-2017
-Kayla Alexander,WNBA,SAN,26,193,88,Arizona State,CA,,,,30,10.6,4,2.2,,0.38,0.63,,,,2016-2017
-Briann January,WNBA,IND,29,173,65,Arizona State,US,,,,25,9.5,1.5,3.9,,0.32,0.68,,,,2016-2017
-Erica Wheeler,WNBA,IND,26,170,65,Rutgers,US,,,,30,11.2,2.3,3.9,,0.16,0.84,,,,2016-2017
-Jewell Loyd,WNBA,SEA,24,178,67,Notre Dame,US,,,,29,9.2,6.5,1.6,,0.26,0.74,,,,2016-2017
-Kristi Toliver,WNBA,WAS,30,170,59,Maryland,US,,,,29,12,2,3.1,,0.15,0.85,,,,2016-2017
-Krystal Thomas,WNBA,WAS,27,196,88,Duke,US,,,,29,6.9,9.3,1,,0.36,0.64,,,,2016-2017
-Damiris Dantas,WNBA,ATL,24,191,89,Brazil,BR,,,,30,8.5,3.8,0.6,,0.26,0.74,,,,2016-2017
-Danielle Robinson,WNBA,PHO,27,175,57,Oklahoma,US,,,,28,7.5,3.1,3.8,,0.15,0.85,,,,2016-2017
-Dearica Hamby,WNBA,SAN,24,191,86,Wake Forest,US,,,,31,8.2,4.5,1,,0.35,0.65,,,,2016-2017
-Lindsay Whalen,WNBA,MIN,34,175,78,Minnesota,US,,,,22,8,2.5,4.1,,0.15,0.85,,,,2016-2017
-Alex Bentley,WNBA,CON,26,170,69,Penn State,US,,,,26,8.4,1.5,3,,0.1,0.9,,,,2016-2017
-Alex Montgomery,WNBA,SAN,28,185,84,Georgia Tech,US,,,,31,6.1,5.5,2.1,,0.21,0.79,,,,2016-2017
-Alysha Clark,WNBA,SEA,30,180,76,Middle Tennessee,US,,,,30,8.1,4.2,1.7,,0.23,0.77,,,,2016-2017
-Bria Holmes,WNBA,ATL,23,185,77,West Virginia,US,,,,28,8.4,3,1.9,,0.34,0.66,,,,2016-2017
-Camille Little,WNBA,PHO,32,188,82,North Carolina,US,,,,30,7.6,3.8,1.4,,0.37,0.63,,,,2016-2017
-Kelsey Plum,WNBA,SAN,23,173,66,Washington,US,,,,28,8,1.9,3.3,,0.21,0.79,,,,2016-2017
-Kia Vaughn,WNBA,NY,30,193,90,Rutgers,US,,,,23,5.8,4.8,0.7,,0.35,0.65,,,,2016-2017
-Leilani Mitchell,WNBA,PHO,32,165,58,Utah,US,,,,30,7.8,2.3,3.6,,0.17,0.83,,,,2016-2017
-Alana Beard,WNBA,LA,35,185,73,Duke,US,,,,30,7.2,3.4,2.4,,0.19,0.81,,,,2016-2017
-Bria Hartley,WNBA,NY,24,173,66,Connecticut,US,,,,29,7.5,2,2,,0.12,0.88,,,,2016-2017
-Jantel Lavender,WNBA,LA,28,193,84,Ohio State,US,,,,28,7.1,3.1,1,,0.36,0.64,,,,2016-2017
-Keisha Hampton,WNBA,CHI,27,185,78,DePaul,US,,,,30,6.9,3.2,0.8,,0.38,0.62,,,,2016-2017
-Kiah Stokes,WNBA,NY,24,191,87,Connecticut,US,,,,29,4.9,6.4,0.7,,0.34,0.66,,,,2016-2017
+﻿player_name,league,team_abbreviation,age,player_height,player_weight,college,country,draft_year,draft_round,draft_number,gp,pts,reb,ast,net_rating,oreb_pct,dreb_pct,usg_pct,ts_pct,ast_pct,season,image_url
+Joel Embiid,NBA,PHI,29,213.36,127.00576,Kansas,Cameroon,2014,1,3,66,33.1,10.2,4.2,8.8,0.057,0.243,0.37,0.655,0.233,2022-23,joel_embiid.png
+Luka Doncic,NBA,DAL,24,200.66,104.32616,None,Slovenia,2018,1,3,66,32.4,8.6,8,2.1,0.024,0.224,0.368,0.609,0.408,2022-23,joel_embiid.png
+Giannis Antetokounmpo,NBA,MIL,28,213.36,110.222856,None,Greece,2013,1,15,63,31.1,11.8,5.7,7.2,0.065,0.268,0.373,0.605,0.314,2022-23,joel_embiid.png
+Nikola Jokic,NBA,DEN,28,210.82,128.820128,None,Serbia,2014,2,41,69,24.5,11.8,9.8,12.5,0.08,0.283,0.263,0.701,0.412,2022-23,joel_embiid.png
+LeBron James,NBA,LAL,38,205.74,113.398,None,USA,2003,1,1,55,28.9,8.3,6.8,4.6,0.033,0.191,0.322,0.583,0.308,2022-23,joel_embiid.png
+Jayson Tatum,NBA,BOS,25,203.2,95.25432,Duke,USA,2017,1,3,74,30.1,8.8,4.6,8.5,0.029,0.2,0.319,0.607,0.205,2022-23,joel_embiid.png
+Anthony Davis,NBA,LAL,30,208.28,114.758776,Kentucky,USA,2012,1,1,56,25.9,12.5,2.6,4.8,0.102,0.248,0.277,0.627,0.128,2022-23,joel_embiid.png
+Damian Lillard,NBA,POR,32,187.96,88.45044,Weber State,USA,2012,1,6,58,32.2,4.8,7.3,2.1,0.022,0.112,0.331,0.645,0.338,2022-23,joel_embiid.png
+Shai Gilgeous-Alexander,NBA,OKC,24,198.12,88.45044,Kentucky,Canada,2018,1,11,68,31.4,4.8,5.5,2.7,0.023,0.109,0.318,0.626,0.249,2022-23,joel_embiid.png
+Kevin Durant,NBA,PHX,34,208.28,108.86208,Texas,USA,2007,1,2,47,29.1,6.7,5,6.8,0.012,0.166,0.305,0.677,0.228,2022-23,joel_embiid.png
+Zion Williamson,NBA,NOP,22,198.12,128.820128,Duke,USA,2019,1,1,29,26,7,4.6,7.8,0.06,0.148,0.288,0.652,0.231,2022-23,joel_embiid.png
+Julius Randle,NBA,NYK,28,203.2,113.398,Kentucky,USA,2014,1,7,77,25.1,10,4.1,2.7,0.05,0.226,0.288,0.581,0.184,2022-23,joel_embiid.png
+Domantas Sabonis,NBA,SAC,27,215.9,108.86208,Gonzaga,Lithuania,2016,1,11,79,19.1,12.3,7.3,3.9,0.096,0.275,0.213,0.668,0.297,2022-23,joel_embiid.png
+Stephen Curry,NBA,GSW,35,187.96,83.91452,Davidson,USA,2009,1,7,56,29.4,6.1,6.3,5.8,0.02,0.147,0.297,0.656,0.274,2022-23,joel_embiid.png
+Devin Booker,NBA,PHX,26,195.58,93.439952,Kentucky,USA,2015,1,13,53,27.8,4.5,5.5,6.2,0.025,0.105,0.311,0.601,0.251,2022-23,joel_embiid.png
+Jaylen Brown,NBA,BOS,26,198.12,101.151016,California,USA,2016,1,3,67,26.6,6.9,3.5,5.4,0.032,0.152,0.307,0.581,0.163,2022-23,joel_embiid.png
+Ja Morant,NBA,MEM,23,187.96,78.925008,Murray State,USA,2019,1,2,61,26.2,5.9,8.1,7.3,0.029,0.139,0.338,0.557,0.412,2022-23,joel_embiid.png
+Lauri Markkanen,NBA,UTA,26,213.36,108.86208,Arizona,Finland,2017,1,7,66,25.6,8.6,1.9,3.8,0.055,0.183,0.259,0.641,0.086,2022-23,joel_embiid.png
+Pascal Siakam,NBA,TOR,29,203.2,104.32616,New Mexico State,Cameroon,2016,1,27,71,24.2,7.8,5.8,2.4,0.047,0.177,0.27,0.565,0.244,2022-23,joel_embiid.png
+James Harden,NBA,PHI,33,195.58,99.79024,Arizona State,USA,2009,1,3,58,21,6.1,10.7,6.1,0.021,0.151,0.247,0.607,0.439,2022-23,joel_embiid.png
+Donovan Mitchell,NBA,CLE,26,185.42,97.52228,Louisville,USA,2017,1,13,68,28.3,4.3,4.4,5.9,0.027,0.097,0.31,0.614,0.205,2022-23,joel_embiid.png
+Kyrie Irving,NBA,DAL,31,187.96,88.45044,Duke,Australia,2011,1,1,60,27.1,5.1,5.5,4.7,0.029,0.107,0.286,0.613,0.233,2022-23,joel_embiid.png
+Trae Young,NBA,ATL,24,185.42,74.389088,Oklahoma,USA,2018,1,5,73,26.2,3,10.2,1.3,0.021,0.062,0.313,0.573,0.414,2022-23,joel_embiid.png
+Brandon Ingram,NBA,NOP,25,203.2,86.18248,Duke,USA,2016,1,2,45,24.7,5.5,5.8,3,0.015,0.145,0.306,0.582,0.277,2022-23,joel_embiid.png
+Anthony Edwards,NBA,MIN,21,193.04,102.0582,Georgia,USA,2020,1,1,79,24.6,5.8,4.4,1.9,0.017,0.139,0.292,0.564,0.192,2022-23,joel_embiid.png
+DeMar DeRozan,NBA,CHI,33,198.12,99.79024,Southern California,USA,2009,1,9,74,24.5,4.6,5.1,1.5,0.013,0.116,0.272,0.592,0.222,2022-23,joel_embiid.png
+Paul George,NBA,LAC,33,203.2,99.79024,Fresno State,USA,2010,1,10,56,23.8,6.1,5.1,4,0.025,0.153,0.294,0.588,0.237,2022-23,joel_embiid.png
+Kawhi Leonard,NBA,LAC,32,200.66,102.0582,San Diego State,USA,2011,1,15,52,23.8,6.5,3.9,6.1,0.034,0.16,0.267,0.623,0.19,2022-23,joel_embiid.png
+LaMelo Ball,NBA,CHA,21,200.66,81.64656,None,USA,2020,1,3,36,23.3,6.4,8.4,-4.7,0.031,0.147,0.289,0.541,0.352,2022-23,joel_embiid.png
+Kristaps Porzingis,NBA,WAS,27,220.98,108.86208,None,Latvia,2015,1,4,65,23.2,8.4,2.7,1.4,0.057,0.194,0.272,0.627,0.125,2022-23,joel_embiid.png
+Jimmy Butler,NBA,MIA,33,200.66,104.32616,Marquette,USA,2011,1,30,64,22.9,5.9,5.3,1.2,0.068,0.121,0.248,0.647,0.264,2022-23,joel_embiid.png
+Karl-Anthony Towns,NBA,MIN,27,213.36,112.490816,Kentucky,USA,2015,1,1,29,20.8,8.1,4.8,1.8,0.05,0.181,0.25,0.618,0.225,2022-23,joel_embiid.png
+Bam Adebayo,NBA,MIA,25,205.74,115.66596,Kentucky,USA,2017,1,14,75,20.4,9.2,3.2,1.8,0.073,0.206,0.251,0.592,0.154,2022-23,joel_embiid.png
+Nikola Vucevic,NBA,CHI,32,208.28,117.93392,Southern California,Montenegro,2011,1,16,82,17.6,11,3.2,-0.5,0.062,0.274,0.218,0.594,0.146,2022-23,joel_embiid.png
+RaiQuan Gray,NBA,BKN,23,200.66,122.016248,Florida State,USA,2021,2,59,1,16,9,7,-17.5,0.075,0.176,0.205,0.621,0.35,2022-23,joel_embiid.png
+De'Aaron Fox,NBA,SAC,25,190.5,83.91452,Kentucky,USA,2017,1,5,73,25,4.2,6.1,3.1,0.017,0.111,0.288,0.599,0.281,2022-23,joel_embiid.png
+Zach LaVine,NBA,CHI,28,195.58,90.7184,UCLA,USA,2014,1,13,77,24.8,4.5,4.2,0.3,0.016,0.108,0.278,0.607,0.187,2022-23,joel_embiid.png
+Jalen Brunson,NBA,NYK,26,187.96,86.18248,Villanova,USA,2018,2,33,68,24,3.5,6.2,2.1,0.016,0.085,0.266,0.597,0.28,2022-23,joel_embiid.png
+Bradley Beal,NBA,WAS,30,193.04,93.893544,Florida,USA,2012,1,3,50,23.2,3.9,5.4,0.7,0.026,0.091,0.288,0.593,0.26,2022-23,joel_embiid.png
+Darius Garland,NBA,CLE,23,185.42,87.089664,Vanderbilt,USA,2019,1,5,69,21.6,2.7,7.8,8,0.012,0.067,0.262,0.587,0.328,2022-23,joel_embiid.png
+Desmond Bane,NBA,MEM,25,195.58,97.52228,TCU,USA,2020,1,30,58,21.5,5,4.4,9,0.022,0.123,0.252,0.606,0.202,2022-23,joel_embiid.png
+Kyle Kuzma,NBA,WAS,27,205.74,100.243832,Utah,USA,2017,1,27,64,21.2,7.2,3.7,0.3,0.025,0.172,0.273,0.544,0.164,2022-23,joel_embiid.png
+Tyrese Haliburton,NBA,IND,23,195.58,83.91452,Iowa State,USA,2020,1,12,56,20.7,3.7,10.4,-1,0.018,0.092,0.238,0.624,0.457,2022-23,joel_embiid.png
+Paolo Banchero,NBA,ORL,20,208.28,113.398,Duke,USA,2022,1,1,72,20,6.9,3.7,-4.2,0.035,0.174,0.272,0.529,0.171,2022-23,joel_embiid.png
+Cade Cunningham,NBA,DET,21,200.66,99.79024,Oklahoma State,USA,2021,1,1,12,19.9,6.2,6,-6.1,0.027,0.148,0.287,0.492,0.306,2022-23,joel_embiid.png
+Deandre Ayton,NBA,PHX,24,213.36,113.398,Arizona,Bahamas,2018,1,1,67,18,10,1.7,0,0.084,0.247,0.231,0.617,0.09,2022-23,joel_embiid.png
+Josh Giddey,NBA,OKC,20,203.2,97.975872,None,Australia,2021,1,6,76,16.6,7.9,6.2,-2.2,0.058,0.189,0.239,0.533,0.293,2022-23,joel_embiid.png
+Jalen Green,NBA,HOU,21,193.04,84.368112,None,USA,2021,1,2,76,22.1,3.7,3.7,-8.7,0.016,0.093,0.274,0.538,0.169,2022-23,joel_embiid.png
+Keldon Johnson,NBA,SAS,23,195.58,99.79024,Kentucky,USA,2019,1,29,63,22,5,2.9,-11.3,0.025,0.133,0.273,0.551,0.137,2022-23,joel_embiid.png
+Klay Thompson,NBA,GSW,33,198.12,99.79024,Washington State,USA,2011,1,11,69,21.9,4.1,2.4,2.9,0.017,0.101,0.256,0.576,0.105,2022-23,joel_embiid.png
+Breanna Stewart,WNBA,SEA,22,193,77,Connecticut,US,,,,29,20.1,8.6,2.7,,0.17,0.83,,,,2016-2017,joel_embiid.png
+Brittney Griner,WNBA,PHO,26,206,93,Baylor,US,,,,22,21,7.8,1.8,,0.25,0.75,,,,2016-2017,joel_embiid.png
+Candace Parker,WNBA,LA,31,193,79,Tennessee,US,,,,29,17,8.3,4.4,,0.15,0.85,,,,2016-2017,joel_embiid.png
+Diana Taurasi,WNBA,PHO,34,183,74,Connecticut,US,,,,20,18.8,6.5,1.6,,0.24,0.76,,,,2016-2017,joel_embiid.png
+Jordan Hooper,WNBA,CHI,25,188,84,Nebraska,US,,,,29,16.1,11.5,1.4,,0.32,0.68,,,,2016-2017,joel_embiid.png
+Alyssa Thomas,WNBA,CON,24,188,84,Maryland,US,,,,28,14.3,6.9,4.9,,0.18,0.82,,,,2016-2017,joel_embiid.png
+Devereaux Peters,WNBA,IND,28,188,79,Notre Dame,US,,,,28,18.4,2.8,2.7,,0.1,0.9,,,,2016-2017,joel_embiid.png
+Evelyn Akhator,WNBA,DAL,22,191,82,Kentucky,NG,,,,30,14.7,9.1,1.7,,0.27,0.73,,,,2016-2017,joel_embiid.png
+Allie Quigley,WNBA,CHI,31,178,64,DePaul,US,,,,26,17,3.5,3.7,,0.1,0.9,,,,2016-2017,joel_embiid.png
+Courtney Vandersloot,WNBA,CHI,28,173,66,Gonzaga,US,,,,22,11.6,4,8,,0.15,0.85,,,,2016-2017,joel_embiid.png
+Emma Cannon,WNBA,PHO,28,188,86,Central Florida,US,,,,18,14,5.8,2.9,,0.31,0.69,,,,2016-2017,joel_embiid.png
+Jia Perkins,WNBA,MIN,35,173,75,Texas Tech,US,,,,30,17.2,3.2,3.4,,0.25,0.75,,,,2016-2017,joel_embiid.png
+Candice Dupree,WNBA,IND,33,188,81,Temple,US,,,,29,15,5.3,1.6,,0.2,0.8,,,,2016-2017,joel_embiid.png
+Chelsea Gray,WNBA,LA,25,180,77,Duke,US,,,,30,15.2,3.3,4.4,,0.19,0.81,,,,2016-2017,joel_embiid.png
+Kayla Pedersen,WNBA,CON,28,193,86,Stanford,US,,,,27,15.2,3.9,2.2,,0.11,0.89,,,,2016-2017,joel_embiid.png
+Isabelle Harrison,WNBA,SAN,23,191,83,Kentucky,US,,,,31,11.7,6.5,1.5,,0.33,0.67,,,,2016-2017,joel_embiid.png
+Jasmine Thomas,WNBA,CON,27,175,66,Duke,US,,,,27,14.5,2.4,4.4,,0.14,0.86,,,,2016-2017,joel_embiid.png
+Layshia Clarendon,WNBA,ATL,26,175,64,UC Berkeley,US,,,,30,11,3.8,6.9,,0.23,0.77,,,,2016-2017,joel_embiid.png
+Brittany Boyd,WNBA,NY,23,175,71,UC Berkeley,US,,,,2,13,4,2.5,,0.38,0.63,,,,2016-2017,joel_embiid.png
+Crystal Langhorne,WNBA,SEA,30,188,84,Maryland,US,,,,30,12.3,5.8,1.5,,0.2,0.8,,,,2016-2017,joel_embiid.png
+Elena Delle Donne,WNBA,WAS,28,196,85,Delaware,US,,,,30,10.6,7.2,1.4,,0.46,0.54,,,,2016-2017,joel_embiid.png
+Aerial Powers,WNBA,DAL,23,183,71,Michigan State,US,,,,8,11.6,3.5,1.5,,0.21,0.79,,,,2016-2017,joel_embiid.png
+Allisha Gray,WNBA,DAL,24,185,76,South Carolina,US,,,,30,13.2,4.2,1.3,,0.41,0.59,,,,2016-2017,joel_embiid.png
+Brittney Sykes,WNBA,ATL,23,175,66,Rutgers,US,,,,30,13.2,4,2,,0.21,0.79,,,,2016-2017,joel_embiid.png
+Cappie Pondexter,WNBA,CHI,34,175,73,Rutgers,US,,,,24,10.4,2.9,4.3,,0.14,0.86,,,,2016-2017,joel_embiid.png
+Courtney Williams,WNBA,CON,22,173,62,South Florida,US,,,,29,12.9,4.2,2.1,,0.31,0.69,,,,2016-2017,joel_embiid.png
+Emma Meesseman,WNBA,WAS,24,193,83,Belgium,BE,,,,23,11.3,3.5,3,,0.28,0.72,,,,2016-2017,joel_embiid.png
+Kayla Alexander,WNBA,SAN,26,193,88,Arizona State,CA,,,,30,10.6,4,2.2,,0.38,0.63,,,,2016-2017,joel_embiid.png
+Briann January,WNBA,IND,29,173,65,Arizona State,US,,,,25,9.5,1.5,3.9,,0.32,0.68,,,,2016-2017,joel_embiid.png
+Erica Wheeler,WNBA,IND,26,170,65,Rutgers,US,,,,30,11.2,2.3,3.9,,0.16,0.84,,,,2016-2017,joel_embiid.png
+Jewell Loyd,WNBA,SEA,24,178,67,Notre Dame,US,,,,29,9.2,6.5,1.6,,0.26,0.74,,,,2016-2017,joel_embiid.png
+Kristi Toliver,WNBA,WAS,30,170,59,Maryland,US,,,,29,12,2,3.1,,0.15,0.85,,,,2016-2017,joel_embiid.png
+Krystal Thomas,WNBA,WAS,27,196,88,Duke,US,,,,29,6.9,9.3,1,,0.36,0.64,,,,2016-2017,joel_embiid.png
+Damiris Dantas,WNBA,ATL,24,191,89,Brazil,BR,,,,30,8.5,3.8,0.6,,0.26,0.74,,,,2016-2017,joel_embiid.png
+Danielle Robinson,WNBA,PHO,27,175,57,Oklahoma,US,,,,28,7.5,3.1,3.8,,0.15,0.85,,,,2016-2017,joel_embiid.png
+Dearica Hamby,WNBA,SAN,24,191,86,Wake Forest,US,,,,31,8.2,4.5,1,,0.35,0.65,,,,2016-2017,joel_embiid.png
+Lindsay Whalen,WNBA,MIN,34,175,78,Minnesota,US,,,,22,8,2.5,4.1,,0.15,0.85,,,,2016-2017,joel_embiid.png
+Alex Bentley,WNBA,CON,26,170,69,Penn State,US,,,,26,8.4,1.5,3,,0.1,0.9,,,,2016-2017,joel_embiid.png
+Alex Montgomery,WNBA,SAN,28,185,84,Georgia Tech,US,,,,31,6.1,5.5,2.1,,0.21,0.79,,,,2016-2017,joel_embiid.png
+Alysha Clark,WNBA,SEA,30,180,76,Middle Tennessee,US,,,,30,8.1,4.2,1.7,,0.23,0.77,,,,2016-2017,joel_embiid.png
+Bria Holmes,WNBA,ATL,23,185,77,West Virginia,US,,,,28,8.4,3,1.9,,0.34,0.66,,,,2016-2017,joel_embiid.png
+Camille Little,WNBA,PHO,32,188,82,North Carolina,US,,,,30,7.6,3.8,1.4,,0.37,0.63,,,,2016-2017,joel_embiid.png
+Kelsey Plum,WNBA,SAN,23,173,66,Washington,US,,,,28,8,1.9,3.3,,0.21,0.79,,,,2016-2017,joel_embiid.png
+Kia Vaughn,WNBA,NY,30,193,90,Rutgers,US,,,,23,5.8,4.8,0.7,,0.35,0.65,,,,2016-2017,joel_embiid.png
+Leilani Mitchell,WNBA,PHO,32,165,58,Utah,US,,,,30,7.8,2.3,3.6,,0.17,0.83,,,,2016-2017,joel_embiid.png
+Alana Beard,WNBA,LA,35,185,73,Duke,US,,,,30,7.2,3.4,2.4,,0.19,0.81,,,,2016-2017,joel_embiid.png
+Bria Hartley,WNBA,NY,24,173,66,Connecticut,US,,,,29,7.5,2,2,,0.12,0.88,,,,2016-2017,joel_embiid.png
+Jantel Lavender,WNBA,LA,28,193,84,Ohio State,US,,,,28,7.1,3.1,1,,0.36,0.64,,,,2016-2017,joel_embiid.png
+Keisha Hampton,WNBA,CHI,27,185,78,DePaul,US,,,,30,6.9,3.2,0.8,,0.38,0.62,,,,2016-2017,joel_embiid.png
+Kiah Stokes,WNBA,NY,24,191,87,Connecticut,US,,,,29,4.9,6.4,0.7,,0.34,0.66,,,,2016-2017,joel_embiid.png
