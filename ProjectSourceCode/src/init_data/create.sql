@@ -85,15 +85,16 @@ DROP TABLE IF EXISTS nbaPlayers;
 CREATE TABLE nbaPlayers (
     id SERIAL PRIMARY KEY,
     player_name VARCHAR(255) NOT NULL,
+    league VARCHAR(100) NOT NULL,
     team_abbreviation VARCHAR(10) NOT NULL,
     age INT NOT NULL,
     player_height FLOAT NOT NULL,
     player_weight FLOAT NOT NULL,
     college VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    draft_year VARCHAR(20) NOT NULL,
-    draft_round VARCHAR(20) NOT NULL,
-    draft_number VARCHAR(20) NOT NULL,
+    draft_year VARCHAR(20),
+    draft_round VARCHAR(20),
+    draft_number VARCHAR(20),
     gp INT NOT NULL,
     -- games played
     pts NUMERIC(4, 1) NOT NULL,
@@ -102,17 +103,17 @@ CREATE TABLE nbaPlayers (
     -- average rebounds per game
     ast NUMERIC(4, 1) NOT NULL,
     -- average assists per game
-    net_rating NUMERIC(4, 1) NOT NULL,
+    net_rating NUMERIC(4, 1),
     -- net rating
     oreb_pct NUMERIC(4, 3) NOT NULL,
     -- offensive rebound percentage
     dreb_pct NUMERIC(4, 3) NOT NULL,
     -- defensive rebound percentage
-    usg_pct NUMERIC(4, 3) NOT NULL,
+    usg_pct NUMERIC(4, 3),
     -- usage percentage
-    ts_pct NUMERIC(4, 3) NOT NULL,
+    ts_pct NUMERIC(4, 3),
     -- true shooting percentage
-    ast_pct NUMERIC(4, 3) NOT NULL,
+    ast_pct NUMERIC(4, 3),
     -- assist percentage
     season VARCHAR(10) NOT NULL
 );

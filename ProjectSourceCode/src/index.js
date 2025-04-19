@@ -948,6 +948,7 @@ app.get("/player/details/:id", auth, async (req, res) => {
         c.overall,
         nb.id AS nba_id,
         nb.player_name,
+        nb.league,
         nb.team_abbreviation,
         nb.age,
         nb.player_height,
