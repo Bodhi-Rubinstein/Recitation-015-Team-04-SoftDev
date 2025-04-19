@@ -1024,6 +1024,58 @@ app.get("/trades/:username", async (req, res) => {
   return null;*/
 });
 
+// in order to get the actaul player stats for the buttons in colections tab not just the game moves
+app.get("/player/details/:id", auth, async (req, res) => {
+  const cardId = req.params.id;
+  try {
+    const query = `
+      SELECT 
+        c.id AS card_id,
+        c.name AS card_name,
+        c.sport,
+        c.attack,
+        c.defense,
+        c.health,
+        c.overall,
+        nb.id AS nba_id,
+        nb.player_name,
+        nb.league,
+        nb.team_abbreviation,
+        nb.age,
+        nb.player_height,
+        nb.player_weight,
+        nb.college,
+        nb.country,
+        nb.draft_year,
+        nb.draft_round,
+        nb.draft_number,
+        nb.gp,
+        nb.pts,
+        nb.reb,
+        nb.ast,
+        nb.net_rating,
+        nb.oreb_pct,
+        nb.dreb_pct,
+        nb.usg_pct,
+        nb.ts_pct,
+        nb.ast_pct,
+        nb.season
+      FROM cards c
+      LEFT JOIN nbaPlayersToCards np2c ON c.id = np2c.card_id
+      LEFT JOIN nbaPlayers nb ON np2c.player_id = nb.id
+      WHERE c.id = $1;
+    `;
+    const result = await db.oneOrNone(query, [cardId]);
+    if (!result) {
+      return res.status(404).json({ error: "Player not found" });
+    }
+    res.json(result);
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error retrieving player details" });
+    }
+});
+
 // Add this to your index.js along with your other routes.
 app.get("/battle/result/:battleId", auth, async (req, res) => {
   const battleId = req.params.battleId;
