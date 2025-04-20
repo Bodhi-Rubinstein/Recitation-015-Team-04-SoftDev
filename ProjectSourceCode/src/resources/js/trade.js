@@ -111,10 +111,14 @@ function updateTradeList(outgoing, incoming, accepted) {
         const tradeItem = document.createElement("li");
         tradeItem.className = "list-group-item d-flex justify-content-between align-items-center";
         tradeItem.innerHTML = `
-          <span>You offered <strong>${trade.offer_name}</strong> for <strong>${trade.request_name}</strong></span>
-          <span class="badge bg-warning">${trade.trade_status}</span>
-          <button class="btn btn-danger btn-sm" onclick="cancelTrade(${trade.id}, ${index})">Cancel</button>
-        `;
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <img src="../resources/img/cards/${trade.offer_image}" alt="${trade.offer_name}" class="trade-card-img">
+                <span class="fw-bold fs-5">⇄</span>
+                <img src="../resources/img/cards/${trade.request_image}" alt="${trade.request_name}" class="trade-card-img">
+            </div>
+            <span class="badge bg-warning">${trade.trade_status}</span>
+            <button class="btn btn-danger btn-sm" onclick="cancelTrade(${trade.id}, ${index})">Cancel</button>
+            `;
         outgoingList.appendChild(tradeItem);
     });
 
@@ -123,12 +127,21 @@ function updateTradeList(outgoing, incoming, accepted) {
         const tradeItem = document.createElement("li");
         tradeItem.className = "list-group-item d-flex justify-content-between align-items-center";
         tradeItem.innerHTML = `
-          <span>${trade.card1_owner} offered <strong>${trade.offer_name}</strong> for your <strong>${trade.request_name}</strong></span>
-          <span class="badge bg-warning">${trade.trade_status}</span>
-          <div>
-            <button class="btn btn-success btn-sm me-1" onclick="acceptTrade(${trade.id}, ${index})">Accept</button>
-            <button class="btn btn-danger btn-sm" onclick="rejectTrade(${trade.id}, ${index})">Reject</button>
-          </div>`;
+            <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+                <img src="../resources/img/cards/${trade.offer_image}" alt="${trade.offer_name}" class="trade-card-img" title="${trade.offer_name}">
+                <span class="fw-bold fs-5">⇄</span>
+                <img src="../resources/img/cards/${trade.request_image}" alt="${trade.request_name}" class="trade-card-img" title="${trade.request_name}">
+            </div>
+            <span>${trade.card1_owner} offered their ${trade.offer_name} for your ${trade.request_name}</span>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="badge bg-warning">${trade.trade_status}</span>
+                <div>
+                <button class="btn btn-success btn-sm me-1" onclick="acceptTrade(${trade.id}, ${index})">Accept</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectTrade(${trade.id}, ${index})">Reject</button>
+                </div>
+            </div>
+            `;
+
         incomingList.appendChild(tradeItem);
     });
 
@@ -137,8 +150,14 @@ function updateTradeList(outgoing, incoming, accepted) {
         const tradeItem = document.createElement("li");
         tradeItem.className = "list-group-item";
         tradeItem.innerHTML = `
-          <span>${trade.card1_owner} traded <strong>${trade.offer_name}</strong> ⇄ <strong>${trade.request_name}</strong> with ${trade.card2_owner}</span>
-          <div><span class="badge bg-success">${trade.trade_status}</span></div>`;
+            <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+                <img src="../resources/img/cards/${trade.offer_image}" alt="${trade.offer_name}" class="trade-card-img" title="${trade.offer_name}">
+                <span class="fw-bold fs-5">⇄</span>
+                <img src="../resources/img/cards/${trade.request_image}" alt="${trade.request_name}" class="trade-card-img" title="${trade.request_name}">
+            </div>
+            <span>${trade.card1_owner} traded with ${trade.card2_owner}</span>
+            <div><span class="badge bg-success">${trade.trade_status}</span></div>
+            `;
         acceptedList.appendChild(tradeItem);
     });
 }
