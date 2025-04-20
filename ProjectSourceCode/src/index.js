@@ -873,7 +873,9 @@ app.get("/trades/:username", async (req, res) => {
         t.card2_owner,
         t.trade_status,
         c1.name AS offer_name,
-        c2.name AS request_name
+        c2.name AS request_name,
+        c1.image_url AS offer_image,
+        c2.image_url AS request_image
         FROM trades t
         JOIN cards c1 ON t.card1_id = c1.id
         JOIN cards c2 ON t.card2_id = c2.id
