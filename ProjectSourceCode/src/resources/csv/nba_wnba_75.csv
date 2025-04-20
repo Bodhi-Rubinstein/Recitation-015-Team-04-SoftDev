@@ -1,4 +1,4 @@
-﻿player_name,league,team_abbreviation,age,player_height,player_weight,college,country,draft_year,draft_round,draft_number,gp,pts,reb,ast,net_rating,oreb_pct,dreb_pct,usg_pct,ts_pct,ast_pct,season,image_url
+player_name,league,team_abbreviation,age,player_height,player_weight,college,country,draft_year,draft_round,draft_number,gp,pts,reb,ast,net_rating,oreb_pct,dreb_pct,usg_pct,ts_pct,ast_pct,season,image_url
 Joel Embiid,NBA,PHI,29,213.36,127.00576,Kansas,Cameroon,2014,1,3,66,33.1,10.2,4.2,8.8,0.057,0.243,0.37,0.655,0.233,2022-23,joel_embiid.png
 Luka Doncic,NBA,DAL,24,200.66,104.32616,None,Slovenia,2018,1,3,66,32.4,8.6,8,2.1,0.024,0.224,0.368,0.609,0.408,2022-23,luka_doncic.png
 Giannis Antetokounmpo,NBA,MIL,28,213.36,110.222856,None,Greece,2013,1,15,63,31.1,11.8,5.7,7.2,0.065,0.268,0.373,0.605,0.314,2022-23,giannis_antetokounmpo.png

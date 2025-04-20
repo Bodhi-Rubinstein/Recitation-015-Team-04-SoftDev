@@ -209,7 +209,7 @@ app.post("/register", async (req, res) => {
 
     // Initialize the user with some default cards
     // Initialize the user with some default cards
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 1), ($1, 2), ($1, 3), ($1, 4), ($1, 5);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 35), ($1, 45), ($1, 55), ($1, 65), ($1, 75);`;
     await db.none(initCardsQuery, [username]);
 
     /*
