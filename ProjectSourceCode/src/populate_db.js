@@ -45,17 +45,27 @@ async function create_cards_from_players() {
 
     for (const player of players) { //iterate through each nba player 
       //console.log('Processing player:', player.player_name);
-      if (player.league == 'NBA') { //only process players in the NBA
-        const attack = Math.round(player.pts) + Math.round(player.ast); //attack = points + assists
-        const defense = Math.round(player.reb); //defense = rebounds
-        const health = Math.round((Math.round(player.player_height) * Math.round(player.player_weight)) / 100); //health = height * weight / 100
-        const overall = Math.round((Math.round(attack) + Math.round(defense) + (Math.round(health)*0.05)) / 3); //overall = average of attack, defense, and health, but with health adjusted to only 5%.
+      //console.log(player.league);
+      const league = player.league?.trim();
+      let attack;
+      let defense;
+      let health;
+      let overall;
+      if (league === 'NBA') { //only process players in the NBA
+        attack = Math.round(player.pts) + Math.round(player.ast); //attack = points + assists
+        defense = Math.round(player.reb); //defense = rebounds
+        health = Math.round((Math.round(player.player_height) * Math.round(player.player_weight)) / 100); //health = height * weight / 100
+        overall = Math.round((Math.round(attack) + Math.round(defense) + (Math.round(health)*0.05)) / 3); //overall = average of attack, defense, and health, but with health adjusted to only 5%.
       }
-      else if (player.league == 'WNBA') { //if the player is in the WNBA, use different calculations
-        const attack = Math.round(Math.round(player.pts)*1.5 + Math.round(player.ast)*2); //attack = points*1.5 + assists*2
-        const defense = Math.round(Math.round(player.reb)*1.25); //defense = rebounds*1.25
-        const health = Math.round((Math.round(player.player_height) * Math.round(player.player_weight)) / 70); //health = height * weight / 70
-        const overall = Math.round((Math.round(attack) + Math.round(defense) + (Math.round(health)*0.05)) / 2.75); //overall = adjusted average of attack, defense, and health, but with health adjusted to only 5%.
+      else if (league === 'WNBA') { //if the player is in the WNBA, use different calculations
+        attack = Math.round(Math.round(player.pts)*1.5 + Math.round(player.ast)*2); //attack = points*1.5 + assists*2
+        defense = Math.round(Math.round(player.reb)*1.25); //defense = rebounds*1.25
+        health = Math.round((Math.round(player.player_height) * Math.round(player.player_weight)) / 70); //health = height * weight / 70
+        overall = Math.round((Math.round(attack) + Math.round(defense) + (Math.round(health)*0.05)) / 2.75); //overall = adjusted average of attack, defense, and health, but with health adjusted to only 5%.
+      }
+      else {
+        console.log('Unknown league:', player.league);
+        continue; //skip this player if the league is unknown
       }
       // insert each card and return card
       let card = await db.one(
@@ -78,7 +88,7 @@ async function create_cards_from_players() {
   }
 }    
 async function populate_db() {
-  let filePath = 'src/resources/csv/nba_players_10.csv';
+  let filePath = 'src/resources/csv/nba_wnba_75.csv';
 
   // variable to hold the promises for each insert and ensure they finish before moving to cards
   let insertPromises = [];
@@ -87,6 +97,7 @@ async function populate_db() {
     .pipe(csv())
     .on('data', async (row) => { // for each row in the csv file
       //define query values
+      //console.log(Object.keys(row));
         const values = [
           row.player_name,
           row.league,
@@ -110,12 +121,13 @@ async function populate_db() {
           parseFloat(row.ts_pct),
           parseFloat(row.ast_pct),
           row.season,
-          row.image
+          row.image_url
         ];
+        //console.log('Inserting row:', values);
         
         //define the query to insert a row into the nbaPlayers table
-        const query = `INSERT INTO nbaPlayers (player_name, team_abbreviation, age, player_height, player_weight, college, country, draft_year, draft_round, draft_number, gp, pts, reb, ast, net_rating, oreb_pct, dreb_pct, usg_pct, ts_pct, ast_pct, season, image_url)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`;
+        const query = `INSERT INTO nbaPlayers (player_name, league, team_abbreviation, age, player_height, player_weight, college, country, draft_year, draft_round, draft_number, gp, pts, reb, ast, net_rating, oreb_pct, dreb_pct, usg_pct, ts_pct, ast_pct, season, image_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`;
         
         // insert the row into the database
 
