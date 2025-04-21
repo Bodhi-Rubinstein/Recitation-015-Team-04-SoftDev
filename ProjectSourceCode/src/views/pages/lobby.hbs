@@ -1,0 +1,64 @@
+<div class="container my-5">
+  <h2 class="mb-4">Human vs Human</h2>
+
+  <div id="step1">
+    <button id="createBtn" class="btn btn-primary me-2">Create Lobby</button>
+    <button id="joinBtn" class="btn btn-outline-primary">Join Lobby</button>
+  </div>
+
+  <!-- Create lobby UI -->
+  <div id="createSection" class="d-none mt-4">
+    <p>Share this code with your friend:</p>
+    <h3 id="lobbyCode"></h3>
+    <p>Waiting for opponent…</p>
+  </div>
+
+  <!-- Join lobby UI -->
+  <div id="joinSection" class="d-none mt-4">
+    <label for="joinCode">Enter Lobby Code:</label>
+    <input id="joinCode" class="form-control w-25 d-inline-block" />
+    <button id="submitJoin" class="btn btn-primary">Join</button>
+    <p id="joinError" class="text-danger mt-2"></p>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const username = "{{session.user.username}}"; // from your session
+  const deckId   = Number(localStorage.getItem("selectedDeckId"));
+  if (!Number.isInteger(deckId)) alert("No deck selected – go back and pick one.");
+
+  document.getElementById("createBtn").onclick = () => {
+    document.getElementById("step1").classList.add("d-none");
+    document.getElementById("createSection").classList.remove("d-none");
+    socket.emit("lobby:create", { username, deckId: Number(deckId) }, ({ code }) => {
+      document.getElementById("lobbyCode").textContent = code;
+    });
+  };
+
+  document.getElementById("joinBtn").onclick = () => {
+    document.getElementById("step1").classList.add("d-none");
+    document.getElementById("joinSection").classList.remove("d-none");
+  };
+
+  document.getElementById("submitJoin").onclick = () => {
+    const code = document.getElementById("joinCode").value.trim().toUpperCase();
+    socket.emit("lobby:join", { code, username, deckId: Number(deckId) }, (res) => {
+      if (!res.success) {
+        document.getElementById("joinError").textContent = res.message;
+      }
+    });
+  };
+
+  // When two players are ready
+  socket.on("lobby:ready", ({ code /*, users */ }) => {
+    // redirect both to the battle page, passing userB as opponent
+    window.location = `/battle/human/${code}`;
+  });
+
+  socket.on("lobby:playerLeft", () => {
+    alert("Opponent left. Returning to battle menu.");
+    window.location = "/battle";
+  });
+</script>

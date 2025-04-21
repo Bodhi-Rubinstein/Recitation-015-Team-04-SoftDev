@@ -13,6 +13,10 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcryptjs"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const battle = require("./resources/js/battle"); // Updated path because battle.js is in src/js/
+const http = require("http");
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+const io = new Server(server);
 app.use("/resources", express.static(path.join(__dirname, "resources")));
 
 // *****************************************************
@@ -79,7 +83,6 @@ app.use(
   })
 );
 
-
 // *****************************************************
 // NEW: Middleware to Update User Stats (Option B)
 // *****************************************************
@@ -119,13 +122,12 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-
 app.get("/tutorial", (req, res) => {
   res.render("pages/tutorial");
 });
 
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/login", (req, res) => {
@@ -174,8 +176,7 @@ app.post("/register", async (req, res) => {
 
   const passwordError = validatePassword(password);
   if (passwordError) {
-
-    return res.render("pages/register", { message: passwordError }); 
+    return res.render("pages/register", { message: passwordError });
   }
 
   if (!username || !password) {
@@ -196,16 +197,13 @@ app.post("/register", async (req, res) => {
   const existingUser = await db.oneOrNone(usernameCheckQuery, [username]);
 
   if (existingUser) {
-
     if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
         .json({ status: "error", message: "Username already exists" });
     }
     return res.status(400).render("pages/register", {
-
       message: "Username already exists. Please choose another one.",
-
     });
   }
 
@@ -237,9 +235,6 @@ app.post("/register", async (req, res) => {
     return res.redirect("/register");
   }
 });
-
-
-
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
@@ -354,7 +349,7 @@ app.get("/collection", auth, async (req, res) => {
 app.use(auth);
 // leaderboard
 
-app.get('/leaderboard', async (req, res) => {
+app.get("/leaderboard", async (req, res) => {
   try {
     //console.log("LIMIT RECEIVED:", req.query.limit);
 
@@ -385,21 +380,18 @@ app.get('/leaderboard', async (req, res) => {
 
     const leaders = await db.any(leaderboardQuery, [validatedLimit]);
 
-    leaders.forEach((leader, i) => leader.rank = i + 1);
+    leaders.forEach((leader, i) => (leader.rank = i + 1));
 
     res.render("pages/leaderboard", {
       leaders,
       selected: validatedLimit,
-      currentUser: req.session.user?.username
+      currentUser: req.session.user?.username,
     });
-    
   } catch (error) {
     console.error(error);
     res.status(500).send("Error loading leaderboard");
   }
 });
-
-
 
 // GET /deckbuilder - Render the deck builder page.
 app.get("/deckBuilder", auth, async (req, res) => {
@@ -518,7 +510,6 @@ app.get("/player/details/:id", auth, async (req, res) => {
     res.status(500).json({ error: "Error retrieving player details" });
   }
 });
-
 
 // GET /battle – Render the battle selection page.
 app.get("/battle", auth, async (req, res) => {
@@ -792,8 +783,7 @@ app.post("/testbattle/next", (req, res) => {
   res.redirect("/testbattle");
 });
 
-
-function validatePassword(password){
+function validatePassword(password) {
   const isNonWhiteSpace = /^\S*$/;
   if (!isNonWhiteSpace.test(password)) {
     return "Password must not contain Whitespaces.";
@@ -814,8 +804,7 @@ function validatePassword(password){
     return "Password must contain at least one Digit.";
   }
 
-  const isContainsSymbol =
-    /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+  const isContainsSymbol = /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
   if (!isContainsSymbol.test(password)) {
     return "Password must contain at least one Special Character.";
   }
@@ -827,7 +816,6 @@ function validatePassword(password){
 
   return null;
 }
-
 
 app.get("/trade", auth, async (req, res) => {
   const username = req.session.user.username;
@@ -1189,10 +1177,184 @@ app.get("/battle/result/:id", auth, async (req, res) => {
 
   res.render("pages/battleResult", { result: { ...result, battleLogs: logs } });
 });
+
+// render lobby page
+app.get("/battle/lobby", auth, (req, res) => {
+  res.render("pages/lobby");
+});
+
+/* 
+app.get("/battle/human/:opponent", auth, async (req, res) => {
+  const username = req.session.user.username;
+  const opponent = req.params.opponent;
+  // Fetch each player’s deck (just like you did for bot)
+  // For simplicity, assume both picked the deck ID stored in session or pass via query.
+  // Here’s a quick example: both use their “selected deck” from session
+  const deckId = req.session.selectedDeckId;
+  const yourCards = await db.any(
+    "SELECT * FROM cards WHERE id IN (SELECT card1_id, card2_id, card3_id, card4_id, card5_id FROM decks WHERE id=$1)",
+    [deckId]
+  );
+  // You’ll need to fetch opponent’s deck similarly
+  // ...
+  res.render("pages/battlePlay", {
+    userCards: JSON.stringify(yourCards),
+    botCards: JSON.stringify(opponentCards), // rename “botCards” to “opponentCards” in client
+    username,
+    opponent,
+  });
+});
+*/
+
+app.post("/battle/selectDeck", auth, (req, res) => {
+  req.session.selectedDeckId = req.body.deckId;
+  res.sendStatus(200);
+});
+
+async function cardsForDeck(id) {
+  return db.any(
+    `
+    SELECT *
+    FROM cards
+    WHERE id IN (
+      SELECT unnest(ARRAY[
+        card1_id, card2_id, card3_id, card4_id, card5_id
+      ])
+      FROM decks
+      WHERE id = $1
+    )
+  `,
+    [id]
+  );
+}
+
+app.get("/battle/human/:code", auth, async (req, res) => {
+  const { code } = req.params;
+  const lobby = lobbies[code];
+  if (!lobby) return res.redirect("/battle");
+
+  // pull cards for each deck
+  const [deckA, deckB] = lobby.decks;
+  const userA = lobby.usernames[0];
+  const userB = lobby.usernames[1];
+
+  const cardsA = await cardsForDeck(deckA);
+  const cardsB = await cardsForDeck(deckB);
+
+  // figure out which side is current user
+  const isHost = req.session.user.username === userA;
+  res.render("pages/battleRoom", {
+    roomCode: code,
+    username: req.session.user.username,
+    opponent: isHost ? userB : userA,
+    userCards: JSON.stringify(isHost ? cardsA : cardsB),
+    oppCards: JSON.stringify(isHost ? cardsB : cardsA),
+  });
+});
+
+// --- In‑memory lobby store: { [code]: { hostSocketId, players: [sid,…] } }
+const lobbies = {};
+const battleRooms = {};
+function initializeRoom() {
+  return { hpA: 90, hpB: 90 };
+}
+
+function ensureInt(v) {
+  return Number.isInteger(v) ? v : null;
+}
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  // Create a new lobby
+  socket.on("lobby:create", ({ username, deckId }, callback) => {
+    if (!ensureInt(deckId))
+      return callback({ success: false, message: "Deck missing" });
+    const code = Math.random().toString(36).substr(2, 6).toUpperCase();
+    lobbies[code] = {
+      host: socket.id,
+      players: [socket.id],
+      usernames: [username],
+      decks: [deckId], // ⬅ remember creator’s deck
+    };
+    socket.join(code);
+    callback({ success: true, code });
+  });
+
+  // Join an existing lobby
+  socket.on("lobby:join", ({ code, username, deckId }, callback) => {
+    const lobby = lobbies[code];
+
+    if (!lobby)
+      return callback({ success: false, message: "Lobby not found." });
+    if (lobby.players.length >= 2)
+      return callback({ success: false, message: "Lobby full." });
+    lobby.players.push(socket.id);
+    lobby.usernames.push(username);
+    const d = ensureInt(deckId);
+    if (!d) return callback({ success: false, message: "Deck missing" });
+    lobby.decks.push(d);
+    socket.join(code);
+    // Notify both players that the match is ready
+    io.to(code).emit("lobby:ready", {
+      code,
+      users: lobby.usernames,
+    });
+    callback({ success: true });
+  });
+  socket.on("room:join", (code) => socket.join(code));
+
+  // Clean up on disconnect
+  socket.on("disconnect", () => {
+    for (const code in lobbies) {
+      const lobby = lobbies[code];
+      const idx = lobby.players.indexOf(socket.id);
+      if (idx !== -1) {
+        // remove player
+        lobby.players.splice(idx, 1);
+        lobby.usernames.splice(idx, 1);
+        io.to(code).emit("lobby:playerLeft");
+        if (lobby.players.length === 0) {
+          delete lobbies[code];
+        }
+      }
+    }
+  });
+  // battle:roll
+  socket.on("battle:roll", ({ room, round }) => {
+    const { roll, multiplier } = rollDiceMultiplier();
+    io.to(room).emit("battle:rollResult", {
+      side: socket.id,
+      round,
+      roll,
+      mul: multiplier,
+    });
+  });
+
+  // battle:attack
+  socket.on("battle:attack", ({ room, round }) => {
+    // you’ll need an in‑memory state per room: hpA, hpB
+    const state = battleRooms[room] || initializeRoom();
+    const { hpA, hpB } = state;
+    // compute new hp …
+    // then:
+    io.to(room).emit("battle:update", { hpA: newA, hpB: newB, winner });
+  });
+
+  // battle:finish
+  socket.on("battle:finish", async ({ room, winner, logs }) => {
+    // persist via your existing recordFinishedBattle(username, scoreA, scoreB, logs, db)
+    const battleId = await recordFinishedBattle(/*…*/);
+    io.to(room).emit("battle:finished", { battleId });
+  });
+});
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-module.exports = app.listen(3000);
 
-console.log("Server is listening on port 3000");
+// (Later we'll add io event handlers here.)
+
+server.listen(3000, () => console.log("Server listening on port 3000"));
+module.exports = server;

@@ -1,5 +1,6 @@
 (() => {
-  const { userCards, botCards, username } = window.BATTLE_DATA;
+  const { userCards, opponentCards, username, opponent } = window.BATTLE_DATA;
+  const socket = io();
 
   let round = 0,
     userScore = 0,
