@@ -1,0 +1,30 @@
+.battle-card-img {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    max-height: 150px;
+    object-fit: contain;
+  }
+
+  .summary-card {
+    height: 80px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+  
+  /* Win = green border + glow */
+  .summary-card.win {
+    border: 4px solid #28a745;
+    box-shadow: 0 0 12px 4px rgba(40, 167, 69, 0.5);
+  }
+  
+  /* Loss = red border + dimmer effect */
+  .summary-card.loss {
+    border: 4px solid #dc3545;
+    filter: grayscale(0.5) brightness(0.8);
+    box-shadow: 0 0 8px 2px rgba(220, 53, 69, 0.4);
+  }
+  
+  
+  

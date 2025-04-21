@@ -1,6 +1,26 @@
 // Disable duplicate selections across the five <select> elements.
 document.addEventListener("DOMContentLoaded", () => {
     const cardSelects = document.querySelectorAll('select[id^="card"]');
+    const previewContainer = document.getElementById("deckPreview");
+
+    function updatePreview() {
+      previewContainer.innerHTML = "";
+  
+      cardSelects.forEach((select) => {
+        const selectedOption = select.options[select.selectedIndex];
+  
+        if (select.value) {
+          const imageUrl = selectedOption.getAttribute("data-image");
+          if (imageUrl) {
+            const img = document.createElement("img");
+            img.src = `../resources/img/cards/${imageUrl}`;
+            img.alt = selectedOption.textContent;
+            img.className = "deck-preview-img";
+            previewContainer.appendChild(img);
+          }
+        }
+      });
+    }
   
     function updateOptions() {
       // Normalise everything to strings so "3" === "3"
@@ -21,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       });
+      updatePreview();                        // update preview after options change
     }
   
     cardSelects.forEach((sel) => sel.addEventListener("change", updateOptions));

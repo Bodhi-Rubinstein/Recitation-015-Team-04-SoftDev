@@ -25,6 +25,10 @@
   let state;
 
   function startRound() {
+    if (round === 0){
+      buildDeckSummary(userCards, botCards);
+    }
+
     state = {
       user: { ...userCards[round], hp: userCards[round].health, mult: 1 },
       bot: { ...botCards[round], hp: botCards[round].health, mult: 1 },
@@ -43,6 +47,15 @@
     }`;
     els.roundTitle.textContent = title;
     document.title = title;
+
+    const userImg = document.getElementById("userCardImage");
+    const botImg = document.getElementById("botCardImage");
+
+    userImg.src = `/resources/img/cards/${state.user.image_url}`;
+    userImg.alt = state.user.name;
+
+    botImg.src = `/resources/img/cards/${state.bot.image_url}`;
+    botImg.alt = state.bot.name;
   }
 
   function updateBars() {
@@ -128,6 +141,22 @@
     appendLog(`⟹ Round Winner: ${winner}\n`);
     els.scoreBoard.textContent = `Score ${userScore}‑${botScore}`;
 
+    // Update the summary images to show the round results.
+    const userImg = document.getElementById(`userSummary${round}`);
+    const botImg = document.getElementById(`botSummary${round}`);
+
+    if (state.user.hp > 0 && state.bot.hp <= 0) {
+      userImg.classList.add("win");
+      botImg.classList.add("loss");
+    } else if (state.bot.hp > 0 && state.user.hp <= 0) {
+      userImg.classList.add("loss");
+      botImg.classList.add("win");
+    } else {
+      userImg.classList.add("loss");
+      botImg.classList.add("loss");
+    }
+
+
     round++;
     if (userScore === 3 || botScore === 3 || round === 5) {
       finishBattle();
@@ -165,3 +194,26 @@
   // Boot up the first round.
   startRound();
 })();
+
+function buildDeckSummary(userCards, botCards) {
+  const userDeck = document.getElementById("userDeckSummary");
+  const botDeck = document.getElementById("botDeckSummary");
+
+  userCards.forEach((card, i) => {
+    const img = document.createElement("img");
+    img.src = `/resources/img/cards/${card.image_url}`;
+    img.className = "summary-card";
+    img.id = `userSummary${i}`;
+    img.alt = card.name;
+    userDeck.appendChild(img);
+  });
+
+  botCards.forEach((card, i) => {
+    const img = document.createElement("img");
+    img.src = `/resources/img/cards/${card.image_url}`;
+    img.className = "summary-card";
+    img.id = `botSummary${i}`;
+    img.alt = card.name;
+    botDeck.appendChild(img);
+  });
+}
