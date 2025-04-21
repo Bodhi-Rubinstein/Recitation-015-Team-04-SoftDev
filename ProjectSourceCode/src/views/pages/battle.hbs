@@ -21,15 +21,30 @@
         type="button"
         id="playHuman"
         class="btn btn-secondary"
-        disabled
+        onclick="window.location='/battle/lobby'"
       >Play Human</button>
     </div>
   </form>
 </div>
 
 <script>
+const deckSelect = document.getElementById("deckSelect");
+
+  // Store the chosen deck locally so the lobby page can read it.
+  function saveDeckId(id) { localStorage.setItem("selectedDeckId", id); }
+
+  document.getElementById("playHuman").onclick = () => {
+    const deckId = deckSelect.value;
+    saveDeckId(deckId);
+    fetch("/battle/selectDeck", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deckId })
+    }).then(() => (window.location = "/battle/lobby"));
+  };
   document.getElementById("playBot").onclick = () => {
     const deckId = document.getElementById("deckSelect").value;
     window.location = `/battle/play/${deckId}`;       // go to animated screen
   };
+
 </script>

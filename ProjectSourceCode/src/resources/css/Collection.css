@@ -1,33 +1,28 @@
 /* Container */
-.collection-container 
-{
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  /* Styles for each card */
-  .collection-item 
-  {
-    cursor: pointer;
-    display: inline-block;
-    background-color: #001f3f;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.collection-container {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
 
-  }
-  
-  /* Hover effect */
-  .collection-item:hover 
-  {
-    transform: scale(1.1);
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  
-  .card-img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;          
-    display: block;
-  }
+/* Styles for each card */
+.collection-item {
+  cursor: pointer;
+  display: inline-block;
+  background-color: #001f3f;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effect */
+.collection-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
