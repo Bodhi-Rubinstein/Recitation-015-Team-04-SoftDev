@@ -12,7 +12,7 @@ const { assert, expect } = chai;
 
 const pgp = require("pg-promise")();
 const db = pgp({
-  host: "db",
+  host: process.env.HOST,
   port: 5432,
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
@@ -25,21 +25,22 @@ const TEST_USER = "mocha_test_user";
 // ********************** DEFAULT WELCOME TESTCASE ****************************
 
 describe("Server!", () => {
-  // Sample test case given to test / endpoint.
-  it("Returns the default welcome message", (done) => {
-    chai
-      .request(server)
-      .get("/welcome")
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals("success");
-        assert.strictEqual(res.body.message, "Welcome!");
-        done();
-      });
-  });
-});
+   // Sample test case given to test / endpoint.
+   it("Returns the default welcome message", (done) => {
+     chai
+       .request(server)
+       .get("/welcome")
+       .end((err, res) => {
+         expect(res).to.have.status(200);
+         expect(res.body.status).to.equals("success");
+         assert.strictEqual(res.body.message, "Welcome!");
+         done();
+       });
+   });
+ });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
+
 
 // Example Positive Testcase :
 // API: /add_user
@@ -74,6 +75,7 @@ describe('Testing Add User API', () => {
   // Result: This test case should pass and return a status 400 along with a "Invalid input" message.
   // Explanation: The testcase will call the /add_user API with the following invalid inputs
   // and expects the API to return a status of 400 along with the "Invalid input" message.
+
   it("Negative : /register. Checking duplicate username.", (done) => {
     chai
       .request(server)
@@ -85,6 +87,7 @@ describe('Testing Add User API', () => {
       .end((err, res) => {
         expect(res).to.have.status(400);
         expect(res.text).to.include("Username already exists. Please choose another one.");
+        //BROKEN CHECKS BELOW
         //expect(res.body.status).to.equal("error");
         //expect(res.body.message).to.match(/username already exists/i);
         done();
@@ -98,6 +101,7 @@ describe("Testing User Login User API", () => {
   it("positive : /login. Checking letting user log in.", (done) => {
     chai
       .request(server)
+      .post("/login")
       .post("/login")
       .type('form')
       .send({username: 'John Doe', password: 'TestPassword123!'})
@@ -118,6 +122,7 @@ describe("Testing User Login User API", () => {
 // Result: This test case should pass and return a status 400 along with a "Invalid input" message.
 // Explanation: The testcase will call the /add_user API with the following invalid inputs
 // and expects the API to return a status of 400 along with the "Invalid input" message.
+
 it('Negative : /login. Checking incorrect passowrd.', done => {
   chai
     .request(server)
@@ -131,5 +136,6 @@ it('Negative : /login. Checking incorrect passowrd.', done => {
     });
 });
 });
+
 // ********************************************************************************
 

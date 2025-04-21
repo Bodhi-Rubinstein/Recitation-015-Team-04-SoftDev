@@ -1,98 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deck Builder</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- include bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/resources/css/deckBuilder.css"> <!-- include custom stylesheet -->
+  <script src="/resources/js/deckbuilder.js"></script>
+  <style>
+    body {
+      background-color: #001f3f; /* Dark blue background */
+      color: white; /* Default text color for contrast */
+    }
+
+    .form-container {
+      background-color: #00509e; /* Slightly lighter blue for the form */
+      border: 2px solid #40E0D0; /* Turquoise border */
+      border-radius: 10px; /* Rounded corners */
+      padding: 20px; /* Add padding inside the form */
+      color: white; /* White text for contrast */
+    }
+
+    .form-select, .form-control {
+      background-color: white; /* White background for inputs */
+      color: black; /* Black text for readability */
+      border: 2px solid #40E0D0; /* Turquoise border */
+    }
+
+    .btn-primary {
+      background-color: #40E0D0; /* Turquoise button */
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #00509e; /* Darker blue on hover */
+    }
+  </style>
 </head>
 <body>
-<div class="container my-5">
-  <h2 class="mb-4">Deck Builder</h2>
+  <div class="container my-5">
+    <h2 class="text-center mb-4">Deck Builder</h2>
   <div id="deckPreview" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
     <!-- Preview card images inserted here -->
   </div>
-  <form action="/deckbuilder" method="POST">
-    <div class="mb-3">
-      <label for="deckName" class="form-label">Deck name (optional)</label>
-      <input
-        id="deckName"
-        name="deckName"
-        class="form-control"
-        placeholder="e.g. NBA All-Stars"
-      />
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <label for="card1" class="form-label">Card 1</label>
-        <select id="card1" name="card1" class="form-select" required>
-          <option value="">Select a card</option>
-
-          {{#each availableCards}}
-
-            <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}}
-              (Atk:
-              {{this.attack}}, Def:
-              {{this.defense}})</option>
-          {{/each}}
-        </select>
+    <form action="/deckbuilder" method="POST" class="form-container">
+      <div class="mb-3">
+        <label for="deckName" class="form-label">Deck Name (Optional)</label>
+        <input
+          id="deckName"
+          name="deckName"
+          class="form-control"
+          placeholder="e.g. NBA All-Stars"
+        />
       </div>
-      <div class="col">
-        <label for="card2" class="form-label">Card 2</label>
-        <select id="card2" name="card2" class="form-select" required>
-          <option value="">Select a card</option>
-          {{#each availableCards}}
-            <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}}
-              (Atk:
-              {{this.attack}}, Def:
-              {{this.defense}})</option>
-          {{/each}}
-        </select>
+      <div class="row mb-3">
+        <div class="col">
+          <label for="card1" class="form-label">Card 1</label>
+          <select id="card1" name="card1" class="form-select" required>
+            <option value="">Select a card</option>
+            {{#each availableCards}}
+              <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}} (Atk: {{this.attack}}, Def: {{this.defense}})</option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="col">
+          <label for="card2" class="form-label">Card 2</label>
+          <select id="card2" name="card2" class="form-select" required>
+            <option value="">Select a card</option>
+            {{#each availableCards}}
+              <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}} (Atk: {{this.attack}}, Def: {{this.defense}})</option>
+            {{/each}}
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <label for="card3" class="form-label">Card 3</label>
-        <select id="card3" name="card3" class="form-select" required>
-          <option value="">Select a card</option>
-          {{#each availableCards}}
-            <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}}
-              (Atk:
-              {{this.attack}}, Def:
-              {{this.defense}})</option>
-          {{/each}}
-        </select>
+      <div class="row mb-3">
+        <div class="col">
+          <label for="card3" class="form-label">Card 3</label>
+          <select id="card3" name="card3" class="form-select" required>
+            <option value="">Select a card</option>
+            {{#each availableCards}}
+              <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}} (Atk: {{this.attack}}, Def: {{this.defense}})</option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="col">
+          <label for="card4" class="form-label">Card 4</label>
+          <select id="card4" name="card4" class="form-select" required>
+            <option value="">Select a card</option>
+            {{#each availableCards}}
+              <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}} (Atk: {{this.attack}}, Def: {{this.defense}})</option>
+            {{/each}}
+          </select>
+        </div>
       </div>
-      <div class="col">
-        <label for="card4" class="form-label">Card 4</label>
-        <select id="card4" name="card4" class="form-select" required>
-          <option value="">Select a card</option>
-          {{#each availableCards}}
-            <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}}
-              (Atk:
-              {{this.attack}}, Def:
-              {{this.defense}})</option>
-          {{/each}}
-        </select>
+      <div class="row mb-3">
+        <div class="col">
+          <label for="card5" class="form-label">Card 5</label>
+          <select id="card5" name="card5" class="form-select" required>
+            <option value="">Select a card</option>
+            {{#each availableCards}}
+              <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}} (Atk: {{this.attack}}, Def: {{this.defense}})</option>
+            {{/each}}
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <label for="card5" class="form-label">Card 5</label>
-        <select id="card5" name="card5" class="form-select" required>
-          <option value="">Select a card</option>
-          {{#each availableCards}}
-            <option value="{{this.id}}" data-image="{{this.image_url}}">{{this.name}}
-              (Atk:
-              {{this.attack}}, Def:
-              {{this.defense}})</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Create Deck</button>
-  </form>
-</div>
-
-<script src="/resources/js/deckbuilder.js"></script>
+      <button type="submit" class="btn btn-primary w-100">Create Deck</button>
+    </form>
+  </div>
 
 </body>
+</html>

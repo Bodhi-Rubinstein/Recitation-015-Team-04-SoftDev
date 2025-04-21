@@ -43,6 +43,22 @@
       border-radius: 5px; /* Rounded corners */
       display: inline-block; /* Ensure the box wraps only around the text */
     }
+    .tutorial-link {
+      display: block; /* Make the link a block element */
+      margin-top: 20px; /* Add spacing above the link */
+      text-align: center; /* Center the link */
+      color: white; /* White text for the link */
+      font-weight: bold; /* Make the link text bold */
+      text-decoration: none; /* Remove underline */
+      padding: 10px 20px; /* Add padding to the link */
+      background-color: #8134ed; /* Turquoise background */
+      border-radius: 5px; /* Rounded corners */
+      transition: background-color 0.3s ease; /* Smooth hover effect */
+    }
+    .tutorial-link:hover {
+      background-color: #00509e; /* Darker blue on hover */
+      color: white; /* Keep text white on hover */
+    }
   </style>
 </head>
 <body>
@@ -60,6 +76,7 @@
       <p class="card-text">
         <span class="money-box">Money:</span> {{user.money}} 💰
       </p>
+      <a href="/tutorial" class="tutorial-link">Go to Tutorial</a>
     </div>
   </div>
 </main>
