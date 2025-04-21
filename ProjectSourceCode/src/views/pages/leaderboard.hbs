@@ -1,5 +1,68 @@
 <!--ChatGPT prompt: write html code using bootstrap to make a table with these columns: rank (number), name, best player, and number of battles won
 (edited to be dynamically loaded with handlebars, and sylistic choices)-->
+
+<!-- ChatGPT prompt: how to edit these code snippets to make the table match the rest of the theme better: (again edited for some stylistic choices-->
+<style>
+    body {
+        background-color: #001f3f;
+        /* Dark blue background */
+        color: white;
+    }
+
+    .btn-primary {
+        background-color: #0dae9e;
+        border: none;
+    }
+
+    /* Table styling to better match the dark theme */
+    .table {
+        color: white;
+        background-color: #003366;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #002b5c;
+    }
+
+    .table-bordered td {
+        border-top: none;
+        border-bottom: none;
+    }
+
+    .table-bordered th {
+        border-bottom: 2px solid #0dae9e;
+        /* Keep a highlight under the header */
+    }
+
+
+    .table-info {
+        background-color: #0dae9e !important;
+        color: #001f3f !important;
+    }
+
+    .badge.bg-info.text-dark {
+        background-color: #ffc107 !important;
+        /* Gold-ish highlight */
+        color: #001f3f !important;
+        font-weight: bold;
+    }
+
+    .table thead tr {
+        background-color: #0dae9e !important;
+    }
+
+    .table thead th {
+        background-color: #0dae9e !important;
+        color: #001f3f !important;
+        border-bottom: 2px solid #0dae9e;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+    }
+</style>
+
 <div class="container mt-4">
     <h2 class="text-center mb-4">Leaderboard</h2>
 
@@ -33,12 +96,12 @@
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
-            <thead class="table-info">
+            <thead>
                 <tr>
                     <th scope="col">Rank</th>
                     <th scope="col">Name</th>
                     <th scope="col">Best Player</th>
-                    <th scope="col">Trophies</th> <!-- equivalent to best_player_rank everywhere else-->
+                    <th scope="col">Trophies</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +110,8 @@
                     <td>{{rank}}</td>
                     <!-- chatGPT prompt: how can i make it so the row color changes if the user which is currently logged in is on the leaderboard (edited a lot, chatGPT suggestion to use a badge-->
                     <td>
-                        {{name}} {{#if (eq this.name ../currentUser)}}
+                        {{name}}
+                        {{#if (eq this.name ../currentUser)}}
                         <span class="badge bg-info text-dark">You</span>
                         {{/if}}
                     </td>
@@ -59,6 +123,7 @@
             </tbody>
         </table>
     </div>
+
 </div>
 
 

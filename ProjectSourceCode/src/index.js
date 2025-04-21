@@ -147,7 +147,9 @@ app.post("/login", async (req, res) => {
       //if user DNE
       return res.render("pages/register", {
         message: "Username does not exist. Please make an account.",
+        error: true,
       });
+      
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -159,7 +161,9 @@ app.post("/login", async (req, res) => {
       //render login again
       res
         .status(400)
-        .render("pages/login", { message: "Incorrect username or password" });
+        .render("pages/login", { message: "Incorrect username or password",
+          error: true,
+        });
     }
   } catch (error) {
     console.error(error);
@@ -175,14 +179,18 @@ app.post("/register", async (req, res) => {
   const passwordError = validatePassword(password);
   if (passwordError) {
 
-    return res.render("pages/register", { message: passwordError }); 
+    return res.render("pages/register", { message: passwordError,
+      error: true,
+    }); 
   }
 
   if (!username || !password) {
     if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
-        .json({ status: "error", message: "Missing field" });
+        .json({ status: "error", message: "Missing field" ,
+          error: true,
+        });
     }
     return res.redirect("/register"); // normal browser flow
   }
@@ -200,12 +208,14 @@ app.post("/register", async (req, res) => {
     if (req.get("X-Test-Env") === "1") {
       return res
         .status(400)
-        .json({ status: "error", message: "Username already exists" });
+        .json({ status: "error", message: "Username already exists" ,
+          error: true,
+        });
     }
     return res.status(400).render("pages/register", {
 
       message: "Username already exists. Please choose another one.",
-
+        error: true,
     });
   }
 
@@ -231,7 +241,9 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     console.error(error);
     if (req.get("X-Test-Env") === "1") {
-      return res.status(400).json({ status: "error", message: error.message });
+      return res.status(400).json({ status: "error", message: error.message,
+        error: true,
+       });
     }
     return res.redirect("/register");
     return res.redirect("/register");
@@ -313,6 +325,7 @@ app.post("/open-pack", auth, async (req, res) => {
       res.json({
         success: false,
         message: "You do not have enough money to open a pack.",
+        error: true,
       });
     }
   } catch (error) {
@@ -320,6 +333,7 @@ app.post("/open-pack", auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred. Please try again later.",
+      error: true,
     });
   }
 });
@@ -1244,7 +1258,8 @@ app.delete("/trades/:tradeId/reject", async (req, res) => {
   try {
     const { tradeId } = req.params;
     await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res.status(200).json({ message: "Trade rejected" });
+    res.status(200).json({ message: "Trade rejected",
+    });
   } catch (err) {
     console.error(err);
     //res.status(500).send("Server error");
