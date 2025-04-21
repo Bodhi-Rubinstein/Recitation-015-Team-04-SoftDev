@@ -102,7 +102,6 @@ describe("Testing User Login User API", () => {
     chai
       .request(server)
       .post("/login")
-      .post("/login")
       .type('form')
       .send({username: 'John Doe', password: 'TestPassword123!'})
 

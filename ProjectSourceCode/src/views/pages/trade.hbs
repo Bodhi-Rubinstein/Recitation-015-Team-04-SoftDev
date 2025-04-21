@@ -23,51 +23,29 @@
   <div class="container mt-4">
     <h2 class="text-center mb-4">Trade System</h2>
     <div class="row">
-      <!-- Trade Modal Button -->
-      <div class="col-md-3">
-        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#tradeModal">Propose Trade</button>
-      </div>
 
-      <!-- Pending Trades Section -->
-      <div class="col-md-9">
-        <!-- Outgoing Trades -->
-        <h3>Outgoing Trades</h3>
-        <ul class="list-group mb-4" id="outgoingTrades">
-          {{#each outgoing_trades}}
-          <li class="list-group-item">
-            <strong>To:</strong> {{this.to_user}} |
-            <strong>Card Offered:</strong> {{this.offer_card}} |
-            <strong>Card Requested:</strong> {{this.request_card}}
-          </li>
-          {{/each}}
-        </ul>
+      <!-- content of trading page-->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- trade modal -->
+            <div class="col-md-3">
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#tradeModal">Propose Trade</button>
+            </div>
 
-        <!-- Incoming Trades -->
-        <h3>Incoming Trades</h3>
-        <ul class="list-group mb-4" id="incomingTrades">
-          {{#each incoming_trades}}
-          <li class="list-group-item">
-            <strong>From:</strong> {{this.from_user}} |
-            <strong>Card Offered:</strong> {{this.offer_card}} |
-            <strong>Card Requested:</strong> {{this.request_card}}
-          </li>
-          {{/each}}
-        </ul>
-
-        <!-- Accepted Trades -->
-        <h3>Accepted Trades</h3>
-        <ul class="list-group mb-4" id="acceptedTrades">
-          {{#each accepted_trades}}
-          <li class="list-group-item">
-            <strong>With:</strong> {{this.trade_partner}} |
-            <strong>Card You Gave:</strong> {{this.given_card}} |
-            <strong>Card You Received:</strong> {{this.received_card}}
-          </li>
-          {{/each}}
-        </ul>
-      </div>
+            <!-- pending trades page -->
+            <div class="col-md-9">
+                <!-- Outgoing trades from the current user -->
+                <h3>Outgoing Trades</h3>
+                <ul class="list-group mb-4" id="outgoingTrades"></ul>
+                <!-- Incoming trades to the current user -->
+                <h3>Incoming Trades</h3>
+                <ul class="list-group mb-4" id="incomingTrades"></ul>
+                <!-- Accepted trades from current user-->
+                <h3>Accepted Trades</h3>
+                <ul class="list-group mb-4" id="acceptedTrades"></ul>
+            </div>
+        </div>
     </div>
-  </div>
 
   <!-- Trade Modal -->
   <div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
