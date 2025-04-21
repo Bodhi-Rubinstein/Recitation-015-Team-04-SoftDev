@@ -241,7 +241,9 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     console.error(error);
     if (req.get("X-Test-Env") === "1") {
-      return res.status(400).json({ status: "error", message: error.message });
+      return res.status(400).json({ status: "error", message: error.message,
+        error: true,
+       });
     }
     return res.redirect("/register");
     return res.redirect("/register");
@@ -323,6 +325,7 @@ app.post("/open-pack", auth, async (req, res) => {
       res.json({
         success: false,
         message: "You do not have enough money to open a pack.",
+        error: true,
       });
     }
   } catch (error) {
@@ -330,6 +333,7 @@ app.post("/open-pack", auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred. Please try again later.",
+      error: true,
     });
   }
 });
@@ -1128,7 +1132,8 @@ app.delete("/trades/:tradeId/reject", async (req, res) => {
   try {
     const { tradeId } = req.params;
     await db.query("DELETE FROM trades WHERE id = $1", [tradeId]);
-    res.status(200).json({ message: "Trade rejected" });
+    res.status(200).json({ message: "Trade rejected",
+    });
   } catch (err) {
     console.error(err);
     //res.status(500).send("Server error");
