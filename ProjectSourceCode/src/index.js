@@ -214,7 +214,7 @@ app.post("/register", async (req, res) => {
 
     // Initialize the user with some default cards
     // Initialize the user with some default cards
-    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 138), ($1, 198), ($1, 197), ($1, 183), ($1, 181);`;
+    let initCardsQuery = `INSERT INTO cardsToUsers (username_id, card_id) VALUES ($1, 35), ($1, 45), ($1, 55), ($1, 65), ($1, 75);`;
     await db.none(initCardsQuery, [username]);
 
     /*
@@ -286,7 +286,7 @@ app.post("/open-pack", auth, async (req, res) => {
       await db.none(updateMoneyQuery, [username]);
 
       //get 5 random cards
-      const randomCardsQuery = `SELECT id, name 
+      const randomCardsQuery = `SELECT id, name, image_url 
         FROM cards 
         ORDER BY RANDOM() 
         LIMIT 5;
@@ -307,7 +307,7 @@ app.post("/open-pack", auth, async (req, res) => {
       res.json({
         success: true,
         message: "Pack opened successfully!",
-        packContents: randomCards.map((card) => card.name), // Send back the names of the cards
+        packContents: randomCards.map((card) => ({id: card.id, name: card.name, image_url: card.image_url})), // Send back the names of the cards
       });
     } else {
       res.json({
@@ -335,7 +335,7 @@ app.get("/collection", auth, async (req, res) => {
 
     // Query the DB for all cards this user owns
     const userCardsQuery = `
-      SELECT c.id, c.name, c.sport, c.attack, c.defense, c.health, c.overall
+      SELECT c.id, c.name, c.sport, c.attack, c.defense, c.health, c.overall, c.image_url
       FROM cards c
       JOIN cardsToUsers cu ON c.id = cu.card_id
       WHERE cu.username_id = $1
@@ -974,7 +974,9 @@ app.get("/trades/:username", async (req, res) => {
         t.card2_owner,
         t.trade_status,
         c1.name AS offer_name,
-        c2.name AS request_name
+        c2.name AS request_name,
+        c1.image_url AS offer_image,
+        c2.image_url AS request_image
         FROM trades t
         JOIN cards c1 ON t.card1_id = c1.id
         JOIN cards c2 ON t.card2_id = c2.id
@@ -1033,6 +1035,58 @@ app.get("/trades/:username", async (req, res) => {
   }
 
   return null;*/
+});
+
+// in order to get the actaul player stats for the buttons in colections tab not just the game moves
+app.get("/player/details/:id", auth, async (req, res) => {
+  const cardId = req.params.id;
+  try {
+    const query = `
+      SELECT 
+        c.id AS card_id,
+        c.name AS card_name,
+        c.sport,
+        c.attack,
+        c.defense,
+        c.health,
+        c.overall,
+        nb.id AS nba_id,
+        nb.player_name,
+        nb.league,
+        nb.team_abbreviation,
+        nb.age,
+        nb.player_height,
+        nb.player_weight,
+        nb.college,
+        nb.country,
+        nb.draft_year,
+        nb.draft_round,
+        nb.draft_number,
+        nb.gp,
+        nb.pts,
+        nb.reb,
+        nb.ast,
+        nb.net_rating,
+        nb.oreb_pct,
+        nb.dreb_pct,
+        nb.usg_pct,
+        nb.ts_pct,
+        nb.ast_pct,
+        nb.season
+      FROM cards c
+      LEFT JOIN nbaPlayersToCards np2c ON c.id = np2c.card_id
+      LEFT JOIN nbaPlayers nb ON np2c.player_id = nb.id
+      WHERE c.id = $1;
+    `;
+    const result = await db.oneOrNone(query, [cardId]);
+    if (!result) {
+      return res.status(404).json({ error: "Player not found" });
+    }
+    res.json(result);
+  }catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error retrieving player details" });
+    }
 });
 
 // Add this to your index.js along with your other routes.

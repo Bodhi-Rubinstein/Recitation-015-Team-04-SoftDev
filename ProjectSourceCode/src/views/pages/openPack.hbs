@@ -24,10 +24,11 @@
       height: auto; /* Maintain aspect ratio */
     }
   </style>
+  <link rel="stylesheet" href="../resources/css/openPack.css"> <!-- include custom stylesheet -->
 </head>
 <body>
   <main class="container mt-4">
-    <div class="card mx-auto" style="max-width: 600px;">
+    <div class="card mx-auto" style="max-width: 1000px;">
       <div class="card-body text-center">
         <h1 class="card-title mb-4">Open Pack</h1>
         <p>Click the chest below to open a pack!</p>
@@ -79,27 +80,47 @@
 
           // Create a row to contain the cards
           const row = document.createElement('div');
-          row.className = 'row justify-content-center';
+          row.className = 'row justify-content-center flex-wrap gap-3';
 
           // Loop through each received card name and build a card element for it
-          data.packContents.forEach(cardName => {
+          // Append all cards first (as face-down)
+          data.packContents.forEach((card, index) => {
             const col = document.createElement('div');
-            col.className = 'col-12 col-md-4 col-lg-3 mb-3';
+            col.className = 'card-slot';
+            col.style.width = '180px';
 
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'card h-100';
+            cardDiv.className = 'flip-card';
 
-            // Create the card body
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
-            const h5 = document.createElement('h5');
-            h5.className = 'card-title';
-            h5.textContent = cardName;
-            cardBody.appendChild(h5);
-            cardDiv.appendChild(cardBody);
+            const inner = document.createElement('div');
+            inner.className = 'flip-card-inner face-down'; // Start hidden
 
+            // Front (card back image)
+            const front = document.createElement('div');
+            front.className = 'flip-card-front';
+            front.innerHTML = `<img src="../resources/img//cards/card_back.png" class="card-img" alt="Back">`;
+
+            // Back (actual card)
+            const back = document.createElement('div');
+            back.className = 'flip-card-back';
+            back.innerHTML = `<img src="../resources/img/cards/${card.image_url}" class="card-img glow-border" alt="${card.name}">`;
+
+            inner.appendChild(front);
+            inner.appendChild(back);
+            cardDiv.appendChild(inner);
             col.appendChild(cardDiv);
             row.appendChild(col);
+          
+
+          
+          cardDiv.style.opacity=0.5;
+            // Delay reveal
+            setTimeout(() => {
+              inner.classList.remove('face-down');
+              inner.classList.add('flipped');
+              cardDiv.style.transtion = 'opacity 0.4s'
+              cardDiv.style.opacity = 1
+            }, 1000 + 800 * index); // 800ms delay between cards
           });
 
           // Append the row of cards to the packContents container
