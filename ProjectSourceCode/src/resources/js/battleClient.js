@@ -59,28 +59,61 @@
     )} | DEF ${state.bot.defense}`;
   }
 
-  // Roll Dice (only once)
-  els.rollBtn.onclick = () => {
-    const u = window.rollDiceMultiplier(),
-      b = window.rollDiceMultiplier();
+  // floating damage popup helper
+  function showDamagePopup(barEl, text, isCrit) {
+    const col = barEl.parentElement.parentElement; // .col wrapper
+    col.style.position = 'relative';
+
+    const popup = document.createElement('div');
+    popup.textContent = text;
+    popup.style.position = 'absolute';
+    popup.style.left = '50%';
+    popup.style.bottom = '-2rem';
+    popup.style.transform = 'translateX(-50%)';
+    popup.style.pointerEvents = 'none';
+    popup.style.color = 'red';
+    popup.style.fontSize = '1.25rem';
+    popup.style.fontWeight = isCrit ? 'bold' : 'normal';
+    popup.style.transition = 'all 0.6s ease-out';
+    popup.style.opacity = '1';
+    popup.style.zIndex = '10';
+
+    col.appendChild(popup);
+    requestAnimationFrame(() => {
+      popup.style.bottom = '-3rem';
+      popup.style.opacity = '0';
+    });
+    setTimeout(() => col.removeChild(popup), 600);
+  }
+
+
+   // Roll Dice (only once), now with miss/crit
+   els.rollBtn.onclick = () => {
+    const u = window.rollAttackOutcome();
+    const b = window.rollAttackOutcome();
+
     state.user.mult = u.multiplier;
-    state.bot.mult = b.multiplier;
-    updateStats(); // update displayed stats with boosted attack
-    appendLog(
-      `You rolled ${u.roll} (x${u.multiplier}). ${
-        state.user.name
-      }'s attack increased from ${state.user.attack} to ${Math.round(
-        state.user.attack * state.user.mult
-      )}.`
-    );
-    appendLog(
-      `Bot rolled ${b.roll} (x${b.multiplier}). ${
-        state.bot.name
-      }'s attack increased from ${state.bot.attack} to ${Math.round(
-        state.bot.attack * state.bot.mult
-      )}.`
-    );
-    // Disable the roll button so the player can only roll once.
+    state.bot.mult  = b.multiplier;
+
+    updateStats();
+
+    const userMsg =
+      u.type === "miss" ?
+        "MISSED!" :
+      u.type === "crit" ?
+        "CRITICAL STRIKE!" :
+        `x${u.multiplier.toFixed(2)}`;
+
+    const botMsg =
+      b.type === "miss" ?
+        "MISSED!" :
+      b.type === "crit" ?
+        "CRITICAL STRIKE!" :
+        `x${b.multiplier.toFixed(2)}`;
+
+    appendLog(`You rolled ${u.roll} → ${userMsg}`);
+    appendLog(`Bot rolled ${b.roll} → ${botMsg}`);
+
     els.rollBtn.disabled = true;
     els.rollBtn.classList.add("disabled");
   };
@@ -97,16 +130,31 @@
       endRound();
       return;
     }
-    const userDmg =
-      state.user.attack * state.user.mult * (1 - state.bot.defense / 100);
-    const botDmg =
-      state.bot.attack * state.bot.mult * (1 - state.user.defense / 100);
-    state.bot.hp -= userDmg;
+    const u = window.rollAttackOutcome();
+    const b = window.rollAttackOutcome();
+
+    if (u.type === "miss")    appendLog(`${state.user.name} MISSES!`);
+    else if (u.type === "crit") appendLog(`${state.user.name} CRITICAL STRIKE!`);
+
+    if (b.type === "miss")    appendLog(`${state.bot.name} MISSES!`);
+    else if (b.type === "crit") appendLog(`${state.bot.name} CRITICAL STRIKE!`);
+
+    const userDmg = state.user.attack * u.multiplier * (1 - state.bot.defense / 100);
+    const botDmg  = state.bot.attack  * b.multiplier * (1 - state.user.defense / 100);
+
+
+    state.bot.hp  -= userDmg;
     state.user.hp -= botDmg;
+
+
+    //show damage popup
+    showDamagePopup(els.botHP,  `${u.type === 'crit' ? 'CRIT ' : ''}-${Math.round(userDmg)}HP`, u.type === 'crit');
+    showDamagePopup(els.userHP, `${b.type === 'crit' ? 'CRIT ' : ''}-${Math.round(botDmg)}HP`, b.type === 'crit');
+
+
+
     appendLog(
-      `${state.user.name} hits ${userDmg.toFixed(1)} | ${
-        state.bot.name
-      } hits ${botDmg.toFixed(1)}`
+      `${state.user.name} hits ${userDmg.toFixed(1)} | ${state.bot.name} hits ${botDmg.toFixed(1)}`
     );
     updateBars();
 

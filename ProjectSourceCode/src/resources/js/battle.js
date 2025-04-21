@@ -1,43 +1,62 @@
 // battle.js
 
-// Helper function: Simulate a dice roll and return a multiplier.
-function rollDiceMultiplier() {
-  const roll = Math.floor(Math.random() * 6) + 1; // returns 1 to 6
-  const mapping = {
-    1: 0.5,
-    2: 0.75,
-    3: 1.0,
-    4: 1.25,
-    5: 1.5,
-    6: 2.0,
-  };
-  return { roll, multiplier: mapping[roll] };
+function rollAttackOutcome() {
+  const roll = Math.floor(Math.random() * 100) + 1; // 1–100
+  let type, multiplier;
+
+  if (roll <= 10) {          // 10% miss chance
+    type = "miss";
+    multiplier = 0;
+  } else if (roll >= 96) {   // 5% crit chance
+    type = "crit";
+    multiplier = 2;
+  } else {
+    type = "normal";
+    // slight variance on normal hits: 0.85×–1.15×
+    multiplier = 1 + (Math.random() * 0.3 - 0.15);
+  }
+
+  return { roll, type, multiplier };
 }
+
+function rollDiceMultiplier() {
+  const { roll, multiplier } = rollAttackOutcome();
+  return { roll, multiplier };
+}
+
 
 // Simulate a one-on-one fight between two cards.
 function simulateCardFight(userCard, botCard) {
   let userHealth = userCard.health;
   let botHealth = botCard.health;
-
-  // Roll dice once for each card at the beginning of the round.
-  const userDice = rollDiceMultiplier();
-  const botDice = rollDiceMultiplier();
-
-  let roundLog = `User's "${userCard.name}" rolled ${userDice.roll} (x${userDice.multiplier}) vs. Bot's "${botCard.name}" rolled ${botDice.roll} (x${botDice.multiplier}).\n`;
+  let roundLog = "";
 
   // Continue the fight until one or both cards run out of health.
   while (userHealth > 0 && botHealth > 0) {
+    const userOutcome = rollAttackOutcome();
+    const botOutcome  = rollAttackOutcome();
+
+    // Log misses/crits
+    if (userOutcome.type === "miss") {
+      roundLog += `User's \"${userCard.name}\" missed!\n`;
+    } else if (userOutcome.type === "crit") {
+      roundLog += `User's \"${userCard.name}\" lands a CRITICAL HIT!\n`;
+    }
+    if (botOutcome.type === "miss") {
+      roundLog += `Bot's \"${botCard.name}\" missed!\n`;
+    } else if (botOutcome.type === "crit") {
+      roundLog += `Bot's \"${botCard.name}\" lands a CRITICAL HIT!\n`;
+    }
+
     const userDamage =
-      userCard.attack * userDice.multiplier * (1 - botCard.defense / 100);
-    const botDamage =
-      botCard.attack * botDice.multiplier * (1 - userCard.defense / 100);
+      userCard.attack * userOutcome.multiplier * (1 - botCard.defense / 100);
+    const botDamage  =
+      botCard.attack  * botOutcome.multiplier * (1 - userCard.defense / 100);
 
     userHealth -= botDamage;
-    botHealth -= userDamage;
+    botHealth  -= userDamage;
 
-    roundLog += `User's "${userCard.name}" deals ${userDamage.toFixed(
-      2
-    )} damage; Bot's "${botCard.name}" deals ${botDamage.toFixed(2)} damage.\n`;
+    roundLog += `User deals ${userDamage.toFixed(2)} damage; Bot deals ${botDamage.toFixed(2)} damage.\n`;
   }
 
   let result;
@@ -184,4 +203,20 @@ async function recordFinishedBattle(
 }
 if (typeof module !== "undefined") {
   module.exports.recordFinishedBattle = recordFinishedBattle;
+}
+
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    rollAttackOutcome,
+    rollDiceMultiplier,   // backward compatibility
+    simulateCardFight,
+    simulateBattle,
+    recordFinishedBattle,
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.rollAttackOutcome = rollAttackOutcome;
+  window.rollDiceMultiplier = rollDiceMultiplier;
 }
