@@ -250,7 +250,49 @@ app.post("/register", async (req, res) => {
   }
 });
 
+app.use(async (req, res, next) => {
+  if (req.session && req.session.user) {
+    try {
+      // Fetch the updated overall, trophies, and money from the database
+      const userStats = await db.one(
+        `SELECT overall, trophies, money FROM users WHERE username = $1`,
+        [req.session.user.username]
+      );
 
+      // Recalculate the user's overall
+      const overallQuery = `
+        SELECT AVG(c.overall) AS overall
+        FROM cards c
+        JOIN cardsToUsers cu ON c.id = cu.card_id
+        WHERE cu.username_id = $1;
+      `;
+      const overallResult = await db.one(overallQuery, [
+        req.session.user.username,
+      ]);
+      const overall = Math.round(overallResult.overall || 0);
+
+      // Update the user's overall in the database
+      await db.none(`UPDATE users SET overall = $1 WHERE username = $2`, [
+        overall,
+        req.session.user.username,
+      ]);
+
+      // Update session user with the latest stats
+      req.session.user.overall = overall;
+      req.session.user.trophies = userStats.trophies;
+      req.session.user.money = userStats.money;
+
+      // Make the updated user object available to all views
+      res.locals.user = req.session.user;
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.locals.user = req.session.user; // Fall back on session data
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
 
 
 // Authentication Middleware.
