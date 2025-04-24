@@ -110,22 +110,13 @@
 
     updateStats();
 
-    const userMsg =
-      u.type === "miss" ?
-        "MISSED!" :
-      u.type === "crit" ?
-        "CRITICAL STRIKE!" :
-        `x${u.multiplier.toFixed(2)}`;
-
-    const botMsg =
-      b.type === "miss" ?
-        "MISSED!" :
-      b.type === "crit" ?
-        "CRITICAL STRIKE!" :
-        `x${b.multiplier.toFixed(2)}`;
-
-    appendLog(`You rolled ${u.roll} → ${userMsg}`);
-    appendLog(`Bot rolled ${b.roll} → ${botMsg}`);
+    // Show attack buff/debuff message instead of crit/miss
+    appendLog(
+      `${username} rolled ${u.roll}. Their attack ${u.multiplier > 1 ? 'increased' : 'decreased'} by x${u.multiplier.toFixed(2)}`
+    );
+    appendLog(
+      `Bot rolled ${b.roll}. Their attack ${b.multiplier > 1 ? 'increased' : 'decreased'} by x${b.multiplier.toFixed(2)}`
+    );
 
     els.rollBtn.disabled = true;
     els.rollBtn.classList.add("disabled");
@@ -139,36 +130,31 @@
   };
 
   function fightTick() {
-    if (state.user.hp <= 0 || state.bot.hp <= 0) {
-      endRound();
-      return;
-    }
+    if (state.user.hp <= 0 || state.bot.hp <= 0) { endRound(); return; }
+
+    // per‑hit variance / crit / miss
     const u = window.rollAttackOutcome();
     const b = window.rollAttackOutcome();
 
-    if (u.type === "miss")    appendLog(`${state.user.name} MISSES!`);
-    else if (u.type === "crit") appendLog(`${state.user.name} CRITICAL STRIKE!`);
+    if (u.type === 'miss') appendLog(`${state.user.name} MISSES!`);
+    else if (u.type === 'crit') appendLog(`${state.user.name} CRITICAL STRIKE!`);
 
-    if (b.type === "miss")    appendLog(`${state.bot.name} MISSES!`);
-    else if (b.type === "crit") appendLog(`${state.bot.name} CRITICAL STRIKE!`);
+    if (b.type === 'miss') appendLog(`${state.bot.name} MISSES!`);
+    else if (b.type === 'crit') appendLog(`${state.bot.name} CRITICAL STRIKE!`);
 
-    const userDmg = state.user.attack * u.multiplier * (1 - state.bot.defense / 100);
-    const botDmg  = state.bot.attack  * b.multiplier * (1 - state.user.defense / 100);
+    // include persistent multiplier *and* per‑hit multiplier
+    const userDmg =
+      state.user.attack * state.user.mult * u.multiplier * (1 - state.bot.defense / 100);
+    const botDmg  =
+      state.bot.attack  * state.bot.mult  * b.multiplier * (1 - state.user.defense / 100);
 
-
-    state.bot.hp  -= userDmg;
+    state.bot.hp -= userDmg;
     state.user.hp -= botDmg;
 
-
-    //show damage popup
-    showDamagePopup(els.botHP,  `${u.type === 'crit' ? 'CRIT ' : ''}-${Math.round(userDmg)}HP`, u.type === 'crit');
+    showDamagePopup(els.botHP, `${u.type === 'crit' ? 'CRIT ' : ''}-${Math.round(userDmg)}HP`, u.type === 'crit');
     showDamagePopup(els.userHP, `${b.type === 'crit' ? 'CRIT ' : ''}-${Math.round(botDmg)}HP`, b.type === 'crit');
 
-
-
-    appendLog(
-      `${state.user.name} hits ${userDmg.toFixed(1)} | ${state.bot.name} hits ${botDmg.toFixed(1)}`
-    );
+    appendLog(`${state.user.name} hits ${userDmg.toFixed(1)} | ${state.bot.name} hits ${botDmg.toFixed(1)}`);
     updateBars();
 
     setTimeout(fightTick, 600);

@@ -1,13 +1,13 @@
 // battle.js
 
 function rollAttackOutcome() {
-  const roll = Math.floor(Math.random() * 100) + 1; // 1–100
+  const roll = Math.floor(Math.random() * 6) + 1; // 1–6
   let type, multiplier;
 
-  if (roll <= 10) {          // 10% miss chance
+  if (roll === 1) {          // miss on a 1
     type = "miss";
     multiplier = 0;
-  } else if (roll >= 96) {   // 5% crit chance
+  } else if (roll === 6) {   // crit on a 6
     type = "crit";
     multiplier = 2;
   } else {
