@@ -22,3 +22,8 @@ Navigate to ProjectSourceCode
 Ensure Docker is installed on your machine
 Start up the program using docker compose up --build
 Access the website at localhost:3000
+
+Or through render:
+follow the provided link:
+
+https://recitation-015-team-04-softdev.onrender.com/ 
