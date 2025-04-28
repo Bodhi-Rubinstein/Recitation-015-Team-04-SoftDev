@@ -23,4 +23,4 @@ Clone the repository
 Navigate to ProjectSourceCode  
 Ensure Docker is installed on your machine  
 Start up the program using docker compose up --build  
-Access the website at localhost:3000  
+Access the website at localhost:3000 or online at https://recitation-015-team-04-softdev.onrender.com/
